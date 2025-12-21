@@ -353,15 +353,23 @@ def main():
                 status_text.empty()
                 progress_bar.empty()
                 
-                st.success("✅ Resume parsed successfully! Scroll down to view your complete resume profile.")
+                st.success("✅ Resume parsed successfully!")
                 st.balloons()
+                
+                # Show immediate preview
+                st.markdown("---")
+                st.info("📋 **Resume parsed!** Your complete resume profile is displayed below. Scroll down to see all details.")
+                
+                # Update has_resume check for immediate display
+                has_resume = True
                 
             except Exception as e:
                 st.error(f"❌ Error parsing resume: {e}")
                 st.info("💡 **Troubleshooting:** Please ensure your PDF contains text (not just images). Try converting your resume to a text-based PDF.")
         
         # Display comprehensive resume information
-        if has_resume:
+        # Check if resume data exists in session state (more reliable than has_resume variable)
+        if st.session_state.get('resume_data') is not None:
             resume_data = st.session_state.resume_data
             
             # Resume Statistics Dashboard
