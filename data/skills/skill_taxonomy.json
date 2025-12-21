@@ -1,0 +1,71 @@
+{
+  "programming_languages": [
+    "Python",
+    "Java",
+    "JavaScript",
+    "TypeScript",
+    "R",
+    "Scala",
+    "Go",
+    "C++",
+    "C#",
+    "SQL"
+  ],
+  "ml_frameworks": [
+    "TensorFlow",
+    "PyTorch",
+    "Keras",
+    "Scikit-learn",
+    "XGBoost",
+    "LightGBM"
+  ],
+  "data_tools": [
+    "Pandas",
+    "NumPy",
+    "Matplotlib",
+    "Seaborn",
+    "Plotly",
+    "Jupyter"
+  ],
+  "cloud_platforms": [
+    "AWS",
+    "Azure",
+    "GCP",
+    "Google Cloud"
+  ],
+  "devops": [
+    "Docker",
+    "Kubernetes",
+    "CI/CD",
+    "Git",
+    "GitHub",
+    "GitLab"
+  ],
+  "databases": [
+    "PostgreSQL",
+    "MySQL",
+    "MongoDB",
+    "Redis",
+    "Elasticsearch"
+  ],
+  "concepts": [
+    "Machine Learning",
+    "Deep Learning",
+    "Data Science",
+    "Data Analysis",
+    "Statistics",
+    "Data Structures",
+    "Algorithms",
+    "NLP",
+    "Computer Vision",
+    "MLOps"
+  ],
+  "soft_skills": [
+    "Communication",
+    "Leadership",
+    "Teamwork",
+    "Problem Solving",
+    "Project Management"
+  ]
+}
+

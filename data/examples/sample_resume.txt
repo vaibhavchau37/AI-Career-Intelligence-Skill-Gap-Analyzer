@@ -1,0 +1,40 @@
+John Doe
+Email: john.doe@email.com
+Phone: (555) 123-4567
+
+PROFESSIONAL SUMMARY
+Software engineer with 2 years of experience in Python development and data analysis. 
+Passionate about machine learning and building scalable applications.
+
+EXPERIENCE
+
+Software Engineer | Tech Company Inc. | 2021 - Present (2 years)
+- Developed Python applications for data processing
+- Built machine learning models using scikit-learn
+- Worked with SQL databases for data extraction
+- Collaborated with cross-functional teams
+
+EDUCATION
+
+Bachelor of Science in Computer Science
+State University | 2019 - 2021
+
+SKILLS
+- Python (3 years)
+- Machine Learning
+- SQL
+- Pandas
+- NumPy
+- Git
+- Data Analysis
+- Statistics
+
+PROJECTS
+- Built a recommendation system using collaborative filtering
+- Developed a data pipeline for processing large datasets
+- Created visualization dashboards using matplotlib
+
+CERTIFICATIONS
+- Coursera Machine Learning Course
+- Python for Data Science Certificate
+

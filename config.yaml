@@ -1,0 +1,48 @@
+# AI Career Intelligence & Skill Gap Analyzer - Configuration
+
+# Scoring Weights (must sum to 100)
+scoring:
+  required_skills: 40      # Weight for required skills match
+  preferred_skills: 20     # Weight for preferred skills match
+  experience: 20           # Weight for years of experience
+  education: 10            # Weight for education alignment
+  certifications: 10       # Weight for certifications/projects
+
+# Skill Matching Settings
+skill_matching:
+  similarity_threshold: 0.8    # Minimum similarity for skill match (0-1)
+  use_semantic_matching: false # Use embeddings for semantic matching (slower but more accurate)
+  fuzzy_threshold: 85          # Fuzzy matching threshold (0-100)
+
+# Job Role Settings
+job_roles:
+  data_path: "data/job_roles"
+  default_roles:
+    - "ML Engineer"
+    - "Data Scientist"
+    - "AI Researcher"
+    - "Data Engineer"
+    - "MLEngineer"
+
+# Skill Taxonomy
+skills:
+  taxonomy_path: "data/skills/skill_taxonomy.json"
+  synonyms_path: "data/skills/skill_synonyms.json"
+
+# Roadmap Generation
+roadmap:
+  default_timeline_days: 90    # 3 months default roadmap
+  prioritize_by_importance: true
+  include_resources: true
+
+# NLP Settings
+nlp:
+  model: "en_core_web_sm"      # spaCy model to use
+  batch_size: 100
+
+# Output Settings
+output:
+  top_n_roles: 5               # Number of top roles to return
+  include_explanations: true   # Include score explanations
+  format: "json"               # Output format: json, dict
+

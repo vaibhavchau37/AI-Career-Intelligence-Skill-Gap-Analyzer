@@ -1,0 +1,426 @@
+{
+  "job_roles": {
+    "ML Engineer": {
+      "description": "Machine Learning Engineer responsible for designing, building, and deploying ML models at scale",
+      "required_skills": [
+        "Python",
+        "Machine Learning",
+        "Deep Learning",
+        "Statistics",
+        "Data Structures",
+        "Algorithms",
+        "SQL",
+        "Git"
+      ],
+      "optional_skills": [
+        "TensorFlow",
+        "PyTorch",
+        "Keras",
+        "Scikit-learn",
+        "AWS",
+        "Docker",
+        "Kubernetes",
+        "MLOps",
+        "Spark",
+        "Hadoop",
+        "Apache Airflow",
+        "CI/CD",
+        "REST API",
+        "Flask",
+        "FastAPI"
+      ]
+    },
+    "Data Scientist": {
+      "description": "Data Scientist who analyzes complex data to extract insights and build predictive models",
+      "required_skills": [
+        "Python",
+        "Data Analysis",
+        "Statistics",
+        "SQL",
+        "Pandas",
+        "NumPy",
+        "Data Visualization",
+        "Machine Learning"
+      ],
+      "optional_skills": [
+        "R",
+        "Jupyter",
+        "Matplotlib",
+        "Seaborn",
+        "Plotly",
+        "Scikit-learn",
+        "TensorFlow",
+        "PyTorch",
+        "Tableau",
+        "Power BI",
+        "MongoDB",
+        "PostgreSQL",
+        "AWS",
+        "Docker",
+        "Git"
+      ]
+    },
+    "Data Analyst": {
+      "description": "Data Analyst who interprets data to help organizations make informed business decisions",
+      "required_skills": [
+        "SQL",
+        "Excel",
+        "Data Analysis",
+        "Statistics",
+        "Data Visualization",
+        "Python"
+      ],
+      "optional_skills": [
+        "Tableau",
+        "Power BI",
+        "Pandas",
+        "NumPy",
+        "R",
+        "Jupyter",
+        "Google Analytics",
+        "A/B Testing",
+        "Business Intelligence",
+        "Reporting",
+        "Dashboard Creation",
+        "ETL",
+        "AWS",
+        "Git"
+      ]
+    },
+    "AI Engineer": {
+      "description": "AI Engineer who builds and deploys artificial intelligence systems and applications",
+      "required_skills": [
+        "Python",
+        "Machine Learning",
+        "Deep Learning",
+        "Neural Networks",
+        "Statistics",
+        "Linear Algebra",
+        "Git"
+      ],
+      "optional_skills": [
+        "TensorFlow",
+        "PyTorch",
+        "Keras",
+        "Computer Vision",
+        "NLP",
+        "OpenCV",
+        "Transformer Models",
+        "BERT",
+        "GPT",
+        "Reinforcement Learning",
+        "AWS",
+        "Docker",
+        "Kubernetes",
+        "Flask",
+        "FastAPI",
+        "REST API",
+        "MLOps"
+      ]
+    },
+    "Python Developer": {
+      "description": "Python Developer who builds applications, APIs, and software solutions using Python",
+      "required_skills": [
+        "Python",
+        "Object-Oriented Programming",
+        "Data Structures",
+        "Algorithms",
+        "Git",
+        "SQL",
+        "REST API"
+      ],
+      "optional_skills": [
+        "Django",
+        "Flask",
+        "FastAPI",
+        "PostgreSQL",
+        "MongoDB",
+        "Redis",
+        "Docker",
+        "Kubernetes",
+        "AWS",
+        "Azure",
+        "GCP",
+        "CI/CD",
+        "Jenkins",
+        "Pytest",
+        "Selenium",
+        "Celery",
+        "RabbitMQ",
+        "Apache Kafka"
+      ]
+    },
+    "Data Engineer": {
+      "description": "Data Engineer who designs and builds data pipelines and infrastructure",
+      "required_skills": [
+        "Python",
+        "SQL",
+        "ETL",
+        "Data Pipelines",
+        "Database Design",
+        "Git"
+      ],
+      "optional_skills": [
+        "Apache Spark",
+        "Hadoop",
+        "Kafka",
+        "Airflow",
+        "AWS",
+        "Azure",
+        "GCP",
+        "Docker",
+        "Kubernetes",
+        "PostgreSQL",
+        "MongoDB",
+        "Redis",
+        "Pandas",
+        "PySpark"
+      ]
+    },
+    "Software Engineer": {
+      "description": "Software Engineer who develops and maintains software applications",
+      "required_skills": [
+        "Programming",
+        "Data Structures",
+        "Algorithms",
+        "Git",
+        "Software Development",
+        "Problem Solving"
+      ],
+      "optional_skills": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "React",
+        "Node.js",
+        "Docker",
+        "Kubernetes",
+        "AWS",
+        "CI/CD",
+        "REST API",
+        "Microservices",
+        "System Design"
+      ]
+    },
+    "Backend Developer": {
+      "description": "Backend Developer who builds server-side applications and APIs",
+      "required_skills": [
+        "Python",
+        "REST API",
+        "Database",
+        "Git",
+        "Backend Development"
+      ],
+      "optional_skills": [
+        "Django",
+        "Flask",
+        "FastAPI",
+        "Node.js",
+        "PostgreSQL",
+        "MongoDB",
+        "Redis",
+        "Docker",
+        "AWS",
+        "Microservices",
+        "GraphQL"
+      ]
+    },
+    "Full Stack Developer": {
+      "description": "Full Stack Developer who works on both frontend and backend",
+      "required_skills": [
+        "Python",
+        "JavaScript",
+        "HTML",
+        "CSS",
+        "Git",
+        "REST API"
+      ],
+      "optional_skills": [
+        "React",
+        "Node.js",
+        "Django",
+        "Flask",
+        "PostgreSQL",
+        "MongoDB",
+        "Docker",
+        "AWS",
+        "TypeScript",
+        "Vue.js"
+      ]
+    },
+    "DevOps Engineer": {
+      "description": "DevOps Engineer who manages infrastructure and deployment pipelines",
+      "required_skills": [
+        "Linux",
+        "Docker",
+        "CI/CD",
+        "Git",
+        "Cloud Platforms",
+        "Scripting"
+      ],
+      "optional_skills": [
+        "Kubernetes",
+        "AWS",
+        "Azure",
+        "GCP",
+        "Jenkins",
+        "Terraform",
+        "Ansible",
+        "Python",
+        "Bash",
+        "Monitoring",
+        "GitLab CI"
+      ]
+    },
+    "Cloud Engineer": {
+      "description": "Cloud Engineer who designs and manages cloud infrastructure",
+      "required_skills": [
+        "Cloud Platforms",
+        "Linux",
+        "Networking",
+        "Scripting",
+        "Git"
+      ],
+      "optional_skills": [
+        "AWS",
+        "Azure",
+        "GCP",
+        "Docker",
+        "Kubernetes",
+        "Terraform",
+        "Python",
+        "Infrastructure as Code",
+        "Monitoring"
+      ]
+    },
+    "NLP Engineer": {
+      "description": "NLP Engineer who builds natural language processing systems",
+      "required_skills": [
+        "Python",
+        "NLP",
+        "Machine Learning",
+        "Deep Learning",
+        "Statistics"
+      ],
+      "optional_skills": [
+        "Transformer Models",
+        "BERT",
+        "GPT",
+        "TensorFlow",
+        "PyTorch",
+        "spaCy",
+        "NLTK",
+        "Hugging Face",
+        "Text Processing"
+      ]
+    },
+    "Computer Vision Engineer": {
+      "description": "Computer Vision Engineer who builds image and video processing systems",
+      "required_skills": [
+        "Python",
+        "Computer Vision",
+        "Deep Learning",
+        "Image Processing",
+        "Machine Learning"
+      ],
+      "optional_skills": [
+        "OpenCV",
+        "TensorFlow",
+        "PyTorch",
+        "CNN",
+        "YOLO",
+        "Image Classification",
+        "Object Detection",
+        "AWS",
+        "Docker"
+      ]
+    },
+    "Business Analyst": {
+      "description": "Business Analyst who analyzes business data and requirements",
+      "required_skills": [
+        "Data Analysis",
+        "Excel",
+        "SQL",
+        "Business Intelligence",
+        "Communication"
+      ],
+      "optional_skills": [
+        "Python",
+        "Tableau",
+        "Power BI",
+        "Statistics",
+        "Reporting",
+        "Dashboard Creation"
+      ]
+    },
+    "Product Manager": {
+      "description": "Product Manager who manages product development and strategy",
+      "required_skills": [
+        "Product Management",
+        "Communication",
+        "Analytics",
+        "Project Management"
+      ],
+      "optional_skills": [
+        "Python",
+        "SQL",
+        "Data Analysis",
+        "Agile",
+        "Scrum",
+        "Business Intelligence"
+      ]
+    },
+    "Research Scientist": {
+      "description": "Research Scientist who conducts AI/ML research and experiments",
+      "required_skills": [
+        "Python",
+        "Machine Learning",
+        "Deep Learning",
+        "Research",
+        "Statistics",
+        "Mathematics"
+      ],
+      "optional_skills": [
+        "TensorFlow",
+        "PyTorch",
+        "Research Papers",
+        "Experimentation",
+        "NLP",
+        "Computer Vision"
+      ]
+    }
+  },
+  "skill_categories": {
+    "programming_languages": [
+      "Python",
+      "Java",
+      "JavaScript",
+      "R",
+      "SQL"
+    ],
+    "ml_frameworks": [
+      "TensorFlow",
+      "PyTorch",
+      "Keras",
+      "Scikit-learn"
+    ],
+    "data_tools": [
+      "Pandas",
+      "NumPy",
+      "Matplotlib",
+      "Seaborn"
+    ],
+    "cloud_platforms": [
+      "AWS",
+      "Azure",
+      "GCP"
+    ],
+    "devops": [
+      "Docker",
+      "Kubernetes",
+      "CI/CD",
+      "Git"
+    ]
+  }
+}
+

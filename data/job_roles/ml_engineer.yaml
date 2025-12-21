@@ -1,0 +1,68 @@
+name: ML Engineer
+description: Machine Learning Engineer responsible for designing, building, and deploying ML models at scale
+
+required_skills:
+  - name: Python
+    importance: 1.0
+    description: Core programming language for ML
+  - name: Machine Learning
+    importance: 1.0
+    description: Understanding of ML algorithms and techniques
+  - name: Deep Learning
+    importance: 0.9
+    description: Neural networks and deep learning frameworks
+  - name: Statistics
+    importance: 0.8
+    description: Statistical foundations for ML
+  - name: Data Structures & Algorithms
+    importance: 0.8
+    description: CS fundamentals for efficient ML code
+
+preferred_skills:
+  - name: TensorFlow
+    importance: 0.8
+    description: Deep learning framework
+  - name: PyTorch
+    importance: 0.8
+    description: Deep learning framework
+  - name: Scikit-learn
+    importance: 0.7
+    description: ML library
+  - name: AWS
+    importance: 0.7
+    description: Cloud platform for ML deployment
+  - name: Docker
+    importance: 0.6
+    description: Containerization for ML models
+  - name: Kubernetes
+    importance: 0.5
+    description: Orchestration for ML workloads
+  - name: MLOps
+    importance: 0.7
+    description: ML operations and pipelines
+  - name: SQL
+    importance: 0.6
+    description: Database queries for data processing
+
+min_years_experience: 2.0
+preferred_years_experience: 3.0
+
+required_degrees:
+  - BS
+  - Bachelor
+  - BSc
+
+preferred_degrees:
+  - MS
+  - Master
+  - MSc
+  - PhD
+
+certifications:
+  - AWS Certified Machine Learning
+  - Google Cloud Professional ML Engineer
+
+preferred_certifications:
+  - TensorFlow Developer Certificate
+  - Databricks ML Engineer
+

@@ -1,0 +1,23 @@
+{
+  "Python": ["python programming", "python3", "python 3"],
+  "Machine Learning": ["ML", "machine learning", "ml engineering"],
+  "Deep Learning": ["DL", "deep learning", "neural networks", "neural nets"],
+  "TensorFlow": ["tf", "tensorflow", "tensor flow"],
+  "PyTorch": ["pytorch", "pytorch framework"],
+  "AWS": ["Amazon Web Services", "amazon aws", "aws cloud"],
+  "SQL": ["sql databases", "structured query language"],
+  "Docker": ["docker containers", "containerization"],
+  "Kubernetes": ["k8s", "kubernetes orchestration"],
+  "Data Science": ["data scientist", "data analytics"],
+  "Statistics": ["statistical analysis", "stats"],
+  "Git": ["git version control", "github", "gitlab"],
+  "Jupyter": ["jupyter notebook", "jupyter notebooks"],
+  "Pandas": ["pandas library", "pandas python"],
+  "NumPy": ["numpy", "numpy library"],
+  "Scikit-learn": ["sklearn", "scikit learn", "scikit-learn"],
+  "NLP": ["natural language processing", "text processing"],
+  "Computer Vision": ["CV", "image processing", "image recognition"],
+  "Data Structures": ["data structures and algorithms", "DSA"],
+  "Algorithms": ["algorithms and data structures", "algo"]
+}
+

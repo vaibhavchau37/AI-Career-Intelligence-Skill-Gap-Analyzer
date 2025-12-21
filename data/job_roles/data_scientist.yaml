@@ -1,0 +1,66 @@
+name: Data Scientist
+description: Data Scientist who analyzes complex data to extract insights and build predictive models
+
+required_skills:
+  - name: Python
+    importance: 1.0
+    description: Primary programming language
+  - name: Data Analysis
+    importance: 1.0
+    description: Analyzing and interpreting data
+  - name: Statistics
+    importance: 0.9
+    description: Statistical methods and hypothesis testing
+  - name: SQL
+    importance: 0.9
+    description: Querying databases
+  - name: Data Visualization
+    importance: 0.8
+    description: Creating charts and dashboards
+
+preferred_skills:
+  - name: Machine Learning
+    importance: 0.8
+    description: Predictive modeling
+  - name: Pandas
+    importance: 0.7
+    description: Data manipulation library
+  - name: NumPy
+    importance: 0.7
+    description: Numerical computing
+  - name: Matplotlib
+    importance: 0.6
+    description: Data visualization
+  - name: Seaborn
+    importance: 0.6
+    description: Statistical visualization
+  - name: Jupyter
+    importance: 0.6
+    description: Interactive data analysis
+  - name: R
+    importance: 0.5
+    description: Statistical programming language
+  - name: Tableau
+    importance: 0.5
+    description: Business intelligence tool
+
+min_years_experience: 1.0
+preferred_years_experience: 2.0
+
+required_degrees:
+  - BS
+  - Bachelor
+
+preferred_degrees:
+  - MS
+  - Master
+  - MSc
+  - PhD
+
+certifications:
+  - IBM Data Science Professional Certificate
+  - Microsoft Certified: Azure Data Scientist Associate
+
+preferred_certifications:
+  - Google Data Analytics Certificate
+
