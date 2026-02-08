@@ -1,0 +1,647 @@
+{
+  "total_skills": 128,
+  "skills_by_frequency": [
+    {
+      "skill": "javascript",
+      "count": 6
+    },
+    {
+      "skill": "web developer",
+      "count": 4
+    },
+    {
+      "skill": "html5",
+      "count": 4
+    },
+    {
+      "skill": "css",
+      "count": 4
+    },
+    {
+      "skill": "problem solving",
+      "count": 3
+    },
+    {
+      "skill": "security",
+      "count": 3
+    },
+    {
+      "skill": "ajax",
+      "count": 2
+    },
+    {
+      "skill": "data structures",
+      "count": 2
+    },
+    {
+      "skill": "mysql",
+      "count": 2
+    },
+    {
+      "skill": "oop",
+      "count": 2
+    },
+    {
+      "skill": "github",
+      "count": 2
+    },
+    {
+      "skill": "debugging",
+      "count": 2
+    },
+    {
+      "skill": "rest",
+      "count": 2
+    },
+    {
+      "skill": "java",
+      "count": 2
+    },
+    {
+      "skill": "json",
+      "count": 2
+    },
+    {
+      "skill": "web technologies",
+      "count": 2
+    },
+    {
+      "skill": "php",
+      "count": 2
+    },
+    {
+      "skill": "html",
+      "count": 2
+    },
+    {
+      "skill": "machine learning",
+      "count": 2
+    },
+    {
+      "skill": "mvc",
+      "count": 1
+    },
+    {
+      "skill": "git",
+      "count": 1
+    },
+    {
+      "skill": "angularjs",
+      "count": 1
+    },
+    {
+      "skill": "postgresql",
+      "count": 1
+    },
+    {
+      "skill": "android development",
+      "count": 1
+    },
+    {
+      "skill": "algorithms",
+      "count": 1
+    },
+    {
+      "skill": "mobile",
+      "count": 1
+    },
+    {
+      "skill": "mvvm",
+      "count": 1
+    },
+    {
+      "skill": "xml",
+      "count": 1
+    },
+    {
+      "skill": "visual studio",
+      "count": 1
+    },
+    {
+      "skill": "bootstrap",
+      "count": 1
+    },
+    {
+      "skill": "jquery",
+      "count": 1
+    },
+    {
+      "skill": "Redux and Flux.\n * Up to date knowledge of modern web standards - HTML5+",
+      "count": 1
+    },
+    {
+      "skill": "Enzyme",
+      "count": 1
+    },
+    {
+      "skill": "CSS and JavaScript .\n * A minimum of 3 years of experience with modern JS frameworks and tool React.js",
+      "count": 1
+    },
+    {
+      "skill": "HTML",
+      "count": 1
+    },
+    {
+      "skill": "React",
+      "count": 1
+    },
+    {
+      "skill": "Css.\n\n\n\n\n * Hands on experience in all facets of UI.\n * Experience with web technologies.\n * More than 4 years of experience with fundamental web technologies - HTML",
+      "count": 1
+    },
+    {
+      "skill": "Webpack",
+      "count": 1
+    },
+    {
+      "skill": "CSS3+.\n * Basic knowledge and understanding of Typescript and CSS pre-processors.\n * Experience utilizing web APIs.\n * Knowledge of performance testing frameworks including Mocha and Jest.\n * Experience with browser-based debugging and performance testing software.",
+      "count": 1
+    },
+    {
+      "skill": "ES6+",
+      "count": 1
+    },
+    {
+      "skill": "Redux",
+      "count": 1
+    },
+    {
+      "skill": "software developer",
+      "count": 1
+    },
+    {
+      "skill": ".net",
+      "count": 1
+    },
+    {
+      "skill": "c#",
+      "count": 1
+    },
+    {
+      "skill": "sql",
+      "count": 1
+    },
+    {
+      "skill": "web development",
+      "count": 1
+    },
+    {
+      "skill": "authoring",
+      "count": 1
+    },
+    {
+      "skill": "team player",
+      "count": 1
+    },
+    {
+      "skill": "fundamentals",
+      "count": 1
+    },
+    {
+      "skill": "web standards",
+      "count": 1
+    },
+    {
+      "skill": "react",
+      "count": 1
+    },
+    {
+      "skill": "js",
+      "count": 1
+    },
+    {
+      "skill": "react.js",
+      "count": 1
+    },
+    {
+      "skill": "devops",
+      "count": 1
+    },
+    {
+      "skill": "wordpress",
+      "count": 1
+    },
+    {
+      "skill": "website maintenance",
+      "count": 1
+    },
+    {
+      "skill": "enterprise security",
+      "count": 1
+    },
+    {
+      "skill": "python",
+      "count": 1
+    },
+    {
+      "skill": "database",
+      "count": 1
+    },
+    {
+      "skill": "artificial intelligence",
+      "count": 1
+    },
+    {
+      "skill": "hadoop",
+      "count": 1
+    },
+    {
+      "skill": "san",
+      "count": 1
+    },
+    {
+      "skill": "big data",
+      "count": 1
+    },
+    {
+      "skill": "and machine learning techniques.\n * Expertise in programming languages such as Python",
+      "count": 1
+    },
+    {
+      "skill": "statistical modelling",
+      "count": 1
+    },
+    {
+      "skill": "or a similar role.\n * Strong proficiency in data analysis",
+      "count": 1
+    },
+    {
+      "skill": "Tableau",
+      "count": 1
+    },
+    {
+      "skill": "Power BI) to effectively communicate insights.\n * Experience with Dataiku will be a plus.",
+      "count": 1
+    },
+    {
+      "skill": "and modelling.\n * Experience with data visualization tools (e.g.",
+      "count": 1
+    },
+    {
+      "skill": "or similar for data manipulation",
+      "count": 1
+    },
+    {
+      "skill": "analysis",
+      "count": 1
+    },
+    {
+      "skill": "Data Science and ML Modeling\n\nExperience : 8-12 years\n\nLocation : All Ust offshore\n\n\n\n\nJob Description:\n\n * Minimum 7 years of professional experience in data science",
+      "count": 1
+    },
+    {
+      "skill": "analytics",
+      "count": 1
+    },
+    {
+      "skill": "you join a team of 30",
+      "count": 1
+    },
+    {
+      "skill": "great potential: it all comes together at Virtusa. We value collaboration and the team environment of our company",
+      "count": 1
+    },
+    {
+      "skill": "merit",
+      "count": 1
+    },
+    {
+      "skill": "sexual orientation",
+      "count": 1
+    },
+    {
+      "skill": "religion",
+      "count": 1
+    },
+    {
+      "skill": "DBSACNetc text classification Nve Bayes MAXENTSVM Tree Based models other ML & Deep Learning model\n\nAbout Virtusa\n\nTeamwork",
+      "count": 1
+    },
+    {
+      "skill": "quality of life",
+      "count": 1
+    },
+    {
+      "skill": "Dependency Parsing Coreference Resolution",
+      "count": 1
+    },
+    {
+      "skill": "color",
+      "count": 1
+    },
+    {
+      "skill": "veteran status or any other basis covered by appropriate law. All employment is decided on the basis of qualifications",
+      "count": 1
+    },
+    {
+      "skill": "Data Scientist\n\nRole: T3\n\nKey Responsibility\n\nBachelors or Masters Engineering in Computer Science preferred though not mandatory",
+      "count": 1
+    },
+    {
+      "skill": "sex",
+      "count": 1
+    },
+    {
+      "skill": "Feature Vector Generation binarycounttfidf etc word2vecdoc2vecglove RAKE",
+      "count": 1
+    },
+    {
+      "skill": "000+ people globally that cares about your growth \u2014 one that seeks to provide you with exciting projects",
+      "count": 1
+    },
+    {
+      "skill": "national origin",
+      "count": 1
+    },
+    {
+      "skill": "non-disqualifying physical or mental disability",
+      "count": 1
+    },
+    {
+      "skill": "or related quantitative field experience with analyzing and quantifying data collected through crowd sourcing protocols\n\nStrong experience with descriptive statistics and visualization tools\n\nSolid Experience With Natural Language Processing\n\nExpert in Python command line usage Bash Solid experience with SQL\n\nKnowledge of statistical modelling machine learning techniques Deep Learning Good to have\n\nExperience with data selection methods identify how to choose which data for which experimental set ups\n\nExcellent communication and organizational skills with significant attention to detailExperience with big data tools Hive Pig and familiarity experience with AWS technology stack S3Redshift Good to have\n\nDemonstrable track record dealing well with ambiguity prioritizing needs and delivering results in an agiledynamic environment\n\nNLP Text Extraction from various sources MS Wordplain text filespdf fileshtml pages",
+      "count": 1
+    },
+    {
+      "skill": "and seek to provide great minds with a dynamic place to nurture new ideas and foster excellence.\n\nVirtusa was founded on principles of equal opportunity for all",
+      "count": 1
+    },
+    {
+      "skill": "and so does not discriminate on the basis of race",
+      "count": 1
+    },
+    {
+      "skill": "etc. Text CleaningText PreProcessing Tokenization POS tagging NER",
+      "count": 1
+    },
+    {
+      "skill": "document similarity Cosine",
+      "count": 1
+    },
+    {
+      "skill": "and business need.",
+      "count": 1
+    },
+    {
+      "skill": "opportunities and work with state of the art technologies throughout your career with us.\n\nGreat minds",
+      "count": 1
+    },
+    {
+      "skill": "gender identity",
+      "count": 1
+    },
+    {
+      "skill": "Jaccardetc fuzzy text matching Lexical and Semantic Information Extraction\n\nTechniques text clustering kmeans",
+      "count": 1
+    },
+    {
+      "skill": "professional and personal development: values that Virtusa is proud to embody. When you join us",
+      "count": 1
+    },
+    {
+      "skill": "age",
+      "count": 1
+    },
+    {
+      "skill": "data science",
+      "count": 1
+    },
+    {
+      "skill": "docker",
+      "count": 1
+    },
+    {
+      "skill": "Financial Planning & Analysis (FP&A)\n\nResponsibilities \u2013\n\n * Assist in preparation of all reporting and schedules for actuals analysis and to provide reports to COE team for upload in HFM.\n * Prepare month P&L and KPI summary.\n * Assist in analyzing the P&L and KPI\u2019s\n * Assist in data uploads from GFS to HFM and its validations.\n * Familiarize with GFS and HFM functionalities and reports.\n * Assist in analyzing the margins for customers and projects.\n * Perform actuals vs forecast and budget variance analysis on costs with detailed breakdown",
+      "count": 1
+    },
+    {
+      "skill": "challenge actuals as needed.\n * Support with preparation of various management Dashboards and manage discissions around Dashboard analysis with Business leaders",
+      "count": 1
+    },
+    {
+      "skill": "posting of cost recovery / cross charge entries.\n * Prepare accounting entries for accruals etc. as needed monthly. \u2022 Assist in legal entity reporting and reconciliations.",
+      "count": 1
+    },
+    {
+      "skill": "as needed (MIS experience a big plus!)\n * Manage Intercompany transactions and ensure no outstanding inventory on all internal projects. Activities include validating and completing Contractual / Internal SOW compliance",
+      "count": 1
+    },
+    {
+      "skill": "invoicing",
+      "count": 1
+    },
+    {
+      "skill": "edit content",
+      "count": 1
+    },
+    {
+      "skill": "Creating content",
+      "count": 1
+    },
+    {
+      "skill": "grammar",
+      "count": 1
+    },
+    {
+      "skill": "mechanical design",
+      "count": 1
+    },
+    {
+      "skill": "inventor",
+      "count": 1
+    },
+    {
+      "skill": "iso",
+      "count": 1
+    },
+    {
+      "skill": "pro-e",
+      "count": 1
+    },
+    {
+      "skill": "design",
+      "count": 1
+    },
+    {
+      "skill": "catia",
+      "count": 1
+    },
+    {
+      "skill": "Flow Control Statements",
+      "count": 1
+    },
+    {
+      "skill": "Database Operations and OOPS concepts).\n\n\u2022 Good Idea on Test Automation Framework implementation.\n\n\u2022 Ability to create & execute Test cases using Element Locators and Selenium WebDriver API Commands.\n\n\u2022 Good to have knowledge on TestNg & Cucumber BDD.\n\n\u2022 Basic knowledge on Jenkins for CI/CD.\n\n\u2022 Desired to have knowledge in SQL server",
+      "count": 1
+    },
+    {
+      "skill": "Variables",
+      "count": 1
+    },
+    {
+      "skill": "Others are also fine.\n\nNotice period: Immediate Joiner\n\n\n\n\n6+ years of experience on Selenium WebDriver(Java)\n\n\u2022 Hands on experience is Rest Assured and Selenium\n\n\u2022 Power BI report Automated testing is good to have.\n\n\u2022 Good knowledge on Data Testing & ETL testing with automated framework.\n\n\u2022 Good knowledge in Java Programming (Data Types",
+      "count": 1
+    },
+    {
+      "skill": "Test automation for ETL Testing",
+      "count": 1
+    },
+    {
+      "skill": "SQL queries and stored procedures.\n\n\u2022 Good to have knowledge on Azure.\n\n\u2022 Problem solving skills & learning attitude\n\nKey Responsibilities\n\n\u2022 Work closely with the Sprint teams",
+      "count": 1
+    },
+    {
+      "skill": "Methods (Built-in as well as User defined)",
+      "count": 1
+    },
+    {
+      "skill": "Operators",
+      "count": 1
+    },
+    {
+      "skill": "Selenium",
+      "count": 1
+    },
+    {
+      "skill": "developers and leads to understand and deliver on requirements\n\n\u2022 Manage and maintain the existing test automation framework.\n\n\u2022 Enhance the test automation framework for more coverage and new features.\n\n\u2022 Metrics and reports on the automation results.",
+      "count": 1
+    },
+    {
+      "skill": "Power BI Report test automation\n 2. Databricks & SQL knowledge\n\n\n\n\nLooking for 5-8 Yrs experience.\n\nLocation Feasibility: Preferred Bangalore",
+      "count": 1
+    },
+    {
+      "skill": "Exception handling",
+      "count": 1
+    }
+  ],
+  "all_skills": [
+    ".net",
+    "000+ people globally that cares about your growth \u2014 one that seeks to provide you with exciting projects",
+    "CSS and JavaScript .\n * A minimum of 3 years of experience with modern JS frameworks and tool React.js",
+    "CSS3+.\n * Basic knowledge and understanding of Typescript and CSS pre-processors.\n * Experience utilizing web APIs.\n * Knowledge of performance testing frameworks including Mocha and Jest.\n * Experience with browser-based debugging and performance testing software.",
+    "Creating content",
+    "Css.\n\n\n\n\n * Hands on experience in all facets of UI.\n * Experience with web technologies.\n * More than 4 years of experience with fundamental web technologies - HTML",
+    "DBSACNetc text classification Nve Bayes MAXENTSVM Tree Based models other ML & Deep Learning model\n\nAbout Virtusa\n\nTeamwork",
+    "Data Science and ML Modeling\n\nExperience : 8-12 years\n\nLocation : All Ust offshore\n\n\n\n\nJob Description:\n\n * Minimum 7 years of professional experience in data science",
+    "Data Scientist\n\nRole: T3\n\nKey Responsibility\n\nBachelors or Masters Engineering in Computer Science preferred though not mandatory",
+    "Database Operations and OOPS concepts).\n\n\u2022 Good Idea on Test Automation Framework implementation.\n\n\u2022 Ability to create & execute Test cases using Element Locators and Selenium WebDriver API Commands.\n\n\u2022 Good to have knowledge on TestNg & Cucumber BDD.\n\n\u2022 Basic knowledge on Jenkins for CI/CD.\n\n\u2022 Desired to have knowledge in SQL server",
+    "Dependency Parsing Coreference Resolution",
+    "ES6+",
+    "Enzyme",
+    "Exception handling",
+    "Feature Vector Generation binarycounttfidf etc word2vecdoc2vecglove RAKE",
+    "Financial Planning & Analysis (FP&A)\n\nResponsibilities \u2013\n\n * Assist in preparation of all reporting and schedules for actuals analysis and to provide reports to COE team for upload in HFM.\n * Prepare month P&L and KPI summary.\n * Assist in analyzing the P&L and KPI\u2019s\n * Assist in data uploads from GFS to HFM and its validations.\n * Familiarize with GFS and HFM functionalities and reports.\n * Assist in analyzing the margins for customers and projects.\n * Perform actuals vs forecast and budget variance analysis on costs with detailed breakdown",
+    "Flow Control Statements",
+    "HTML",
+    "Jaccardetc fuzzy text matching Lexical and Semantic Information Extraction\n\nTechniques text clustering kmeans",
+    "Methods (Built-in as well as User defined)",
+    "Operators",
+    "Others are also fine.\n\nNotice period: Immediate Joiner\n\n\n\n\n6+ years of experience on Selenium WebDriver(Java)\n\n\u2022 Hands on experience is Rest Assured and Selenium\n\n\u2022 Power BI report Automated testing is good to have.\n\n\u2022 Good knowledge on Data Testing & ETL testing with automated framework.\n\n\u2022 Good knowledge in Java Programming (Data Types",
+    "Power BI Report test automation\n 2. Databricks & SQL knowledge\n\n\n\n\nLooking for 5-8 Yrs experience.\n\nLocation Feasibility: Preferred Bangalore",
+    "Power BI) to effectively communicate insights.\n * Experience with Dataiku will be a plus.",
+    "React",
+    "Redux",
+    "Redux and Flux.\n * Up to date knowledge of modern web standards - HTML5+",
+    "SQL queries and stored procedures.\n\n\u2022 Good to have knowledge on Azure.\n\n\u2022 Problem solving skills & learning attitude\n\nKey Responsibilities\n\n\u2022 Work closely with the Sprint teams",
+    "Selenium",
+    "Tableau",
+    "Test automation for ETL Testing",
+    "Variables",
+    "Webpack",
+    "age",
+    "ajax",
+    "algorithms",
+    "analysis",
+    "analytics",
+    "and business need.",
+    "and machine learning techniques.\n * Expertise in programming languages such as Python",
+    "and modelling.\n * Experience with data visualization tools (e.g.",
+    "and seek to provide great minds with a dynamic place to nurture new ideas and foster excellence.\n\nVirtusa was founded on principles of equal opportunity for all",
+    "and so does not discriminate on the basis of race",
+    "android development",
+    "angularjs",
+    "artificial intelligence",
+    "as needed (MIS experience a big plus!)\n * Manage Intercompany transactions and ensure no outstanding inventory on all internal projects. Activities include validating and completing Contractual / Internal SOW compliance",
+    "authoring",
+    "big data",
+    "bootstrap",
+    "c#",
+    "catia",
+    "challenge actuals as needed.\n * Support with preparation of various management Dashboards and manage discissions around Dashboard analysis with Business leaders",
+    "color",
+    "css",
+    "data science",
+    "data structures",
+    "database",
+    "debugging",
+    "design",
+    "developers and leads to understand and deliver on requirements\n\n\u2022 Manage and maintain the existing test automation framework.\n\n\u2022 Enhance the test automation framework for more coverage and new features.\n\n\u2022 Metrics and reports on the automation results.",
+    "devops",
+    "docker",
+    "document similarity Cosine",
+    "edit content",
+    "enterprise security",
+    "etc. Text CleaningText PreProcessing Tokenization POS tagging NER",
+    "fundamentals",
+    "gender identity",
+    "git",
+    "github",
+    "grammar",
+    "great potential: it all comes together at Virtusa. We value collaboration and the team environment of our company",
+    "hadoop",
+    "html",
+    "html5",
+    "inventor",
+    "invoicing",
+    "iso",
+    "java",
+    "javascript",
+    "jquery",
+    "js",
+    "json",
+    "machine learning",
+    "mechanical design",
+    "merit",
+    "mobile",
+    "mvc",
+    "mvvm",
+    "mysql",
+    "national origin",
+    "non-disqualifying physical or mental disability",
+    "oop",
+    "opportunities and work with state of the art technologies throughout your career with us.\n\nGreat minds",
+    "or a similar role.\n * Strong proficiency in data analysis",
+    "or related quantitative field experience with analyzing and quantifying data collected through crowd sourcing protocols\n\nStrong experience with descriptive statistics and visualization tools\n\nSolid Experience With Natural Language Processing\n\nExpert in Python command line usage Bash Solid experience with SQL\n\nKnowledge of statistical modelling machine learning techniques Deep Learning Good to have\n\nExperience with data selection methods identify how to choose which data for which experimental set ups\n\nExcellent communication and organizational skills with significant attention to detailExperience with big data tools Hive Pig and familiarity experience with AWS technology stack S3Redshift Good to have\n\nDemonstrable track record dealing well with ambiguity prioritizing needs and delivering results in an agiledynamic environment\n\nNLP Text Extraction from various sources MS Wordplain text filespdf fileshtml pages",
+    "or similar for data manipulation",
+    "php",
+    "postgresql",
+    "posting of cost recovery / cross charge entries.\n * Prepare accounting entries for accruals etc. as needed monthly. \u2022 Assist in legal entity reporting and reconciliations.",
+    "pro-e",
+    "problem solving",
+    "professional and personal development: values that Virtusa is proud to embody. When you join us",
+    "python",
+    "quality of life",
+    "react",
+    "react.js",
+    "religion",
+    "rest",
+    "san",
+    "security",
+    "sex",
+    "sexual orientation",
+    "software developer",
+    "sql",
+    "statistical modelling",
+    "team player",
+    "veteran status or any other basis covered by appropriate law. All employment is decided on the basis of qualifications",
+    "visual studio",
+    "web developer",
+    "web development",
+    "web standards",
+    "web technologies",
+    "website maintenance",
+    "wordpress",
+    "xml",
+    "you join a team of 30"
+  ]
+}

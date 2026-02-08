@@ -1,0 +1,63 @@
+name: Web Developer
+description: Web Developer focused on building and maintaining websites and web applications
+
+required_skills:
+  - name: HTML5
+    importance: 1.0
+    description: Modern HTML markup
+  - name: CSS3
+    importance: 1.0
+    description: Styling and responsive design
+  - name: JavaScript
+    importance: 1.0
+    description: Core JavaScript programming
+  - name: Responsive Design
+    importance: 0.9
+    description: Mobile-first and cross-browser compatibility
+  - name: Web Development
+    importance: 0.9
+    description: Full web development lifecycle
+
+preferred_skills:
+  - name: React.js
+    importance: 0.8
+    description: React framework for UI
+  - name: Angular
+    importance: 0.7
+    description: Angular framework
+  - name: Node.js
+    importance: 0.7
+    description: Backend JavaScript runtime
+  - name: RESTful APIs
+    importance: 0.7
+    description: API integration
+  - name: Git
+    importance: 0.7
+    description: Version control
+  - name: Bootstrap
+    importance: 0.6
+    description: CSS framework
+  - name: MySQL
+    importance: 0.6
+    description: Database management
+  - name: PHP
+    importance: 0.6
+    description: Server-side scripting
+
+required_experience:
+  min_years: 1
+  max_years: 4
+
+education:
+  - Bachelor's degree in Computer Science or related field
+  - Equivalent practical experience
+
+certifications:
+  - Frontend Developer Certification
+  - Full Stack Web Development
+  - JavaScript Advanced Certification
+
+projects:
+  - Responsive web applications
+  - E-commerce websites
+  - Portfolio and landing pages

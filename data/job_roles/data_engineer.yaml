@@ -1,0 +1,64 @@
+name: Data Engineer
+description: Data Engineer responsible for designing, building, and maintaining data pipelines and infrastructure
+
+required_skills:
+  - name: SQL
+    importance: 1.0
+    description: Database querying and management
+  - name: Python
+    importance: 1.0
+    description: Primary programming for data engineering
+  - name: ETL
+    importance: 0.9
+    description: Extract, Transform, Load processes
+  - name: Data Warehousing
+    importance: 0.9
+    description: Data warehouse architecture and design
+  - name: Data Pipeline
+    importance: 0.9
+    description: Building and maintaining data pipelines
+
+preferred_skills:
+  - name: PySpark
+    importance: 0.8
+    description: Distributed data processing
+  - name: Apache Kafka
+    importance: 0.7
+    description: Stream processing
+  - name: AWS
+    importance: 0.8
+    description: Cloud data services
+  - name: Azure
+    importance: 0.7
+    description: Azure data platform
+  - name: Snowflake
+    importance: 0.7
+    description: Cloud data warehouse
+  - name: Databricks
+    importance: 0.7
+    description: Unified analytics platform
+  - name: Hadoop
+    importance: 0.6
+    description: Big data framework
+  - name: Scala
+    importance: 0.6
+    description: Functional programming
+
+required_experience:
+  min_years: 3
+  max_years: 7
+
+education:
+  - Bachelor's degree in Computer Science, Engineering, or related field
+  - Master's degree preferred
+
+certifications:
+  - AWS Certified Data Analytics
+  - Azure Data Engineer Associate
+  - Google Cloud Professional Data Engineer
+  - Databricks Certified Associate Developer
+
+projects:
+  - Data pipeline development
+  - ETL workflow automation
+  - Data warehouse implementation

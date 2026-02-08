@@ -1,0 +1,58 @@
+name: Business Analyst
+description: Business Analyst responsible for analyzing business processes and requirements to drive solutions
+
+required_skills:
+  - name: Business Analysis
+    importance: 1.0
+    description: Requirements gathering and analysis
+  - name: Communication
+    importance: 1.0
+    description: Stakeholder communication
+  - name: Analytical Skills
+    importance: 0.9
+    description: Data analysis and problem solving
+  - name: Documentation
+    importance: 0.9
+    description: Creating business requirement documents
+  - name: SQL
+    importance: 0.8
+    description: Data querying and analysis
+
+preferred_skills:
+  - name: Agile/Scrum
+    importance: 0.8
+    description: Agile methodologies
+  - name: JIRA
+    importance: 0.7
+    description: Project management tools
+  - name: Data Visualization
+    importance: 0.7
+    description: Tableau, Power BI
+  - name: Excel
+    importance: 0.8
+    description: Advanced Excel for analysis
+  - name: Process Modeling
+    importance: 0.6
+    description: Business process mapping
+  - name: UML
+    importance: 0.5
+    description: Unified Modeling Language
+
+required_experience:
+  min_years: 3
+  max_years: 6
+
+education:
+  - Bachelor's degree in Business, IT, or related field
+  - MBA preferred
+
+certifications:
+  - CBAP (Certified Business Analysis Professional)
+  - PMI-PBA (Professional in Business Analysis)
+  - Agile Analysis Certification
+  - Six Sigma
+
+projects:
+  - Business process improvement
+  - Requirements documentation
+  - Stakeholder analysis

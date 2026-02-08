@@ -9,6 +9,8 @@ import sys
 from pathlib import Path
 import json
 import time
+import yaml
+import os
 from datetime import datetime
 
 # Add src to path
@@ -180,15 +182,101 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-def load_job_roles():
-    """Load job roles from skill mapping."""
+def load_combined_skills():
+    """Load combined skills from extracted LinkedIn data."""
     try:
-        with open("data/job_roles/skill_mapping.json", "r", encoding="utf-8") as f:
+        with open("data/combined_skills.json", "r", encoding="utf-8") as f:
             data = json.load(f)
-            return data.get("job_roles", {})
+            # Extract skill names from skills_by_frequency array
+            skills_list = [item['skill'] for item in data.get('skills_by_frequency', [])]
+            return {
+                'total_skills': data.get('total_skills', 0),
+                'skills_list': skills_list,
+                'skills_by_frequency': data.get('skills_by_frequency', [])
+            }
     except Exception as e:
-        st.error(f"Error loading job roles: {e}")
-        return {}
+        st.warning(f"Could not load combined skills data: {e}")
+        return {'total_skills': 0, 'skills_list': [], 'skills_by_frequency': []}
+
+
+def load_combined_job_titles():
+    """Load combined job titles from extracted LinkedIn data."""
+    try:
+        with open("data/combined_job_titles.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+            # Extract title names from titles_by_frequency array
+            titles_list = [item['title'] for item in data.get('titles_by_frequency', [])]
+            return {
+                'total_titles': data.get('total_titles', 0),
+                'titles_list': titles_list,
+                'titles_by_frequency': data.get('titles_by_frequency', [])
+            }
+    except Exception as e:
+        st.warning(f"Could not load combined job titles data: {e}")
+        return {'total_titles': 0, 'titles_list': [], 'titles_by_frequency': []}
+
+
+def load_job_roles():
+    """Load job roles from YAML files."""
+    job_roles = {}
+    yaml_files_dir = "data/job_roles"
+    
+    def normalize_skills(skills_list):
+        """Convert skills list to simple string list, handling both dict and string formats."""
+        if not skills_list:
+            return []
+        
+        normalized = []
+        for skill in skills_list:
+            if isinstance(skill, dict):
+                # Extract 'name' field from dict
+                skill_name = skill.get('name', '')
+                if skill_name:
+                    normalized.append(skill_name)
+            elif isinstance(skill, str):
+                # Already a string
+                normalized.append(skill)
+        return normalized
+    
+    try:
+        # Get all YAML files in the directory
+        yaml_files = [f for f in os.listdir(yaml_files_dir) if f.endswith('.yaml')]
+        
+        for yaml_file in yaml_files:
+            try:
+                with open(os.path.join(yaml_files_dir, yaml_file), 'r', encoding='utf-8') as f:
+                    role_data = yaml.safe_load(f)
+                    if role_data:
+                        # Extract role name from filename (e.g., data_scientist.yaml -> Data Scientist)
+                        role_name = yaml_file.replace('.yaml', '').replace('_', ' ').title()
+                        
+                        # If the YAML has a 'name' field, use that instead
+                        if 'name' in role_data:
+                            role_name = role_data['name']
+                        
+                        # Normalize skills to simple string lists
+                        if 'required_skills' in role_data:
+                            role_data['required_skills'] = normalize_skills(role_data['required_skills'])
+                        if 'optional_skills' in role_data:
+                            role_data['optional_skills'] = normalize_skills(role_data['optional_skills'])
+                        if 'preferred_skills' in role_data:
+                            role_data['preferred_skills'] = normalize_skills(role_data['preferred_skills'])
+                        
+                        job_roles[role_name] = role_data
+            except Exception as e:
+                st.warning(f"Could not load {yaml_file}: {e}")
+                continue
+        
+        return job_roles
+    except Exception as e:
+        st.error(f"Error loading job roles directory: {e}")
+        # Fallback to skill_mapping.json if YAML loading fails
+        try:
+            with open("data/job_roles/skill_mapping.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return data.get("job_roles", {})
+        except:
+            return {}
 
 
 def main():
@@ -260,6 +348,10 @@ def main():
     # Load job roles
     job_roles = load_job_roles()
     role_names = list(job_roles.keys()) if job_roles else []
+    
+    # Load combined skills and job titles from LinkedIn data
+    combined_skills_data = load_combined_skills()
+    combined_titles_data = load_combined_job_titles()
     
     # Initialize job market analyzer
     try:
@@ -766,13 +858,57 @@ Projects ({len(projects)}):
                 if st.button("✅ Confirm Selection", type="primary"):
                     st.success(f"✅ Role '{selected_role}' selected! Proceed to 'Skill Gaps' tab.")
                 
-                # Show real-time job market data
+                # Show LinkedIn data insights
                 st.markdown("---")
-                st.subheader("📊 Real-Time Job Market (India)")
+                st.subheader("📊 LinkedIn Job Market Insights (India)")
+                
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    st.markdown(f"""
+                    <div class="stat-card">
+                        <h2 style="margin: 0; font-size: 2rem;">{combined_titles_data['total_titles']:,}</h2>
+                        <p style="margin: 5px 0; opacity: 0.9;">Job Titles in Database</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with col2:
+                    st.markdown(f"""
+                    <div class="stat-card">
+                        <h2 style="margin: 0; font-size: 2rem;">{combined_skills_data['total_skills']}</h2>
+                        <p style="margin: 5px 0; opacity: 0.9;">Unique Skills Identified</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with col3:
+                    st.markdown(f"""
+                    <div class="stat-card">
+                        <h2 style="margin: 0; font-size: 2rem;">8,876</h2>
+                        <p style="margin: 5px 0; opacity: 0.9;">Total Job Listings</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                # Show top skills for the market
+                if combined_skills_data['skills_by_frequency']:
+                    st.markdown("**🔝 Top 15 In-Demand Skills in India:**")
+                    top_skills = combined_skills_data['skills_by_frequency'][:15]
+                    
+                    cols = st.columns(3)
+                    for idx, skill_data in enumerate(top_skills):
+                        with cols[idx % 3]:
+                            st.markdown(f"""
+                            <div class="skill-badge">
+                                {skill_data['skill']} ({skill_data['count']:,} jobs)
+                            </div>
+                            """, unsafe_allow_html=True)
+                
+                # Show real-time job market data via API
+                st.markdown("---")
+                st.subheader("🌐 Real-Time Job Market API (Adzuna)")
                 
                 if job_market and job_market.is_available():
                     # Fetch all available jobs
-                    with st.spinner("🔍 Fetching real-time job listings from India..."):
+                    with st.spinner("🔍 Fetching real-time job listings from Adzuna API..."):
                         # Fetch more jobs (up to 50 - API limit)
                         jobs = job_market.get_jobs_for_role(selected_role, location="India", limit=50)
                         stats = job_market.get_market_statistics(selected_role, location="India")

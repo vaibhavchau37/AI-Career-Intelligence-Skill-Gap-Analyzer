@@ -1,0 +1,57 @@
+name: Business Development Manager
+description: Business Development Manager focused on growth strategy, partnerships, and revenue generation
+
+required_skills:
+  - name: Business Strategy
+    importance: 1.0
+    description: Strategic business planning
+  - name: Sales & Negotiation
+    importance: 1.0
+    description: Sales techniques and negotiation
+  - name: Relationship Management
+    importance: 0.9
+    description: Client and partner relationships
+  - name: Market Analysis
+    importance: 0.9
+    description: Market research and competitive analysis
+  - name: Communication
+    importance: 0.9
+    description: Excellent verbal and written communication
+
+preferred_skills:
+  - name: CRM Tools
+    importance: 0.7
+    description: Salesforce, HubSpot
+  - name: Financial Acumen
+    importance: 0.7
+    description: P&L understanding
+  - name: Presentation Skills
+    importance: 0.8
+    description: Creating compelling presentations
+  - name: Lead Generation
+    importance: 0.7
+    description: Prospecting and outreach
+  - name: Contract Management
+    importance: 0.6
+    description: Contract negotiation and management
+  - name: Data Analytics
+    importance: 0.6
+    description: Business intelligence tools
+
+required_experience:
+  min_years: 4
+  max_years: 8
+
+education:
+  - Bachelor's degree in Business, Marketing, or related field
+  - MBA preferred
+
+certifications:
+  - Certified Business Development Professional
+  - Sales Management Certification
+  - Digital Marketing Certification
+
+projects:
+  - Revenue growth initiatives
+  - Partnership development
+  - Market expansion strategies

@@ -1,316 +1,254 @@
-# Detailed Architecture Documentation
+# System Architecture - Detailed Documentation
 
-## System Overview
+## Overview
 
-The AI Career Intelligence & Skill Gap Analyzer is a lightweight, modular Python application designed to analyze resumes against job roles and generate personalized recommendations.
+The AI Career Intelligence & Skill Gap Analyzer is designed as a lightweight, modular Python application that analyzes resumes against job roles without requiring heavy model training.
 
-## Architecture Diagram
+## Architecture Layers
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      INPUT LAYER                             │
-│                   (Resume Text File)                         │
-└──────────────────────┬──────────────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  PROCESSING LAYER                            │
-│                                                              │
-│  ┌──────────────┐      ┌──────────────┐                    │
-│  │ Resume       │─────▶│ Skill        │                    │
-│  │ Parser       │      │ Extractor    │                    │
-│  └──────┬───────┘      └──────┬───────┘                    │
-│         │                     │                             │
-│         ▼                     ▼                             │
-│  ┌──────────────────────────────────────┐                  │
-│  │      Structured Resume Data          │                  │
-│  └──────────────────────────────────────┘                  │
-└──────────────────────┬──────────────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  ANALYSIS LAYER                              │
-│                                                              │
-│  For each Job Role:                                         │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │ Skill        │─▶│ Score        │─▶│ Gap          │     │
-│  │ Matcher      │  │ Calculator   │  │ Analyzer     │     │
-│  └──────────────┘  └──────────────┘  └──────┬───────┘     │
-│                                               │             │
-│                                               ▼             │
-│                                     ┌──────────────┐       │
-│                                     │ Roadmap      │       │
-│                                     │ Generator    │       │
-│                                     └──────────────┘       │
-└──────────────────────┬──────────────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  OUTPUT LAYER                                │
-│                                                              │
-│  • Job Readiness Scores (0-100)                             │
-│  • Skill Gap Analysis                                       │
-│  • Learning Roadmaps                                        │
-│  • Role Recommendations                                     │
-│  • Detailed Explanations                                    │
-└─────────────────────────────────────────────────────────────┘
-```
+### 1. Data Layer
 
-## Module Interactions
+**Purpose**: Store and manage data structures and configurations
 
-### Sequence Diagram
+**Components**:
+- **Job Role Definitions** (`data/job_roles/*.yaml`): YAML files defining job requirements
+- **Skill Taxonomy** (`data/skills/skill_taxonomy.json`): Hierarchical skill categorization
+- **Skill Synonyms** (`data/skills/skill_synonyms.json`): Skill name variations and aliases
 
-```
-User → CareerAnalyzer → ResumeParser → Resume Object
-                              ↓
-                    SkillExtractor → Skill List
-                              ↓
-        ┌─────────────────────┼─────────────────────┐
-        │                     │                     │
-        ▼                     ▼                     ▼
-   SkillMatcher        ScoreCalculator      SkillGapAnalyzer
-        │                     │                     │
-        └──────────┬──────────┴──────────┬──────────┘
-                   │                     │
-                   ▼                     ▼
-              JobMatcher         RoadmapGenerator
-                   │                     │
-                   └──────────┬──────────┘
-                              ▼
-                        AnalysisResult
-```
+**Design Decision**: YAML for job roles (human-readable, easy to edit) and JSON for skill data (structured, programmatic access).
 
-## Component Details
+### 2. Core Processing Layer
 
-### 1. Data Models
+**Purpose**: Extract, match, and score resume data
 
-#### Resume Model
-```python
-Resume:
-  - Basic Info: name, email, phone
-  - Skills: technical_skills, soft_skills
-  - Experience: years_of_experience, experience_items
-  - Education: degrees, certifications
-  - Sections: List[ResumeSection]
-```
+#### 2.1 Resume Parser (`src/core/resume_parser.py`)
 
-#### JobRole Model
-```python
-JobRole:
-  - Metadata: name, description
-  - Requirements:
-    - required_skills: List[SkillRequirement]
-    - preferred_skills: List[SkillRequirement]
-    - min_years_experience: float
-    - required_degrees: List[str]
-  - Certifications: List[str]
-```
+**Responsibilities**:
+- Parse raw resume text into structured format
+- Extract sections (Education, Experience, Skills, etc.)
+- Extract basic information (name, email, phone)
+- Identify years of experience
+- Extract degrees and certifications
 
-#### AnalysisResult Model
-```python
-AnalysisResult:
-  - scores: Dict[str, RoleScore]
-  - skill_gaps: Dict[str, List[SkillGap]]
-  - roadmaps: Dict[str, List[LearningPath]]
-  - top_roles: List[str]
-  - predicted_roles: List[str]
-  - summary: str
-```
-
-### 2. Core Processing Modules
-
-#### ResumeParser
-**Input**: Raw resume text (string)
-**Output**: Resume object
 **Algorithm**:
-1. Section detection (regex-based)
-2. Entity extraction (spaCy or regex)
-3. Information extraction (email, phone, dates)
-4. Structured data assembly
+- Rule-based parsing using regex patterns
+- Section detection using keyword matching
+- Entity extraction using spaCy (optional, lightweight model)
 
-#### SkillExtractor
-**Input**: Resume object
+**Output**: `Resume` object with structured data
+
+#### 2.2 Skill Extractor (`src/core/skill_extractor.py`)
+
+**Responsibilities**:
+- Identify skills from resume text
+- Match skills against taxonomy
+- Handle synonyms and variations
+- Categorize skills (technical vs soft)
+
+**Algorithm**:
+- Keyword matching against skill taxonomy
+- Synonym resolution
+- Normalization for fuzzy matching
+- Pattern matching for common technical terms
+
 **Output**: List of canonical skill names
+
+#### 2.3 Skill Matcher (`src/core/skill_matcher.py`)
+
+**Responsibilities**:
+- Match resume skills with job requirements
+- Identify matched and missing skills
+- Handle skill name variations
+
 **Algorithm**:
-1. Load skill taxonomy
-2. Normalize skill names
-3. Match against taxonomy
-4. Resolve synonyms
-5. Return unique skills
+- Exact matching (normalized names)
+- Fuzzy string matching (fuzzywuzzy library)
+- Optional: Semantic similarity (sentence-transformers, if enabled)
 
-#### SkillMatcher
-**Input**: Resume skills, JobRole requirements
-**Output**: Matching results (matched/missing)
+**Output**: Matching results with matched/missing skills
+
+#### 2.4 Score Calculator (`src/core/score_calculator.py`)
+
+**Responsibilities**:
+- Calculate job readiness score (0-100)
+- Compute component scores (skills, experience, education, etc.)
+- Apply weighted scoring
+
 **Algorithm**:
-1. Normalize all skill names
-2. Exact matching
-3. Fuzzy matching (Levenshtein distance)
-4. Optional: Semantic similarity (embeddings)
-5. Categorize (matched/missing)
+- Weighted sum of component scores
+- Normalized percentage calculations
+- Linear scaling for experience and education
 
-#### ScoreCalculator
-**Input**: Resume, JobRole, Skill match results
-**Output**: Score breakdown (0-100)
-**Algorithm**:
-1. Calculate component scores:
-   - Required skills: (matched / total) × 100
-   - Preferred skills: (matched / total) × 100
-   - Experience: Linear scaling based on years
-   - Education: Boolean + preference matching
-   - Certifications: Percentage matching
-2. Apply weights
-3. Sum to get overall score
-
-### 3. Matching & Prediction
-
-#### JobMatcher
-**Algorithm**:
-1. Score resume against each role
-2. Sort by score (descending)
-3. Return top N matches
-
-#### RolePredictor
-**Algorithm**:
-1. Calculate skill overlap for each role
-2. Score = (overlap_ratio × 0.7) + (matched_count_factor × 0.3)
-3. Sort and return top N
-
-### 4. Roadmap Generation
-
-#### SkillGapAnalyzer
-**Algorithm**:
-1. Identify missing skills from match results
-2. Categorize (required vs preferred)
-3. Sort by importance
-
-#### RoadmapGenerator
-**Algorithm**:
-1. Prioritize gaps (required first)
-2. Estimate learning time per skill
-3. Map skills to resources
-4. Identify prerequisites
-5. Create timeline
-
-## Data Flow Example
-
-### Input
+**Scoring Formula**:
 ```
-Resume Text:
-"John Doe
-Software Engineer with 2 years Python experience.
-Skills: Python, SQL, Machine Learning
-Education: BS Computer Science"
+Overall Score = 
+  (Required Skills Match % × 40%) +
+  (Preferred Skills Match % × 20%) +
+  (Experience Score × 20%) +
+  (Education Score × 10%) +
+  (Certifications Score × 10%)
 ```
 
-### Processing Steps
+**Output**: Score breakdown and overall score
 
-1. **Parse**:
-   ```
-   Resume {
-     name: "John Doe"
-     years_of_experience: 2.0
-     skills: ["Python", "SQL", "Machine Learning"]
-     degrees: ["BS"]
-   }
-   ```
+### 3. Matching & Prediction Layer
 
-2. **Extract Skills**:
-   ```
-   Skills: ["Python", "SQL", "Machine Learning"]
-   ```
+#### 3.1 Job Matcher (`src/matcher/job_matcher.py`)
 
-3. **Match Against ML Engineer Role**:
-   ```
-   Required: ["Python", "Machine Learning", "Deep Learning", ...]
-   Matched: ["Python", "Machine Learning"]
-   Missing: ["Deep Learning", "Statistics", ...]
-   ```
+**Responsibilities**:
+- Match resume against multiple job roles
+- Rank roles by suitability
+- Provide top N recommendations
 
-4. **Calculate Score**:
-   ```
-   Required Skills: 2/5 = 40%
-   Preferred Skills: ...
-   Experience: 2 years / 3 preferred = 67%
-   Overall: (40×0.4) + ... = 58/100
-   ```
+**Algorithm**:
+- Score resume against each role
+- Sort by overall score
+- Return ranked list
 
-5. **Generate Roadmap**:
-   ```
-   1. Deep Learning (14 days)
-   2. Statistics (14 days)
-   ...
-   ```
+#### 3.2 Role Predictor (`src/matcher/role_predictor.py`)
 
-### Output
-```json
-{
-  "top_roles": ["ML Engineer"],
-  "scores": {
-    "ML Engineer": {
-      "overall_score": 58.0,
-      "breakdown": {...},
-      "missing_skills": ["Deep Learning", "Statistics"]
-    }
-  },
-  "roadmaps": {
-    "ML Engineer": [
-      {"skill": "Deep Learning", "days": 14, ...}
-    ]
-  }
-}
+**Responsibilities**:
+- Predict suitable roles based on skills
+- Suggest roles user might not have considered
+
+**Algorithm**:
+- Skill overlap analysis
+- Similarity scoring based on matched skills
+- Ranking by overlap ratio
+
+### 4. Roadmap Generation Layer
+
+#### 4.1 Skill Gap Analyzer (`src/roadmap/skill_gaps.py`)
+
+**Responsibilities**:
+- Identify missing skills
+- Categorize gaps (required vs preferred)
+- Prioritize gaps by importance
+
+**Output**: List of `SkillGap` objects
+
+#### 4.2 Roadmap Generator (`src/roadmap/roadmap_generator.py`)
+
+**Responsibilities**:
+- Create learning paths for missing skills
+- Estimate learning time
+- Suggest learning resources
+- Identify prerequisites
+
+**Algorithm**:
+- Prioritize gaps (required > preferred)
+- Estimate days based on skill complexity
+- Map skills to learning resources
+- Identify skill dependencies
+
+**Output**: List of `LearningPath` objects
+
+### 5. Application Layer
+
+#### 5.1 Career Analyzer (`src/analyzer/career_analyzer.py`)
+
+**Purpose**: Main orchestrator
+
+**Responsibilities**:
+- Coordinate all modules
+- Load configurations and data
+- Provide simple API
+- Generate complete analysis results
+
+**Workflow**:
+```
+1. Load configuration and job roles
+2. Parse resume text → Resume object
+3. Extract skills → Skill list
+4. For each target role:
+   a. Match skills
+   b. Calculate score
+   c. Analyze gaps
+   d. Generate roadmap
+5. Rank roles
+6. Predict additional roles
+7. Generate summary
+8. Return AnalysisResult
 ```
 
-## Configuration System
+## Data Flow
 
-Configuration is hierarchical:
-
-```yaml
-scoring:              # Scoring weights
-skill_matching:       # Matching parameters
-job_roles:           # Role data paths
-skills:              # Skill taxonomy paths
-roadmap:             # Roadmap settings
-nlp:                 # NLP settings
-output:              # Output settings
+```
+Input: Resume Text
+  ↓
+[Resume Parser] → Resume Object
+  ↓
+[Skill Extractor] → Skill List
+  ↓
+For each Job Role:
+  ├─→ [Skill Matcher] → Matched/Missing Skills
+  ├─→ [Score Calculator] → Score (0-100)
+  ├─→ [Skill Gap Analyzer] → Skill Gaps
+  └─→ [Roadmap Generator] → Learning Roadmap
+  ↓
+[Job Matcher] → Ranked Roles
+  ↓
+[Role Predictor] → Suggested Roles
+  ↓
+Output: AnalysisResult
 ```
 
-## Extensibility Points
+## Key Design Decisions
 
-1. **Job Roles**: Add YAML files to `data/job_roles/`
-2. **Skills**: Extend `skill_taxonomy.json`
-3. **Scoring**: Modify `ScoreCalculator` or weights in config
-4. **Matching**: Enhance `SkillMatcher` with better algorithms
-5. **Roadmaps**: Extend `RoadmapGenerator` with more resources
+### 1. No Heavy Training
+- Uses pre-trained spaCy model (lightweight, ~50MB)
+- Rule-based parsing and matching
+- Optional semantic similarity (sentence-transformers, but not required)
 
-## Performance Characteristics
+### 2. Modularity
+- Each module is independent and testable
+- Clear interfaces between modules
+- Easy to swap implementations
 
-- **Resume Parsing**: ~100-200ms
-- **Skill Extraction**: ~50-100ms
-- **Role Analysis**: ~50-100ms per role
-- **Total**: < 1 second for typical resume + 2-3 roles
+### 3. Explainability
+- Every score has clear breakdown
+- Explanations generated for each recommendation
+- Transparent scoring algorithm
 
-## Error Handling Strategy
+### 4. Extensibility
+- Easy to add new job roles (just add YAML file)
+- Skill taxonomy can be extended
+- Scoring weights configurable
 
-1. **Missing Dependencies**: Graceful degradation
-2. **Invalid Input**: Validation and clear error messages
-3. **Missing Data**: Default values and warnings
-4. **Processing Errors**: Try-except with logging
+### 5. Performance
+- Efficient for normal laptop usage
+- No GPU required
+- Fast processing for single resume (< 1 second)
 
-## Testing Strategy
+## Configuration
 
-- **Unit Tests**: Each module tested independently
-- **Integration Tests**: Full workflow testing
-- **Data Tests**: Validate with various resume formats
-- **Edge Cases**: Empty resumes, missing sections, etc.
+Configuration is stored in `config.yaml`:
+
+- **Scoring weights**: Adjust importance of different factors
+- **Matching thresholds**: Control skill matching sensitivity
+- **Roadmap settings**: Timeline and prioritization options
+- **Data paths**: Where to find job roles and skill taxonomy
+
+## Error Handling
+
+- Graceful degradation: If spaCy model not installed, falls back to regex
+- Default job roles: If no YAML files found, uses built-in defaults
+- Missing data: Handles missing sections gracefully
 
 ## Future Enhancements
 
-1. ML-based skill matching (optional)
-2. Web UI with Streamlit
-3. Batch processing API
-4. Database integration
-5. A/B testing framework
-6. Custom scoring functions
-7. Resume parsing from PDF/DOCX
-8. Real-time learning resource updates
+1. **ML-based matching**: Add optional ML model for better skill matching
+2. **Web UI**: Add Streamlit interface
+3. **Batch processing**: Analyze multiple resumes
+4. **Custom scoring**: Allow users to define custom scoring functions
+5. **API endpoints**: REST API for integration
+6. **Database integration**: Store resumes and results
+7. **A/B testing**: Compare different scoring strategies
+
+## Testing Strategy
+
+- Unit tests for each module
+- Integration tests for full workflow
+- Test with various resume formats
+- Validate scoring consistency
 

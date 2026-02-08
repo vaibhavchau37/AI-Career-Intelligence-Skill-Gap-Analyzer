@@ -1,0 +1,2482 @@
+{
+  "total_titles": 495,
+  "titles_by_frequency": [
+    {
+      "title": "Data Scientist",
+      "count": 47
+    },
+    {
+      "title": "Product Manager",
+      "count": 35
+    },
+    {
+      "title": "Business Development Manager",
+      "count": 28
+    },
+    {
+      "title": "Content Writer",
+      "count": 22
+    },
+    {
+      "title": "Financial Analyst",
+      "count": 20
+    },
+    {
+      "title": "Copywriter",
+      "count": 19
+    },
+    {
+      "title": "Software Engineer",
+      "count": 18
+    },
+    {
+      "title": "Mechanical Design Engineer",
+      "count": 18
+    },
+    {
+      "title": "Human Resources Business Partner",
+      "count": 17
+    },
+    {
+      "title": "Human Resources Manager",
+      "count": 16
+    },
+    {
+      "title": "Assistant Manager | Field Sales and Servicing | B2B Sales",
+      "count": 15
+    },
+    {
+      "title": "Social Media Executive",
+      "count": 15
+    },
+    {
+      "title": "Web Developer",
+      "count": 14
+    },
+    {
+      "title": "Associate Product Manager",
+      "count": 12
+    },
+    {
+      "title": "Machine Learning Engineer",
+      "count": 10
+    },
+    {
+      "title": "Finance Analyst",
+      "count": 9
+    },
+    {
+      "title": "Mechanical Engineer",
+      "count": 9
+    },
+    {
+      "title": "Business Development Executive",
+      "count": 7
+    },
+    {
+      "title": "Staff Product Manager",
+      "count": 7
+    },
+    {
+      "title": "Product manager",
+      "count": 7
+    },
+    {
+      "title": "Manager - Human Resources",
+      "count": 7
+    },
+    {
+      "title": "Social Media Marketing Specialist",
+      "count": 6
+    },
+    {
+      "title": "Business Development Manager (BDM)",
+      "count": 6
+    },
+    {
+      "title": "Senior Product Manager",
+      "count": 6
+    },
+    {
+      "title": "Lead Data Scientist",
+      "count": 5
+    },
+    {
+      "title": "Area Sales Executive",
+      "count": 5
+    },
+    {
+      "title": "Credit Analyst",
+      "count": 5
+    },
+    {
+      "title": "Manufacturing Engineer",
+      "count": 5
+    },
+    {
+      "title": "Aerospace Engineer",
+      "count": 5
+    },
+    {
+      "title": "Sales Manager",
+      "count": 4
+    },
+    {
+      "title": "Digital Marketing Executive",
+      "count": 4
+    },
+    {
+      "title": "Mechanical Engineer Fresher",
+      "count": 4
+    },
+    {
+      "title": "Quality Engineer",
+      "count": 4
+    },
+    {
+      "title": "Data Scientists with career break-Woman",
+      "count": 3
+    },
+    {
+      "title": "Relationship Manager | Field Sales and Servicing | B2B Sales",
+      "count": 3
+    },
+    {
+      "title": "Area Sales Manager",
+      "count": 3
+    },
+    {
+      "title": "Digital Marketing Specialist",
+      "count": 3
+    },
+    {
+      "title": "Digital marketing freshers- Thane West",
+      "count": 3
+    },
+    {
+      "title": "Junior Social Media Marketing Executive",
+      "count": 3
+    },
+    {
+      "title": "Credit Risk Analyst",
+      "count": 3
+    },
+    {
+      "title": "Hiring for HFM /FCCS - looking for immediate Joiner Only- Work from office --Pune/Mumbai/Bangalore",
+      "count": 3
+    },
+    {
+      "title": "Equity Analyst",
+      "count": 3
+    },
+    {
+      "title": "Senior Financial Analyst",
+      "count": 3
+    },
+    {
+      "title": "Assistant Manager Human Resources",
+      "count": 3
+    },
+    {
+      "title": "Deputy Manager - HR",
+      "count": 3
+    },
+    {
+      "title": "Content Writing",
+      "count": 3
+    },
+    {
+      "title": "Copy Writer",
+      "count": 3
+    },
+    {
+      "title": "Mechanical Engineer (Canada): : $500,000/year USD",
+      "count": 3
+    },
+    {
+      "title": "Junior Software Developer",
+      "count": 2
+    },
+    {
+      "title": "Software Development Engineer",
+      "count": 2
+    },
+    {
+      "title": "Software Developer",
+      "count": 2
+    },
+    {
+      "title": "Software Engineer 2",
+      "count": 2
+    },
+    {
+      "title": "SDE 1",
+      "count": 2
+    },
+    {
+      "title": "React Developer",
+      "count": 2
+    },
+    {
+      "title": "web developer",
+      "count": 2
+    },
+    {
+      "title": "Data Scientist (People & HR Analytics)",
+      "count": 2
+    },
+    {
+      "title": "Machine Learning",
+      "count": 2
+    },
+    {
+      "title": "Python Developer",
+      "count": 2
+    },
+    {
+      "title": "Senior Data Scientist",
+      "count": 2
+    },
+    {
+      "title": "Senior Machine Learning Engineer",
+      "count": 2
+    },
+    {
+      "title": "AI Safety Data Scientist",
+      "count": 2
+    },
+    {
+      "title": "ML Engineer",
+      "count": 2
+    },
+    {
+      "title": "Retail Sales Executive",
+      "count": 2
+    },
+    {
+      "title": "Sales Executive",
+      "count": 2
+    },
+    {
+      "title": "Assistant Manager - Channel Sales",
+      "count": 2
+    },
+    {
+      "title": "Assistant Manager- Sales",
+      "count": 2
+    },
+    {
+      "title": "Marketing Manager",
+      "count": 2
+    },
+    {
+      "title": "Social Media Marketing",
+      "count": 2
+    },
+    {
+      "title": "Assistant Marketing Manager",
+      "count": 2
+    },
+    {
+      "title": "Director of Business Development",
+      "count": 2
+    },
+    {
+      "title": "CI Business Development Executive",
+      "count": 2
+    },
+    {
+      "title": "Senior Business Development Manager",
+      "count": 2
+    },
+    {
+      "title": "Senior Manager - Product Management",
+      "count": 2
+    },
+    {
+      "title": "Financial Planning and Analysis Specialist",
+      "count": 2
+    },
+    {
+      "title": "Portfolio Analyst",
+      "count": 2
+    },
+    {
+      "title": "Junior Financial Analyst",
+      "count": 2
+    },
+    {
+      "title": "Analyst - Finance",
+      "count": 2
+    },
+    {
+      "title": "Investment Analyst",
+      "count": 2
+    },
+    {
+      "title": "Senior Manager - Human Resources",
+      "count": 2
+    },
+    {
+      "title": "Sr HR Generalist",
+      "count": 2
+    },
+    {
+      "title": "Human Resources Generalist",
+      "count": 2
+    },
+    {
+      "title": "Senior Manager - HR Business Partner",
+      "count": 2
+    },
+    {
+      "title": "HR Manager",
+      "count": 2
+    },
+    {
+      "title": "HR Generalist",
+      "count": 2
+    },
+    {
+      "title": "Firstcry.com - Content Writer",
+      "count": 2
+    },
+    {
+      "title": "Content Writer/Executive Administration H&S",
+      "count": 2
+    },
+    {
+      "title": "Staff Copywriter",
+      "count": 2
+    },
+    {
+      "title": "Copy Editor",
+      "count": 2
+    },
+    {
+      "title": "Associate - Copywriter",
+      "count": 2
+    },
+    {
+      "title": "Junior Content Writer",
+      "count": 2
+    },
+    {
+      "title": "Product Quality Engineer",
+      "count": 2
+    },
+    {
+      "title": "Piping Engineer",
+      "count": 2
+    },
+    {
+      "title": "Mechanical Engineer (Canada) - $500,000/year USD",
+      "count": 2
+    },
+    {
+      "title": "Mechanical Engineering",
+      "count": 2
+    },
+    {
+      "title": "Front-end Engineer/Web Developer (SDE 1 & 2)",
+      "count": 1
+    },
+    {
+      "title": "Android Developer-SDE 1 & 2(Software Development Engineer)",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer - Fullstack",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer, Systems Infrastructure",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer - Front-end Developer",
+      "count": 1
+    },
+    {
+      "title": "SDE 1 (Frontend)",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer - Applications",
+      "count": 1
+    },
+    {
+      "title": "Frontend Developer",
+      "count": 1
+    },
+    {
+      "title": "Software Development Engineer 1 (SDE-1)",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer II",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer- Java",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer II, Full Stack, Google Cloud",
+      "count": 1
+    },
+    {
+      "title": "Jr. Frontend Developer",
+      "count": 1
+    },
+    {
+      "title": "Bigbasket - Software Development Engineer - Test - Manual Testing",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer Test",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer - Entry Level - Java",
+      "count": 1
+    },
+    {
+      "title": "SDE III-Front END (React.JS)",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer ( Intern )",
+      "count": 1
+    },
+    {
+      "title": "Web / UI Developer (HTML5 / CSS3 / JavaScript)",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer - Backend (3-5yrs), Pune",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer (Python)",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer, Core",
+      "count": 1
+    },
+    {
+      "title": "Web developer",
+      "count": 1
+    },
+    {
+      "title": "Web Application Developer",
+      "count": 1
+    },
+    {
+      "title": "SDE-I (Full-stack Developer)",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer- 2",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer, Machine Learning, Google Ads",
+      "count": 1
+    },
+    {
+      "title": "Associate Software Engineer",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer, AI Platform",
+      "count": 1
+    },
+    {
+      "title": "Software Development",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer - Intern",
+      "count": 1
+    },
+    {
+      "title": "Fresher Software Engineer",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer Intern, Frontend",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer I",
+      "count": 1
+    },
+    {
+      "title": "Web DevelopeR - pune",
+      "count": 1
+    },
+    {
+      "title": "Java Developer",
+      "count": 1
+    },
+    {
+      "title": "React JS Developer- Software Engineer",
+      "count": 1
+    },
+    {
+      "title": "Software engineer (Remote)",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer - UI",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer Intern",
+      "count": 1
+    },
+    {
+      "title": "InsuranceDekho - Full Stack Software Development Engineer I - React.js/Node.js",
+      "count": 1
+    },
+    {
+      "title": "Software Development Engineer 1 - Frontend",
+      "count": 1
+    },
+    {
+      "title": "Junior Full Stack Engineer",
+      "count": 1
+    },
+    {
+      "title": "Full Stack Software Engineer",
+      "count": 1
+    },
+    {
+      "title": "SDE 2 - Backend",
+      "count": 1
+    },
+    {
+      "title": "Software Development Engineer - II (Backend)",
+      "count": 1
+    },
+    {
+      "title": "Junior Web Developer",
+      "count": 1
+    },
+    {
+      "title": "Web Developer (Front-End)",
+      "count": 1
+    },
+    {
+      "title": "Upstox - Software Development Engineer - II/III (Frontend)",
+      "count": 1
+    },
+    {
+      "title": "full Stack Developer",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer - Frontend",
+      "count": 1
+    },
+    {
+      "title": "Junior Frontend Web Developer",
+      "count": 1
+    },
+    {
+      "title": "Jr. Web Developer",
+      "count": 1
+    },
+    {
+      "title": "Data Scientist I",
+      "count": 1
+    },
+    {
+      "title": "Data Scientist (AI/ML)",
+      "count": 1
+    },
+    {
+      "title": "Data Scientist- BLR HYD GGN",
+      "count": 1
+    },
+    {
+      "title": "Data Science",
+      "count": 1
+    },
+    {
+      "title": "Data Scientist, Research, Search",
+      "count": 1
+    },
+    {
+      "title": "Data Scientist - Image Processing",
+      "count": 1
+    },
+    {
+      "title": "AI/ML Developer",
+      "count": 1
+    },
+    {
+      "title": "AI ENGINEER",
+      "count": 1
+    },
+    {
+      "title": "AI and Machine Learning Engineer",
+      "count": 1
+    },
+    {
+      "title": "Python developer",
+      "count": 1
+    },
+    {
+      "title": "Machine Learning Ops Engineer",
+      "count": 1
+    },
+    {
+      "title": "Machine Learning Engineer - Python",
+      "count": 1
+    },
+    {
+      "title": "Data Scientists (All levels), Analytical Chemistry",
+      "count": 1
+    },
+    {
+      "title": "Machine Learning Engineer (Python / NLP)",
+      "count": 1
+    },
+    {
+      "title": "MACHINE LEARNING AI PLATFORM ENGINEER",
+      "count": 1
+    },
+    {
+      "title": "Applied Scientist",
+      "count": 1
+    },
+    {
+      "title": "AI/ML Engineer",
+      "count": 1
+    },
+    {
+      "title": "Machine Learning Engineer - Python/SQL",
+      "count": 1
+    },
+    {
+      "title": "Software Engineer - NLP, Machine Learning",
+      "count": 1
+    },
+    {
+      "title": "Data Scientist - II",
+      "count": 1
+    },
+    {
+      "title": "Deep Learning Engineer",
+      "count": 1
+    },
+    {
+      "title": "Python Development",
+      "count": 1
+    },
+    {
+      "title": "Price and Promo- Data Scientist",
+      "count": 1
+    },
+    {
+      "title": "Data Scientist - Kochi",
+      "count": 1
+    },
+    {
+      "title": "Applied Data Scientist - 2",
+      "count": 1
+    },
+    {
+      "title": "Python & Machine Learning Engineer - Pandas/Numpy",
+      "count": 1
+    },
+    {
+      "title": "Junior ML Engineer",
+      "count": 1
+    },
+    {
+      "title": "Datascientist",
+      "count": 1
+    },
+    {
+      "title": "AI/ML consultants_GCP Build",
+      "count": 1
+    },
+    {
+      "title": "Immediate opening for Data Scientist- Delhi (Hybrid)",
+      "count": 1
+    },
+    {
+      "title": "Machine Learning Engineer - MLOps",
+      "count": 1
+    },
+    {
+      "title": "Senior Software Engineer, Machine Learning",
+      "count": 1
+    },
+    {
+      "title": "Product Data Scientist, Security",
+      "count": 1
+    },
+    {
+      "title": "Data Scientist - 3",
+      "count": 1
+    },
+    {
+      "title": "Machine learning developer",
+      "count": 1
+    },
+    {
+      "title": "Sr. Data Scientist \u2013 IoT data & Satellite Analytics",
+      "count": 1
+    },
+    {
+      "title": "Data Scientist - Product",
+      "count": 1
+    },
+    {
+      "title": "Data Science Specialist",
+      "count": 1
+    },
+    {
+      "title": "Sr. Sales Executive",
+      "count": 1
+    },
+    {
+      "title": "Account Executive - SMB",
+      "count": 1
+    },
+    {
+      "title": "Sales Manager I",
+      "count": 1
+    },
+    {
+      "title": "Retails Sales Executive",
+      "count": 1
+    },
+    {
+      "title": "Counter Sales Executive",
+      "count": 1
+    },
+    {
+      "title": "Franchisee Sales Executive",
+      "count": 1
+    },
+    {
+      "title": "Area Sales Manager-Goa (QR Sales)",
+      "count": 1
+    },
+    {
+      "title": "Key Account Manager- Jaipur (QR Sales)",
+      "count": 1
+    },
+    {
+      "title": "Key Account Manager : Pune (QR Sales )",
+      "count": 1
+    },
+    {
+      "title": "Associate Sales Manager",
+      "count": 1
+    },
+    {
+      "title": "CSD Area Sales Manager",
+      "count": 1
+    },
+    {
+      "title": "Sales Manager II",
+      "count": 1
+    },
+    {
+      "title": "Deputy Area Sales Manager Goa",
+      "count": 1
+    },
+    {
+      "title": "Area Sales Manger / Sales Manager",
+      "count": 1
+    },
+    {
+      "title": "Team Lead, Area sales Manager & Key Account Manager- Bengaluru",
+      "count": 1
+    },
+    {
+      "title": "EaseMyTrip - Assistant Manager/Manager - Sales",
+      "count": 1
+    },
+    {
+      "title": "Relationship Manager | Inside Sales and Servicing | B2B Sales",
+      "count": 1
+    },
+    {
+      "title": "Manager \u2013 Sales, Indore",
+      "count": 1
+    },
+    {
+      "title": "Assistant Sales Manager- Kalyan / Dombivli",
+      "count": 1
+    },
+    {
+      "title": "Assistant Sales Manager - Noida",
+      "count": 1
+    },
+    {
+      "title": "Elite Foods - Regional Sales Manager",
+      "count": 1
+    },
+    {
+      "title": "Sales Manager- Mohali",
+      "count": 1
+    },
+    {
+      "title": "LCS Sales Manager",
+      "count": 1
+    },
+    {
+      "title": "Assistant Manager - Sales & Specifications",
+      "count": 1
+    },
+    {
+      "title": "Account Manager",
+      "count": 1
+    },
+    {
+      "title": "Assistant Manager Sales (Pune)",
+      "count": 1
+    },
+    {
+      "title": "Vacancies Area Sales Manager, Area Sales Officer, Area Business Manager",
+      "count": 1
+    },
+    {
+      "title": "Assistant Manager - Sales",
+      "count": 1
+    },
+    {
+      "title": "AM Sales & Sales Manager",
+      "count": 1
+    },
+    {
+      "title": "Territory Sales Manager - Corporate Sales",
+      "count": 1
+    },
+    {
+      "title": "Kotak Life Suraksha Samarth Bal - Ex-Servicemen Hiring - L-3 - Sales- Manager - All Locations",
+      "count": 1
+    },
+    {
+      "title": "Field Sales Executive",
+      "count": 1
+    },
+    {
+      "title": "Pharma sales executive",
+      "count": 1
+    },
+    {
+      "title": "Account Manager, Ad Sales",
+      "count": 1
+    },
+    {
+      "title": "Regional Sales Manager (OTC Sales)",
+      "count": 1
+    },
+    {
+      "title": "Assistant Sales Manager",
+      "count": 1
+    },
+    {
+      "title": "Senior Sales Executive / Sales Manager",
+      "count": 1
+    },
+    {
+      "title": "ZEE - Assistant Manager/Manager - Marketing",
+      "count": 1
+    },
+    {
+      "title": "FirstCry - Executive - Social Media",
+      "count": 1
+    },
+    {
+      "title": "Digital Marketing intern",
+      "count": 1
+    },
+    {
+      "title": "Manager, Marketing Regional Brands",
+      "count": 1
+    },
+    {
+      "title": "Digital Marketing Manager",
+      "count": 1
+    },
+    {
+      "title": "Social media (short creater)",
+      "count": 1
+    },
+    {
+      "title": "Social Media Promoter",
+      "count": 1
+    },
+    {
+      "title": "Assistant Marketing Manager \u2013 South Asia (Unilever International)",
+      "count": 1
+    },
+    {
+      "title": "Senior Manager \u2013 Shopper Marketing",
+      "count": 1
+    },
+    {
+      "title": "Digital Marketing (3-6 years)",
+      "count": 1
+    },
+    {
+      "title": "Mamaearth - Assistant Manager - Performance Marketing",
+      "count": 1
+    },
+    {
+      "title": "Manager \u2013 Marketing, D2C",
+      "count": 1
+    },
+    {
+      "title": "Assistant Manager - Retention Marketing",
+      "count": 1
+    },
+    {
+      "title": "Manager- Ecommerce Marketing (Marketplace)",
+      "count": 1
+    },
+    {
+      "title": "Manager - Brand Marketing",
+      "count": 1
+    },
+    {
+      "title": "Associate Product Marketing Manager",
+      "count": 1
+    },
+    {
+      "title": "Social Media Executive (Fresher)",
+      "count": 1
+    },
+    {
+      "title": "Assistant Manager Digital Marketing",
+      "count": 1
+    },
+    {
+      "title": "Regional Marketing Manager",
+      "count": 1
+    },
+    {
+      "title": "Social Media Marketing Associate / Brand Manager",
+      "count": 1
+    },
+    {
+      "title": "Social Media Marketing Executive",
+      "count": 1
+    },
+    {
+      "title": "Manager- Customer Retention Marketing",
+      "count": 1
+    },
+    {
+      "title": "Content & Brand Marketing Executive (Social Media Focus)",
+      "count": 1
+    },
+    {
+      "title": "Social Media executive",
+      "count": 1
+    },
+    {
+      "title": "Marketing coordinator",
+      "count": 1
+    },
+    {
+      "title": "hiring Jr. Digital Marketing Executive@ Ghansoli",
+      "count": 1
+    },
+    {
+      "title": "Digital Marketing(Freshers)",
+      "count": 1
+    },
+    {
+      "title": "Social Media Coordinator",
+      "count": 1
+    },
+    {
+      "title": "Assistant Manager - Marketing",
+      "count": 1
+    },
+    {
+      "title": "Assistant Marketing Manager - Gurgaon Based",
+      "count": 1
+    },
+    {
+      "title": "Social Media Executive-Fresher to 1 year",
+      "count": 1
+    },
+    {
+      "title": "junior social media marketing",
+      "count": 1
+    },
+    {
+      "title": "Digital Marketing Associate",
+      "count": 1
+    },
+    {
+      "title": "Digital Marketing",
+      "count": 1
+    },
+    {
+      "title": "Junior Marketing Associate - Social Media",
+      "count": 1
+    },
+    {
+      "title": "Assistant Manager Digital & Marketing",
+      "count": 1
+    },
+    {
+      "title": "Executive- Social Media",
+      "count": 1
+    },
+    {
+      "title": "Social Media Specialist",
+      "count": 1
+    },
+    {
+      "title": "International Marketing Manager",
+      "count": 1
+    },
+    {
+      "title": "Director, Strategic Business Development - India",
+      "count": 1
+    },
+    {
+      "title": "Area Manager Retail Business Development (Rest of Maharashtra)",
+      "count": 1
+    },
+    {
+      "title": "Manager / Senior Manager (Business Development & Partnerships)",
+      "count": 1
+    },
+    {
+      "title": "Business Development Manager - MENA",
+      "count": 1
+    },
+    {
+      "title": "Manager/Senior Manager Business Development",
+      "count": 1
+    },
+    {
+      "title": "Senior Manager - Business Development and Operations/VP Business and Operation",
+      "count": 1
+    },
+    {
+      "title": "NxtWave - Manager - Business Development",
+      "count": 1
+    },
+    {
+      "title": "Sr. Manager Business Development",
+      "count": 1
+    },
+    {
+      "title": "Business Development Manager- Interiors",
+      "count": 1
+    },
+    {
+      "title": "NxtWave - Business Development Manager - Sales - Hindi",
+      "count": 1
+    },
+    {
+      "title": "Corporate Development Manager (Founder\u2019s Office)",
+      "count": 1
+    },
+    {
+      "title": "Business Development Manager (Kochi Location)",
+      "count": 1
+    },
+    {
+      "title": "Business Development Manager ( NBFC)",
+      "count": 1
+    },
+    {
+      "title": "Hiring Senior Business Development Manager",
+      "count": 1
+    },
+    {
+      "title": "Business Development Director - CDMO",
+      "count": 1
+    },
+    {
+      "title": "Assistant Manager - New Business Development (Mumbai/Pune)",
+      "count": 1
+    },
+    {
+      "title": "Sr. Manager/Manager - Business Development",
+      "count": 1
+    },
+    {
+      "title": "BDM (Business Development Manager)",
+      "count": 1
+    },
+    {
+      "title": "Business Development Director",
+      "count": 1
+    },
+    {
+      "title": "International Business Development Executive",
+      "count": 1
+    },
+    {
+      "title": "NxtWave - Business Development Manager - Sales - Tamil",
+      "count": 1
+    },
+    {
+      "title": "Business Development GM",
+      "count": 1
+    },
+    {
+      "title": "Regional Business Development Manager - Emerging Markets",
+      "count": 1
+    },
+    {
+      "title": "Deputy General Manager Business Development",
+      "count": 1
+    },
+    {
+      "title": "Senior Executive Relationship Manager - Business Development",
+      "count": 1
+    },
+    {
+      "title": "Manager - Business Development",
+      "count": 1
+    },
+    {
+      "title": "India Business Development Manager",
+      "count": 1
+    },
+    {
+      "title": "WedMeGood - Manager - Business Development",
+      "count": 1
+    },
+    {
+      "title": "Business Development Manager (Mumbai)",
+      "count": 1
+    },
+    {
+      "title": "Business Development Manager (AGM)",
+      "count": 1
+    },
+    {
+      "title": "NxtWave - Manager - Business Development/Sales",
+      "count": 1
+    },
+    {
+      "title": "Business Development Manager, Mumbai, Chennai",
+      "count": 1
+    },
+    {
+      "title": "Business Development Manager - India",
+      "count": 1
+    },
+    {
+      "title": "Business Development and Operations Manager",
+      "count": 1
+    },
+    {
+      "title": "Senior Manager - Business Development",
+      "count": 1
+    },
+    {
+      "title": "Assistant Manager, Business Development - India",
+      "count": 1
+    },
+    {
+      "title": "NxtWave - Business Development Manager - Sales - Odia",
+      "count": 1
+    },
+    {
+      "title": "Senior Business Development Manager - Alternate Accommodation",
+      "count": 1
+    },
+    {
+      "title": "Associate Director / Director in Business Development (AI/ML)",
+      "count": 1
+    },
+    {
+      "title": "Nxtwave - Manager - Business Development/Sales",
+      "count": 1
+    },
+    {
+      "title": "NxtWave - Business Development Manager - Sales",
+      "count": 1
+    },
+    {
+      "title": "Business Development Executive Adfors",
+      "count": 1
+    },
+    {
+      "title": "Manager Business Development - International Programs",
+      "count": 1
+    },
+    {
+      "title": "International Business Development Manager",
+      "count": 1
+    },
+    {
+      "title": "Business Development Manager, , LPA Offline Merchants",
+      "count": 1
+    },
+    {
+      "title": "AVP Business Development",
+      "count": 1
+    },
+    {
+      "title": "Business Development Manager - South India",
+      "count": 1
+    },
+    {
+      "title": "Director, Business Development Leader",
+      "count": 1
+    },
+    {
+      "title": "Product Manager Credit Card",
+      "count": 1
+    },
+    {
+      "title": "Product Owner - Process Manager",
+      "count": 1
+    },
+    {
+      "title": "Product Manager (Full Time, Remote)",
+      "count": 1
+    },
+    {
+      "title": "Product Innovation Manager",
+      "count": 1
+    },
+    {
+      "title": "Manager Product - Denim",
+      "count": 1
+    },
+    {
+      "title": "Product Manager (WFH)",
+      "count": 1
+    },
+    {
+      "title": "Product Manager, India & MENA",
+      "count": 1
+    },
+    {
+      "title": "Product Strategy Manager",
+      "count": 1
+    },
+    {
+      "title": "Product Manager - Payment Services",
+      "count": 1
+    },
+    {
+      "title": "Product Manager, Looker Studio",
+      "count": 1
+    },
+    {
+      "title": "Product Management Team",
+      "count": 1
+    },
+    {
+      "title": "Technical Product Manager",
+      "count": 1
+    },
+    {
+      "title": "Senior Product Manager (Platform)",
+      "count": 1
+    },
+    {
+      "title": "Product Owner - Platform",
+      "count": 1
+    },
+    {
+      "title": "Product Manager, Looker",
+      "count": 1
+    },
+    {
+      "title": "Product Owner - eLogbook",
+      "count": 1
+    },
+    {
+      "title": "Product Manager- Healthcare",
+      "count": 1
+    },
+    {
+      "title": "Product Manager - Millennial Banking",
+      "count": 1
+    },
+    {
+      "title": "Associate Product Manager - II",
+      "count": 1
+    },
+    {
+      "title": "Senior Product Manager (Product Strategy)",
+      "count": 1
+    },
+    {
+      "title": "Associate Finance Analyst",
+      "count": 1
+    },
+    {
+      "title": "Financial Analyst - FP&A (Financial Planning Analyst)",
+      "count": 1
+    },
+    {
+      "title": "Jr. Finance Analyst",
+      "count": 1
+    },
+    {
+      "title": "Lead Financial Analyst",
+      "count": 1
+    },
+    {
+      "title": "Investment Banking Analyst",
+      "count": 1
+    },
+    {
+      "title": "Trading Analyst",
+      "count": 1
+    },
+    {
+      "title": "Global Equity Analyst",
+      "count": 1
+    },
+    {
+      "title": "Financial Planning and Analysis Specialist (Only Night Shift)",
+      "count": 1
+    },
+    {
+      "title": "Global Markets - Equity Research - Analyst",
+      "count": 1
+    },
+    {
+      "title": "Credit Analyst-Home Loans",
+      "count": 1
+    },
+    {
+      "title": "AML/KYC Analyst",
+      "count": 1
+    },
+    {
+      "title": "Sr. Credit Risk Analyst",
+      "count": 1
+    },
+    {
+      "title": "Analyst/Associate, Real Assets Financing",
+      "count": 1
+    },
+    {
+      "title": "Financial Analysis - Analyst",
+      "count": 1
+    },
+    {
+      "title": "Finance Manager",
+      "count": 1
+    },
+    {
+      "title": "Equity Research Analyst",
+      "count": 1
+    },
+    {
+      "title": "Financial Planning and Analysis",
+      "count": 1
+    },
+    {
+      "title": "Finance Analyst - Accounting & Reporting",
+      "count": 1
+    },
+    {
+      "title": "Equity Capital Market Analyst",
+      "count": 1
+    },
+    {
+      "title": "Analyst - Risk Management",
+      "count": 1
+    },
+    {
+      "title": "Risk Analyst",
+      "count": 1
+    },
+    {
+      "title": "Financial Planning & Analysis - Retail Sector",
+      "count": 1
+    },
+    {
+      "title": "Financial Analyst( Debt funding)",
+      "count": 1
+    },
+    {
+      "title": "Financial Analyst, Mumbai",
+      "count": 1
+    },
+    {
+      "title": "Jr. Financial Analyst",
+      "count": 1
+    },
+    {
+      "title": "Principal Analyst - Macro (Equity)- Core Equity Research.",
+      "count": 1
+    },
+    {
+      "title": "Credit Analyst - Investments",
+      "count": 1
+    },
+    {
+      "title": "Equity Research Analyst/Associate",
+      "count": 1
+    },
+    {
+      "title": "Finance Analyst, Processor",
+      "count": 1
+    },
+    {
+      "title": "Junior FP&A",
+      "count": 1
+    },
+    {
+      "title": "Senior Finance Manager",
+      "count": 1
+    },
+    {
+      "title": "Credit Analyst (Finance Department/ Banking)",
+      "count": 1
+    },
+    {
+      "title": "Valuation Risk Analyst",
+      "count": 1
+    },
+    {
+      "title": "FP&A Analyst",
+      "count": 1
+    },
+    {
+      "title": "Financial Analyst, FC Ops Finance",
+      "count": 1
+    },
+    {
+      "title": "Sr. Associate - Financial Analyst",
+      "count": 1
+    },
+    {
+      "title": "Financial Analyst - FP&A",
+      "count": 1
+    },
+    {
+      "title": "Financial Services and Insurance Data Analyst",
+      "count": 1
+    },
+    {
+      "title": "Analyst |Capital Markets & Investment Services | Gurugram",
+      "count": 1
+    },
+    {
+      "title": "Assistant Manager - Finance",
+      "count": 1
+    },
+    {
+      "title": "Sr. Finance Analyst",
+      "count": 1
+    },
+    {
+      "title": "Financial Analyst for All India",
+      "count": 1
+    },
+    {
+      "title": "Credit Research Analyst",
+      "count": 1
+    },
+    {
+      "title": "AML Analyst",
+      "count": 1
+    },
+    {
+      "title": "Finance Intern (Equity Research)",
+      "count": 1
+    },
+    {
+      "title": "Valuation Analyst",
+      "count": 1
+    },
+    {
+      "title": "Finance Analyst (II)",
+      "count": 1
+    },
+    {
+      "title": "Aurum Equity Partners - Analyst - Investment Banking",
+      "count": 1
+    },
+    {
+      "title": "Credit Research Analyst- High Yield",
+      "count": 1
+    },
+    {
+      "title": "Global Banking and Markets-Bengaluru Analyst Program-Analyst-Bengaluru",
+      "count": 1
+    },
+    {
+      "title": "Associate Analyst I - Finance",
+      "count": 1
+    },
+    {
+      "title": "Analyst, Financial Planning & Analysis",
+      "count": 1
+    },
+    {
+      "title": "Finance Analyst - Global RTR Process",
+      "count": 1
+    },
+    {
+      "title": "Financial Planning & Analysis (FP&A)",
+      "count": 1
+    },
+    {
+      "title": "Deputy Manager, Business HR",
+      "count": 1
+    },
+    {
+      "title": "Manager, Business HR",
+      "count": 1
+    },
+    {
+      "title": "Area Human Resources Manager",
+      "count": 1
+    },
+    {
+      "title": "Dy.Manager/Manager HR",
+      "count": 1
+    },
+    {
+      "title": "Human Resources Executive/ HR Generalist",
+      "count": 1
+    },
+    {
+      "title": "Senior Human Resources Business Partner",
+      "count": 1
+    },
+    {
+      "title": "Human Resources Business Partner - Bangalore, India",
+      "count": 1
+    },
+    {
+      "title": "Chief Human Resources Officer",
+      "count": 1
+    },
+    {
+      "title": "Asst. Manager HR",
+      "count": 1
+    },
+    {
+      "title": "Regional HR Manager",
+      "count": 1
+    },
+    {
+      "title": "Human Resources Business Manager",
+      "count": 1
+    },
+    {
+      "title": "Human Resource Manager",
+      "count": 1
+    },
+    {
+      "title": "Senior Manager Corporate Human Resources",
+      "count": 1
+    },
+    {
+      "title": "Assistant Manager - HR",
+      "count": 1
+    },
+    {
+      "title": "Human Resources Director",
+      "count": 1
+    },
+    {
+      "title": "Senior Human Resources Communications Manager",
+      "count": 1
+    },
+    {
+      "title": "Assistant Manager - HR COE",
+      "count": 1
+    },
+    {
+      "title": "HR BP Manager",
+      "count": 1
+    },
+    {
+      "title": "Interesting Job Opportunity: Xpressbees - Manager - HR Business Partner - South",
+      "count": 1
+    },
+    {
+      "title": "Human Resources Operations Manager",
+      "count": 1
+    },
+    {
+      "title": "Senior Manager - Talent Acquisition",
+      "count": 1
+    },
+    {
+      "title": "Manager / Senior Manager - Human Resources",
+      "count": 1
+    },
+    {
+      "title": "Assistant Human Resource Manager",
+      "count": 1
+    },
+    {
+      "title": "NxtWave - Senior HR Business Partner",
+      "count": 1
+    },
+    {
+      "title": "Associate Director Human Resources",
+      "count": 1
+    },
+    {
+      "title": "Sr. Manager Unit HR IR - Nanded",
+      "count": 1
+    },
+    {
+      "title": "Regional Human Resources Manager",
+      "count": 1
+    },
+    {
+      "title": "Sr Associate Human Resources",
+      "count": 1
+    },
+    {
+      "title": "Talent Acquisition Manager",
+      "count": 1
+    },
+    {
+      "title": "Associate Human Resources Business Partner",
+      "count": 1
+    },
+    {
+      "title": "Senior Manager HR Compliances",
+      "count": 1
+    },
+    {
+      "title": "Senior Human Resource Manager",
+      "count": 1
+    },
+    {
+      "title": "Human Resources Business Partner (Tech)",
+      "count": 1
+    },
+    {
+      "title": "HR Manager - Regional APAC",
+      "count": 1
+    },
+    {
+      "title": "Senior Manager - HR Process Excellence",
+      "count": 1
+    },
+    {
+      "title": "Regional HR Manager, Employee Relations",
+      "count": 1
+    },
+    {
+      "title": "General Manager - Human Resource",
+      "count": 1
+    },
+    {
+      "title": "Regional HR Manager (North)",
+      "count": 1
+    },
+    {
+      "title": "Dy. Manager - Manager HR / ER",
+      "count": 1
+    },
+    {
+      "title": "Firstcry - Content Writing Role",
+      "count": 1
+    },
+    {
+      "title": "Web Content Writer",
+      "count": 1
+    },
+    {
+      "title": "Copywriter (Mumbai)",
+      "count": 1
+    },
+    {
+      "title": "Content Strategist",
+      "count": 1
+    },
+    {
+      "title": "Associate Manager - Copywriter",
+      "count": 1
+    },
+    {
+      "title": "Assistant Manager - Copywriter",
+      "count": 1
+    },
+    {
+      "title": "Content Writer - Blogs",
+      "count": 1
+    },
+    {
+      "title": "Editor (Content Writer) - Mumbai",
+      "count": 1
+    },
+    {
+      "title": "Content Editor",
+      "count": 1
+    },
+    {
+      "title": "Content Writers / Business Writers",
+      "count": 1
+    },
+    {
+      "title": "Business content writers/desk professionals",
+      "count": 1
+    },
+    {
+      "title": "Features Writer, Vogue",
+      "count": 1
+    },
+    {
+      "title": "Content Writers Fresher",
+      "count": 1
+    },
+    {
+      "title": "Finance Copywriter",
+      "count": 1
+    },
+    {
+      "title": "Copy writer",
+      "count": 1
+    },
+    {
+      "title": "Copywriter  (Social Media) 3-5Yrs",
+      "count": 1
+    },
+    {
+      "title": "Writer-Editor",
+      "count": 1
+    },
+    {
+      "title": "Youtube Content Writer",
+      "count": 1
+    },
+    {
+      "title": "Vacancy for__Copy Writer",
+      "count": 1
+    },
+    {
+      "title": "Sub Editor",
+      "count": 1
+    },
+    {
+      "title": "Editor \u2013 News, Cleantech Publications",
+      "count": 1
+    },
+    {
+      "title": "Engineer / Senior Engineer / Assistant Manager - Mechanical",
+      "count": 1
+    },
+    {
+      "title": "Engineer / Senior Engineer - Mechanical",
+      "count": 1
+    },
+    {
+      "title": "Mechanical Maintenance Engineer  - Chakan Pune (Only Diploma Mechanical )",
+      "count": 1
+    },
+    {
+      "title": "Plant Simulation Engineer",
+      "count": 1
+    },
+    {
+      "title": "Vehicle Dynamics Simulation Engineer",
+      "count": 1
+    },
+    {
+      "title": "Mechanical Equipment Engineer",
+      "count": 1
+    },
+    {
+      "title": "CAE Engineer",
+      "count": 1
+    },
+    {
+      "title": "Aero Seating Mechanical Design Engineer",
+      "count": 1
+    },
+    {
+      "title": "Mechanical - Trainee Design Engineer",
+      "count": 1
+    },
+    {
+      "title": "BIW Process Engineer (Digital Manufacturing)",
+      "count": 1
+    },
+    {
+      "title": "Manufacturing Process Engineer",
+      "count": 1
+    },
+    {
+      "title": "Design Engineer",
+      "count": 1
+    },
+    {
+      "title": "Mechanical Engineer (Canada Loc) $500,000/year USD",
+      "count": 1
+    },
+    {
+      "title": "Supplier Quality Assurance Engineer, India",
+      "count": 1
+    },
+    {
+      "title": "Mechanical Engineer (Fresher)",
+      "count": 1
+    },
+    {
+      "title": "Mechanical Engineer (Canada):; : $500,000/year USD",
+      "count": 1
+    },
+    {
+      "title": "Automobile Engineer",
+      "count": 1
+    },
+    {
+      "title": "Manufacturing engineer",
+      "count": 1
+    },
+    {
+      "title": "Mechanical Engineer (Canada) : $500,000/year USD",
+      "count": 1
+    },
+    {
+      "title": "Project Engineer - Mechanical Design",
+      "count": 1
+    },
+    {
+      "title": "Mechanical Static Engineer (Design)",
+      "count": 1
+    },
+    {
+      "title": "Sr. Engineer / Assistant Manager - Mechanical",
+      "count": 1
+    },
+    {
+      "title": "Project Engineer (Mechanical) (Saudi Arabia)",
+      "count": 1
+    },
+    {
+      "title": "Fresh HVAC Project Engineer",
+      "count": 1
+    },
+    {
+      "title": "Product Engineer \u2013 Brake Friction",
+      "count": 1
+    },
+    {
+      "title": "Mechanical engineering",
+      "count": 1
+    },
+    {
+      "title": "Product Engineer (1-2 Years)",
+      "count": 1
+    },
+    {
+      "title": "Quality Engineering Specialist",
+      "count": 1
+    },
+    {
+      "title": "Automotive Mechanical Engineer",
+      "count": 1
+    },
+    {
+      "title": "Mechanical Design Engineer\u2013 BOP/Main Plant-Thermal",
+      "count": 1
+    },
+    {
+      "title": "GET",
+      "count": 1
+    },
+    {
+      "title": "BIW Design Engineer",
+      "count": 1
+    },
+    {
+      "title": "Design Engineer - Vehicle Integration",
+      "count": 1
+    },
+    {
+      "title": "Engineer - Mechanical",
+      "count": 1
+    },
+    {
+      "title": "Mechanical Engineer (Canada: $500,000/year USD",
+      "count": 1
+    },
+    {
+      "title": "Mechanical engineer",
+      "count": 1
+    },
+    {
+      "title": "Jr. Engineer Mechanical Testing Laboratory",
+      "count": 1
+    },
+    {
+      "title": "Motor Grader Engineer.",
+      "count": 1
+    },
+    {
+      "title": "Required Design Engineer Mechanical_Kolkata",
+      "count": 1
+    },
+    {
+      "title": "Inprocess Quality Engineer - Bommasandra, Bangalore",
+      "count": 1
+    },
+    {
+      "title": "R & D Engineer- Mechanical",
+      "count": 1
+    },
+    {
+      "title": "Plant Vehicle Engineer",
+      "count": 1
+    },
+    {
+      "title": "Assembly Engineer",
+      "count": 1
+    },
+    {
+      "title": "Mechanical Engineer (Saudi Arabia)",
+      "count": 1
+    },
+    {
+      "title": "Global Manufacturing engineer",
+      "count": 1
+    },
+    {
+      "title": "Stamping Simulation Engineer",
+      "count": 1
+    },
+    {
+      "title": "Jr engineer-Mechanical",
+      "count": 1
+    },
+    {
+      "title": "Engineer Mechanical",
+      "count": 1
+    },
+    {
+      "title": "Junior Engineer - Locomotive NDT Quality",
+      "count": 1
+    },
+    {
+      "title": "Product Design Engineer",
+      "count": 1
+    },
+    {
+      "title": "HVAC Design Engineer",
+      "count": 1
+    },
+    {
+      "title": "Production Engineer - Injection Molding",
+      "count": 1
+    }
+  ],
+  "all_titles": [
+    "AI ENGINEER",
+    "AI Safety Data Scientist",
+    "AI and Machine Learning Engineer",
+    "AI/ML Developer",
+    "AI/ML Engineer",
+    "AI/ML consultants_GCP Build",
+    "AM Sales & Sales Manager",
+    "AML Analyst",
+    "AML/KYC Analyst",
+    "AVP Business Development",
+    "Account Executive - SMB",
+    "Account Manager",
+    "Account Manager, Ad Sales",
+    "Aero Seating Mechanical Design Engineer",
+    "Aerospace Engineer",
+    "Analyst - Finance",
+    "Analyst - Risk Management",
+    "Analyst |Capital Markets & Investment Services | Gurugram",
+    "Analyst, Financial Planning & Analysis",
+    "Analyst/Associate, Real Assets Financing",
+    "Android Developer-SDE 1 & 2(Software Development Engineer)",
+    "Applied Data Scientist - 2",
+    "Applied Scientist",
+    "Area Human Resources Manager",
+    "Area Manager Retail Business Development (Rest of Maharashtra)",
+    "Area Sales Executive",
+    "Area Sales Manager",
+    "Area Sales Manager-Goa (QR Sales)",
+    "Area Sales Manger / Sales Manager",
+    "Assembly Engineer",
+    "Assistant Human Resource Manager",
+    "Assistant Manager - Channel Sales",
+    "Assistant Manager - Copywriter",
+    "Assistant Manager - Finance",
+    "Assistant Manager - HR",
+    "Assistant Manager - HR COE",
+    "Assistant Manager - Marketing",
+    "Assistant Manager - New Business Development (Mumbai/Pune)",
+    "Assistant Manager - Retention Marketing",
+    "Assistant Manager - Sales",
+    "Assistant Manager - Sales & Specifications",
+    "Assistant Manager Digital & Marketing",
+    "Assistant Manager Digital Marketing",
+    "Assistant Manager Human Resources",
+    "Assistant Manager Sales (Pune)",
+    "Assistant Manager | Field Sales and Servicing | B2B Sales",
+    "Assistant Manager, Business Development - India",
+    "Assistant Manager- Sales",
+    "Assistant Marketing Manager",
+    "Assistant Marketing Manager - Gurgaon Based",
+    "Assistant Marketing Manager \u2013 South Asia (Unilever International)",
+    "Assistant Sales Manager",
+    "Assistant Sales Manager - Noida",
+    "Assistant Sales Manager- Kalyan / Dombivli",
+    "Associate - Copywriter",
+    "Associate Analyst I - Finance",
+    "Associate Director / Director in Business Development (AI/ML)",
+    "Associate Director Human Resources",
+    "Associate Finance Analyst",
+    "Associate Human Resources Business Partner",
+    "Associate Manager - Copywriter",
+    "Associate Product Manager",
+    "Associate Product Manager - II",
+    "Associate Product Marketing Manager",
+    "Associate Sales Manager",
+    "Associate Software Engineer",
+    "Asst. Manager HR",
+    "Aurum Equity Partners - Analyst - Investment Banking",
+    "Automobile Engineer",
+    "Automotive Mechanical Engineer",
+    "BDM (Business Development Manager)",
+    "BIW Design Engineer",
+    "BIW Process Engineer (Digital Manufacturing)",
+    "Bigbasket - Software Development Engineer - Test - Manual Testing",
+    "Business Development Director",
+    "Business Development Director - CDMO",
+    "Business Development Executive",
+    "Business Development Executive Adfors",
+    "Business Development GM",
+    "Business Development Manager",
+    "Business Development Manager ( NBFC)",
+    "Business Development Manager (AGM)",
+    "Business Development Manager (BDM)",
+    "Business Development Manager (Kochi Location)",
+    "Business Development Manager (Mumbai)",
+    "Business Development Manager - India",
+    "Business Development Manager - MENA",
+    "Business Development Manager - South India",
+    "Business Development Manager, , LPA Offline Merchants",
+    "Business Development Manager, Mumbai, Chennai",
+    "Business Development Manager- Interiors",
+    "Business Development and Operations Manager",
+    "Business content writers/desk professionals",
+    "CAE Engineer",
+    "CI Business Development Executive",
+    "CSD Area Sales Manager",
+    "Chief Human Resources Officer",
+    "Content & Brand Marketing Executive (Social Media Focus)",
+    "Content Editor",
+    "Content Strategist",
+    "Content Writer",
+    "Content Writer - Blogs",
+    "Content Writer/Executive Administration H&S",
+    "Content Writers / Business Writers",
+    "Content Writers Fresher",
+    "Content Writing",
+    "Copy Editor",
+    "Copy Writer",
+    "Copy writer",
+    "Copywriter",
+    "Copywriter  (Social Media) 3-5Yrs",
+    "Copywriter (Mumbai)",
+    "Corporate Development Manager (Founder\u2019s Office)",
+    "Counter Sales Executive",
+    "Credit Analyst",
+    "Credit Analyst (Finance Department/ Banking)",
+    "Credit Analyst - Investments",
+    "Credit Analyst-Home Loans",
+    "Credit Research Analyst",
+    "Credit Research Analyst- High Yield",
+    "Credit Risk Analyst",
+    "Data Science",
+    "Data Science Specialist",
+    "Data Scientist",
+    "Data Scientist (AI/ML)",
+    "Data Scientist (People & HR Analytics)",
+    "Data Scientist - 3",
+    "Data Scientist - II",
+    "Data Scientist - Image Processing",
+    "Data Scientist - Kochi",
+    "Data Scientist - Product",
+    "Data Scientist I",
+    "Data Scientist, Research, Search",
+    "Data Scientist- BLR HYD GGN",
+    "Data Scientists (All levels), Analytical Chemistry",
+    "Data Scientists with career break-Woman",
+    "Datascientist",
+    "Deep Learning Engineer",
+    "Deputy Area Sales Manager Goa",
+    "Deputy General Manager Business Development",
+    "Deputy Manager - HR",
+    "Deputy Manager, Business HR",
+    "Design Engineer",
+    "Design Engineer - Vehicle Integration",
+    "Digital Marketing",
+    "Digital Marketing (3-6 years)",
+    "Digital Marketing Associate",
+    "Digital Marketing Executive",
+    "Digital Marketing Manager",
+    "Digital Marketing Specialist",
+    "Digital Marketing intern",
+    "Digital Marketing(Freshers)",
+    "Digital marketing freshers- Thane West",
+    "Director of Business Development",
+    "Director, Business Development Leader",
+    "Director, Strategic Business Development - India",
+    "Dy. Manager - Manager HR / ER",
+    "Dy.Manager/Manager HR",
+    "EaseMyTrip - Assistant Manager/Manager - Sales",
+    "Editor (Content Writer) - Mumbai",
+    "Editor \u2013 News, Cleantech Publications",
+    "Elite Foods - Regional Sales Manager",
+    "Engineer - Mechanical",
+    "Engineer / Senior Engineer - Mechanical",
+    "Engineer / Senior Engineer / Assistant Manager - Mechanical",
+    "Engineer Mechanical",
+    "Equity Analyst",
+    "Equity Capital Market Analyst",
+    "Equity Research Analyst",
+    "Equity Research Analyst/Associate",
+    "Executive- Social Media",
+    "FP&A Analyst",
+    "Features Writer, Vogue",
+    "Field Sales Executive",
+    "Finance Analyst",
+    "Finance Analyst (II)",
+    "Finance Analyst - Accounting & Reporting",
+    "Finance Analyst - Global RTR Process",
+    "Finance Analyst, Processor",
+    "Finance Copywriter",
+    "Finance Intern (Equity Research)",
+    "Finance Manager",
+    "Financial Analysis - Analyst",
+    "Financial Analyst",
+    "Financial Analyst - FP&A",
+    "Financial Analyst - FP&A (Financial Planning Analyst)",
+    "Financial Analyst for All India",
+    "Financial Analyst( Debt funding)",
+    "Financial Analyst, FC Ops Finance",
+    "Financial Analyst, Mumbai",
+    "Financial Planning & Analysis (FP&A)",
+    "Financial Planning & Analysis - Retail Sector",
+    "Financial Planning and Analysis",
+    "Financial Planning and Analysis Specialist",
+    "Financial Planning and Analysis Specialist (Only Night Shift)",
+    "Financial Services and Insurance Data Analyst",
+    "FirstCry - Executive - Social Media",
+    "Firstcry - Content Writing Role",
+    "Firstcry.com - Content Writer",
+    "Franchisee Sales Executive",
+    "Fresh HVAC Project Engineer",
+    "Fresher Software Engineer",
+    "Front-end Engineer/Web Developer (SDE 1 & 2)",
+    "Frontend Developer",
+    "Full Stack Software Engineer",
+    "GET",
+    "General Manager - Human Resource",
+    "Global Banking and Markets-Bengaluru Analyst Program-Analyst-Bengaluru",
+    "Global Equity Analyst",
+    "Global Manufacturing engineer",
+    "Global Markets - Equity Research - Analyst",
+    "HR BP Manager",
+    "HR Generalist",
+    "HR Manager",
+    "HR Manager - Regional APAC",
+    "HVAC Design Engineer",
+    "Hiring Senior Business Development Manager",
+    "Hiring for HFM /FCCS - looking for immediate Joiner Only- Work from office --Pune/Mumbai/Bangalore",
+    "Human Resource Manager",
+    "Human Resources Business Manager",
+    "Human Resources Business Partner",
+    "Human Resources Business Partner (Tech)",
+    "Human Resources Business Partner - Bangalore, India",
+    "Human Resources Director",
+    "Human Resources Executive/ HR Generalist",
+    "Human Resources Generalist",
+    "Human Resources Manager",
+    "Human Resources Operations Manager",
+    "Immediate opening for Data Scientist- Delhi (Hybrid)",
+    "India Business Development Manager",
+    "Inprocess Quality Engineer - Bommasandra, Bangalore",
+    "InsuranceDekho - Full Stack Software Development Engineer I - React.js/Node.js",
+    "Interesting Job Opportunity: Xpressbees - Manager - HR Business Partner - South",
+    "International Business Development Executive",
+    "International Business Development Manager",
+    "International Marketing Manager",
+    "Investment Analyst",
+    "Investment Banking Analyst",
+    "Java Developer",
+    "Jr engineer-Mechanical",
+    "Jr. Engineer Mechanical Testing Laboratory",
+    "Jr. Finance Analyst",
+    "Jr. Financial Analyst",
+    "Jr. Frontend Developer",
+    "Jr. Web Developer",
+    "Junior Content Writer",
+    "Junior Engineer - Locomotive NDT Quality",
+    "Junior FP&A",
+    "Junior Financial Analyst",
+    "Junior Frontend Web Developer",
+    "Junior Full Stack Engineer",
+    "Junior ML Engineer",
+    "Junior Marketing Associate - Social Media",
+    "Junior Social Media Marketing Executive",
+    "Junior Software Developer",
+    "Junior Web Developer",
+    "Key Account Manager : Pune (QR Sales )",
+    "Key Account Manager- Jaipur (QR Sales)",
+    "Kotak Life Suraksha Samarth Bal - Ex-Servicemen Hiring - L-3 - Sales- Manager - All Locations",
+    "LCS Sales Manager",
+    "Lead Data Scientist",
+    "Lead Financial Analyst",
+    "MACHINE LEARNING AI PLATFORM ENGINEER",
+    "ML Engineer",
+    "Machine Learning",
+    "Machine Learning Engineer",
+    "Machine Learning Engineer (Python / NLP)",
+    "Machine Learning Engineer - MLOps",
+    "Machine Learning Engineer - Python",
+    "Machine Learning Engineer - Python/SQL",
+    "Machine Learning Ops Engineer",
+    "Machine learning developer",
+    "Mamaearth - Assistant Manager - Performance Marketing",
+    "Manager - Brand Marketing",
+    "Manager - Business Development",
+    "Manager - Human Resources",
+    "Manager / Senior Manager (Business Development & Partnerships)",
+    "Manager / Senior Manager - Human Resources",
+    "Manager Business Development - International Programs",
+    "Manager Product - Denim",
+    "Manager \u2013 Marketing, D2C",
+    "Manager \u2013 Sales, Indore",
+    "Manager, Business HR",
+    "Manager, Marketing Regional Brands",
+    "Manager- Customer Retention Marketing",
+    "Manager- Ecommerce Marketing (Marketplace)",
+    "Manager/Senior Manager Business Development",
+    "Manufacturing Engineer",
+    "Manufacturing Process Engineer",
+    "Manufacturing engineer",
+    "Marketing Manager",
+    "Marketing coordinator",
+    "Mechanical - Trainee Design Engineer",
+    "Mechanical Design Engineer",
+    "Mechanical Design Engineer\u2013 BOP/Main Plant-Thermal",
+    "Mechanical Engineer",
+    "Mechanical Engineer (Canada Loc) $500,000/year USD",
+    "Mechanical Engineer (Canada) - $500,000/year USD",
+    "Mechanical Engineer (Canada) : $500,000/year USD",
+    "Mechanical Engineer (Canada): : $500,000/year USD",
+    "Mechanical Engineer (Canada):; : $500,000/year USD",
+    "Mechanical Engineer (Canada: $500,000/year USD",
+    "Mechanical Engineer (Fresher)",
+    "Mechanical Engineer (Saudi Arabia)",
+    "Mechanical Engineer Fresher",
+    "Mechanical Engineering",
+    "Mechanical Equipment Engineer",
+    "Mechanical Maintenance Engineer  - Chakan Pune (Only Diploma Mechanical )",
+    "Mechanical Static Engineer (Design)",
+    "Mechanical engineer",
+    "Mechanical engineering",
+    "Motor Grader Engineer.",
+    "NxtWave - Business Development Manager - Sales",
+    "NxtWave - Business Development Manager - Sales - Hindi",
+    "NxtWave - Business Development Manager - Sales - Odia",
+    "NxtWave - Business Development Manager - Sales - Tamil",
+    "NxtWave - Manager - Business Development",
+    "NxtWave - Manager - Business Development/Sales",
+    "NxtWave - Senior HR Business Partner",
+    "Nxtwave - Manager - Business Development/Sales",
+    "Pharma sales executive",
+    "Piping Engineer",
+    "Plant Simulation Engineer",
+    "Plant Vehicle Engineer",
+    "Portfolio Analyst",
+    "Price and Promo- Data Scientist",
+    "Principal Analyst - Macro (Equity)- Core Equity Research.",
+    "Product Data Scientist, Security",
+    "Product Design Engineer",
+    "Product Engineer (1-2 Years)",
+    "Product Engineer \u2013 Brake Friction",
+    "Product Innovation Manager",
+    "Product Management Team",
+    "Product Manager",
+    "Product Manager (Full Time, Remote)",
+    "Product Manager (WFH)",
+    "Product Manager - Millennial Banking",
+    "Product Manager - Payment Services",
+    "Product Manager Credit Card",
+    "Product Manager, India & MENA",
+    "Product Manager, Looker",
+    "Product Manager, Looker Studio",
+    "Product Manager- Healthcare",
+    "Product Owner - Platform",
+    "Product Owner - Process Manager",
+    "Product Owner - eLogbook",
+    "Product Quality Engineer",
+    "Product Strategy Manager",
+    "Product manager",
+    "Production Engineer - Injection Molding",
+    "Project Engineer (Mechanical) (Saudi Arabia)",
+    "Project Engineer - Mechanical Design",
+    "Python & Machine Learning Engineer - Pandas/Numpy",
+    "Python Developer",
+    "Python Development",
+    "Python developer",
+    "Quality Engineer",
+    "Quality Engineering Specialist",
+    "R & D Engineer- Mechanical",
+    "React Developer",
+    "React JS Developer- Software Engineer",
+    "Regional Business Development Manager - Emerging Markets",
+    "Regional HR Manager",
+    "Regional HR Manager (North)",
+    "Regional HR Manager, Employee Relations",
+    "Regional Human Resources Manager",
+    "Regional Marketing Manager",
+    "Regional Sales Manager (OTC Sales)",
+    "Relationship Manager | Field Sales and Servicing | B2B Sales",
+    "Relationship Manager | Inside Sales and Servicing | B2B Sales",
+    "Required Design Engineer Mechanical_Kolkata",
+    "Retail Sales Executive",
+    "Retails Sales Executive",
+    "Risk Analyst",
+    "SDE 1",
+    "SDE 1 (Frontend)",
+    "SDE 2 - Backend",
+    "SDE III-Front END (React.JS)",
+    "SDE-I (Full-stack Developer)",
+    "Sales Executive",
+    "Sales Manager",
+    "Sales Manager I",
+    "Sales Manager II",
+    "Sales Manager- Mohali",
+    "Senior Business Development Manager",
+    "Senior Business Development Manager - Alternate Accommodation",
+    "Senior Data Scientist",
+    "Senior Executive Relationship Manager - Business Development",
+    "Senior Finance Manager",
+    "Senior Financial Analyst",
+    "Senior Human Resource Manager",
+    "Senior Human Resources Business Partner",
+    "Senior Human Resources Communications Manager",
+    "Senior Machine Learning Engineer",
+    "Senior Manager - Business Development",
+    "Senior Manager - Business Development and Operations/VP Business and Operation",
+    "Senior Manager - HR Business Partner",
+    "Senior Manager - HR Process Excellence",
+    "Senior Manager - Human Resources",
+    "Senior Manager - Product Management",
+    "Senior Manager - Talent Acquisition",
+    "Senior Manager Corporate Human Resources",
+    "Senior Manager HR Compliances",
+    "Senior Manager \u2013 Shopper Marketing",
+    "Senior Product Manager",
+    "Senior Product Manager (Platform)",
+    "Senior Product Manager (Product Strategy)",
+    "Senior Sales Executive / Sales Manager",
+    "Senior Software Engineer, Machine Learning",
+    "Social Media Coordinator",
+    "Social Media Executive",
+    "Social Media Executive (Fresher)",
+    "Social Media Executive-Fresher to 1 year",
+    "Social Media Marketing",
+    "Social Media Marketing Associate / Brand Manager",
+    "Social Media Marketing Executive",
+    "Social Media Marketing Specialist",
+    "Social Media Promoter",
+    "Social Media Specialist",
+    "Social Media executive",
+    "Social media (short creater)",
+    "Software Developer",
+    "Software Development",
+    "Software Development Engineer",
+    "Software Development Engineer - II (Backend)",
+    "Software Development Engineer 1 (SDE-1)",
+    "Software Development Engineer 1 - Frontend",
+    "Software Engineer",
+    "Software Engineer ( Intern )",
+    "Software Engineer (Python)",
+    "Software Engineer - Applications",
+    "Software Engineer - Backend (3-5yrs), Pune",
+    "Software Engineer - Entry Level - Java",
+    "Software Engineer - Front-end Developer",
+    "Software Engineer - Frontend",
+    "Software Engineer - Fullstack",
+    "Software Engineer - Intern",
+    "Software Engineer - NLP, Machine Learning",
+    "Software Engineer - UI",
+    "Software Engineer 2",
+    "Software Engineer I",
+    "Software Engineer II",
+    "Software Engineer II, Full Stack, Google Cloud",
+    "Software Engineer Intern",
+    "Software Engineer Intern, Frontend",
+    "Software Engineer Test",
+    "Software Engineer, AI Platform",
+    "Software Engineer, Core",
+    "Software Engineer, Machine Learning, Google Ads",
+    "Software Engineer, Systems Infrastructure",
+    "Software Engineer- 2",
+    "Software Engineer- Java",
+    "Software engineer (Remote)",
+    "Sr Associate Human Resources",
+    "Sr HR Generalist",
+    "Sr. Associate - Financial Analyst",
+    "Sr. Credit Risk Analyst",
+    "Sr. Data Scientist \u2013 IoT data & Satellite Analytics",
+    "Sr. Engineer / Assistant Manager - Mechanical",
+    "Sr. Finance Analyst",
+    "Sr. Manager Business Development",
+    "Sr. Manager Unit HR IR - Nanded",
+    "Sr. Manager/Manager - Business Development",
+    "Sr. Sales Executive",
+    "Staff Copywriter",
+    "Staff Product Manager",
+    "Stamping Simulation Engineer",
+    "Sub Editor",
+    "Supplier Quality Assurance Engineer, India",
+    "Talent Acquisition Manager",
+    "Team Lead, Area sales Manager & Key Account Manager- Bengaluru",
+    "Technical Product Manager",
+    "Territory Sales Manager - Corporate Sales",
+    "Trading Analyst",
+    "Upstox - Software Development Engineer - II/III (Frontend)",
+    "Vacancies Area Sales Manager, Area Sales Officer, Area Business Manager",
+    "Vacancy for__Copy Writer",
+    "Valuation Analyst",
+    "Valuation Risk Analyst",
+    "Vehicle Dynamics Simulation Engineer",
+    "Web / UI Developer (HTML5 / CSS3 / JavaScript)",
+    "Web Application Developer",
+    "Web Content Writer",
+    "Web DevelopeR - pune",
+    "Web Developer",
+    "Web Developer (Front-End)",
+    "Web developer",
+    "WedMeGood - Manager - Business Development",
+    "Writer-Editor",
+    "Youtube Content Writer",
+    "ZEE - Assistant Manager/Manager - Marketing",
+    "full Stack Developer",
+    "hiring Jr. Digital Marketing Executive@ Ghansoli",
+    "junior social media marketing",
+    "web developer"
+  ]
+}

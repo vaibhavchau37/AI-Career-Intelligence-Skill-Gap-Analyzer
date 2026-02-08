@@ -1,0 +1,59 @@
+name: Java Developer
+description: Java Developer responsible for building enterprise-level applications and services
+
+required_skills:
+  - name: Java
+    importance: 1.0
+    description: Core Java programming
+  - name: Spring Framework
+    importance: 0.9
+    description: Spring/Spring Boot
+  - name: REST API
+    importance: 0.9
+    description: RESTful web services
+  - name: SQL
+    importance: 0.8
+    description: Database management
+  - name: OOP
+    importance: 0.9
+    description: Object-oriented design
+
+preferred_skills:
+  - name: Microservices
+    importance: 0.8
+    description: Microservices architecture
+  - name: Hibernate
+    importance: 0.7
+    description: ORM framework
+  - name: Maven/Gradle
+    importance: 0.7
+    description: Build tools
+  - name: Docker/Kubernetes
+    importance: 0.7
+    description: Containerization
+  - name: AWS
+    importance: 0.6
+    description: Cloud services
+  - name: Git
+    importance: 0.8
+    description: Version control
+  - name: JUnit
+    importance: 0.7
+    description: Testing framework
+
+required_experience:
+  min_years: 3
+  max_years: 7
+
+education:
+  - Bachelor's degree in Computer Science or related field
+
+certifications:
+  - Oracle Certified Java Programmer
+  - Spring Professional Certification
+  - AWS Certified Developer
+
+projects:
+  - Enterprise application development
+  - Microservices implementation
+  - Backend system design

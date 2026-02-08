@@ -1,0 +1,59 @@
+name: Python Developer
+description: Python Developer responsible for building scalable applications and backend systems
+
+required_skills:
+  - name: Python
+    importance: 1.0
+    description: Core Python programming
+  - name: Django/Flask
+    importance: 0.9
+    description: Python web frameworks
+  - name: REST API
+    importance: 0.9
+    description: RESTful API development
+  - name: SQL
+    importance: 0.8
+    description: Database management
+  - name: OOP
+    importance: 0.9
+    description: Object-oriented programming
+
+preferred_skills:
+  - name: Docker
+    importance: 0.7
+    description: Containerization
+  - name: AWS/Azure
+    importance: 0.7
+    description: Cloud platforms
+  - name: Git
+    importance: 0.8
+    description: Version control
+  - name: PostgreSQL/MySQL
+    importance: 0.7
+    description: Relational databases
+  - name: MongoDB
+    importance: 0.6
+    description: NoSQL database
+  - name: Microservices
+    importance: 0.7
+    description: Microservices architecture
+  - name: CI/CD
+    importance: 0.6
+    description: Continuous integration/deployment
+
+required_experience:
+  min_years: 2
+  max_years: 5
+
+education:
+  - Bachelor's degree in Computer Science or related field
+
+certifications:
+  - Python Institute Certifications
+  - AWS Certified Developer
+  - Microsoft Certified: Azure Developer
+
+projects:
+  - Backend API development
+  - Web application development
+  - Automation scripts

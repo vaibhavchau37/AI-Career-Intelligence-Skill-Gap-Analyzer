@@ -1,0 +1,57 @@
+name: Salesforce Developer
+description: Salesforce Developer responsible for customizing and developing on the Salesforce platform
+
+required_skills:
+  - name: Salesforce
+    importance: 1.0
+    description: Salesforce platform knowledge
+  - name: Apex
+    importance: 0.9
+    description: Apex programming
+  - name: Lightning Web Components
+    importance: 0.9
+    description: LWC development
+  - name: Visualforce
+    importance: 0.8
+    description: Visualforce pages
+  - name: SOQL/SOSL
+    importance: 0.8
+    description: Salesforce query languages
+
+preferred_skills:
+  - name: Sales Cloud
+    importance: 0.7
+    description: Sales Cloud features
+  - name: Service Cloud
+    importance: 0.7
+    description: Service Cloud features
+  - name: Integration
+    importance: 0.8
+    description: API and integration patterns
+  - name: Vlocity
+    importance: 0.6
+    description: Vlocity/OmniStudio
+  - name: CPQ
+    importance: 0.6
+    description: Configure Price Quote
+  - name: JavaScript
+    importance: 0.7
+    description: Frontend development
+
+required_experience:
+  min_years: 3
+  max_years: 6
+
+education:
+  - Bachelor's degree in Computer Science or related field
+
+certifications:
+  - Salesforce Certified Platform Developer I
+  - Salesforce Certified Platform Developer II
+  - Salesforce Certified Administrator
+  - Salesforce Certified App Builder
+
+projects:
+  - Salesforce implementation
+  - Custom application development
+  - Integration projects

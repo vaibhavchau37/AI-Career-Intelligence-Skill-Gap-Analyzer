@@ -1,0 +1,57 @@
+name: Product Manager
+description: Product Manager responsible for defining product vision, strategy, and roadmap
+
+required_skills:
+  - name: Product Strategy
+    importance: 1.0
+    description: Product vision and strategic planning
+  - name: Stakeholder Management
+    importance: 0.9
+    description: Communication with stakeholders
+  - name: Market Research
+    importance: 0.9
+    description: User research and market analysis
+  - name: Agile/Scrum
+    importance: 0.9
+    description: Agile product development
+  - name: Data Analysis
+    importance: 0.8
+    description: Data-driven decision making
+
+preferred_skills:
+  - name: Technical Knowledge
+    importance: 0.7
+    description: Understanding of software development
+  - name: UX/UI Design
+    importance: 0.7
+    description: User experience principles
+  - name: SQL
+    importance: 0.6
+    description: Data querying and analysis
+  - name: Product Analytics
+    importance: 0.7
+    description: Tools like Mixpanel, Amplitude
+  - name: A/B Testing
+    importance: 0.6
+    description: Experimentation and testing
+  - name: Wireframing
+    importance: 0.6
+    description: Product design tools
+
+required_experience:
+  min_years: 3
+  max_years: 7
+
+education:
+  - Bachelor's degree in Business, Engineering, or related field
+  - MBA preferred
+
+certifications:
+  - Certified Scrum Product Owner
+  - Product Management Certificate
+  - Google Analytics Certification
+
+projects:
+  - Product launches
+  - Feature development
+  - Product roadmap creation

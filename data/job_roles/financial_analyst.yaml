@@ -1,0 +1,58 @@
+name: Financial Analyst
+description: Financial Analyst responsible for financial planning, analysis, and reporting
+
+required_skills:
+  - name: Financial Modeling
+    importance: 1.0
+    description: Building financial models
+  - name: Excel
+    importance: 1.0
+    description: Advanced Excel and data analysis
+  - name: Financial Reporting
+    importance: 0.9
+    description: Financial statements and reports
+  - name: Data Analysis
+    importance: 0.9
+    description: Analyzing financial data
+  - name: Accounting Principles
+    importance: 0.9
+    description: GAAP and accounting standards
+
+preferred_skills:
+  - name: SQL
+    importance: 0.7
+    description: Database querying
+  - name: PowerBI/Tableau
+    importance: 0.7
+    description: Data visualization
+  - name: Python
+    importance: 0.6
+    description: Programming for analysis
+  - name: Forecasting
+    importance: 0.8
+    description: Financial forecasting
+  - name: Budgeting
+    importance: 0.7
+    description: Budget planning and analysis
+  - name: ERP Systems
+    importance: 0.6
+    description: SAP, Oracle
+
+required_experience:
+  min_years: 2
+  max_years: 5
+
+education:
+  - Bachelor's degree in Finance, Accounting, Economics
+  - CFA or MBA preferred
+
+certifications:
+  - CFA (Chartered Financial Analyst)
+  - FRM (Financial Risk Manager)
+  - CPA (Certified Public Accountant)
+  - Financial Modeling Certification
+
+projects:
+  - Financial forecasting models
+  - Budget variance analysis
+  - Investment analysis

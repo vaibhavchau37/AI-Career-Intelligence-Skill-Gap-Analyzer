@@ -1,0 +1,54 @@
+name: Software Engineer
+description: Software Engineer responsible for designing, developing, testing, and maintaining software applications
+
+required_skills:
+  - name: Programming Languages
+    importance: 1.0
+    description: Proficiency in languages like Java, Python, C++, or JavaScript
+  - name: Data Structures & Algorithms
+    importance: 0.9
+    description: Strong foundation in DS and algorithms
+  - name: Object-Oriented Programming
+    importance: 0.9
+    description: OOP concepts and design patterns
+  - name: Problem Solving
+    importance: 0.9
+    description: Analytical and problem-solving abilities
+  - name: Version Control
+    importance: 0.8
+    description: Git/GitHub for code management
+
+preferred_skills:
+  - name: Web Development
+    importance: 0.7
+    description: Experience with web frameworks and technologies
+  - name: Database Management
+    importance: 0.7
+    description: SQL and NoSQL databases
+  - name: API Development
+    importance: 0.7
+    description: REST API design and development
+  - name: Cloud Platforms
+    importance: 0.6
+    description: AWS, Azure, or GCP experience
+  - name: Agile Methodologies
+    importance: 0.6
+    description: Experience with Agile/Scrum
+
+required_experience:
+  min_years: 2
+  max_years: 5
+
+education:
+  - BE/B.Tech in Computer Science or related field
+  - MCA or equivalent
+
+certifications:
+  - AWS Certified Developer
+  - Oracle Certified Java Developer
+  - Microsoft Azure Developer
+
+projects:
+  - Full-stack application development
+  - System design projects
+  - Open source contributions

@@ -18,11 +18,18 @@ skill_matching:
 job_roles:
   data_path: "data/job_roles"
   default_roles:
-    - "ML Engineer"
     - "Data Scientist"
-    - "AI Researcher"
+    - "ML Engineer"
     - "Data Engineer"
-    - "MLEngineer"
+    - "Software Engineer"
+    - "Web Developer"
+    - "Python Developer"
+    - "Java Developer"
+    - "Salesforce Developer"
+    - "Business Analyst"
+    - "Product Manager"
+    - "Financial Analyst"
+    - "Business Development Manager"
 
 # Skill Taxonomy
 skills:
