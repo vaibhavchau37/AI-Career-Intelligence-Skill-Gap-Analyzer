@@ -5,12 +5,41 @@ A clean, simple, college-presentation ready web interface for career analysis.
 """
 
 import streamlit as st
+
+# Local dev convenience: load environment variables from .env (ignored by git)
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except Exception:
+    pass
+
+
+def _has_config_value(key_name: str) -> bool:
+    """Return True if a config value exists in env or Streamlit secrets."""
+    if os.getenv(key_name):
+        return True
+    try:
+        return bool(st.secrets.get(key_name))
+    except Exception:
+        return False
+
+
+def _default_ai_provider() -> str:
+    # Prefer providers that are configured to avoid confusing quota errors.
+    if _has_config_value("GOOGLE_GEMINI_API_KEY"):
+        return "Gemini"
+    if _has_config_value("SAMBANOVA_API_KEY"):
+        return "SambaNova"
+    return "OpenAI"
 import sys
 from pathlib import Path
 import json
 import time
 import yaml
 import os
+import difflib
+import html
 from datetime import datetime
 
 # Add src to path
@@ -19,8 +48,10 @@ sys.path.insert(0, str(Path(__file__).parent))
 from src.core.pdf_resume_parser import PDFResumeParser
 from src.core.skill_gap_analyzer_tfidf import SkillGapAnalyzerTFIDF
 from src.core.job_readiness_scorer import JobReadinessScorer
+from src.core.skill_extractor import SkillExtractor
 from src.matcher.role_suitability_predictor import RoleSuitabilityPredictor
 from src.roadmap.personalized_roadmap_generator import PersonalizedRoadmapGenerator
+from src.api.interview_ai import start_interview, interview_turn, generate_skill_questions
 from src.api.job_market_analyzer import JobMarketAnalyzer
 
 try:
@@ -216,6 +247,252 @@ def load_combined_job_titles():
         return {'total_titles': 0, 'titles_list': [], 'titles_by_frequency': []}
 
 
+@st.cache_data(show_spinner=False)
+def load_market_job_titles() -> dict:
+    """Load job titles from all available datasets (JSON + CSV) for the role dropdown.
+
+    Returns:
+        dict with keys:
+        - titles: List[str]
+        - title_counts: Dict[str, int] (0 when unknown)
+    """
+
+    def normalize_title(value: str) -> str:
+        value = html.unescape(str(value or "")).strip()
+        # Collapse whitespace
+        value = " ".join(value.split())
+        return value
+
+    def simplify_linkedin_job_field(value: str) -> str:
+        """Best-effort clean-up for the noisy `job` field in linkdin_Job_data.csv."""
+        value = normalize_title(value)
+        if not value:
+            return value
+        # Remove salary / extra details after " - "
+        if " - " in value:
+            value = value.split(" - ", 1)[0].strip()
+        # Remove company portion after first comma
+        if "," in value:
+            value = value.split(",", 1)[0].strip()
+        return value
+
+    titles: list[str] = []
+    title_counts: dict[str, int] = {}
+
+    # 1) Combined JSON (already curated + deduped with counts)
+    try:
+        with open("data/combined_job_titles.json", "r", encoding="utf-8") as f:
+            data = json.load(f) or {}
+        for item in data.get("titles_by_frequency", []) or []:
+            t = normalize_title(item.get("title", ""))
+            if not t:
+                continue
+            if t not in title_counts:
+                titles.append(t)
+            title_counts[t] = int(item.get("count", 0) or 0)
+    except Exception:
+        pass
+
+    # 2) Extracted JSON (smaller dataset)
+    try:
+        with open("data/extracted_job_titles.json", "r", encoding="utf-8") as f:
+            data = json.load(f) or {}
+        for item in data.get("titles_by_frequency", []) or []:
+            t = normalize_title(item.get("title", ""))
+            if not t:
+                continue
+            if t not in title_counts:
+                titles.append(t)
+            # Only set count if we don't already have a better one
+            title_counts.setdefault(t, int(item.get("count", 0) or 0))
+    except Exception:
+        pass
+
+    # 3) CSV datasets (optional; may add titles not present in JSON)
+    try:
+        import pandas as pd
+
+        # a) Noisy dataset: `job` column
+        try:
+            df = pd.read_csv("linkdin_Job_data.csv", usecols=["job"], dtype=str)
+            for raw in df["job"].dropna().tolist():
+                t = simplify_linkedin_job_field(raw)
+                if not t:
+                    continue
+                if t not in title_counts:
+                    titles.append(t)
+                    title_counts[t] = 0
+        except Exception:
+            pass
+
+        # b) Cleaner dataset: `title` column
+        try:
+            df = pd.read_csv("LinkedIn_Jobs_Data_India.csv", usecols=["title"], dtype=str)
+            for raw in df["title"].dropna().tolist():
+                t = normalize_title(raw)
+                if not t:
+                    continue
+                if t not in title_counts:
+                    titles.append(t)
+                    title_counts[t] = 0
+        except Exception:
+            pass
+    except Exception:
+        # pandas not available
+        pass
+
+    return {"titles": titles, "title_counts": title_counts}
+
+
+def build_role_options(curated_role_names: list[str], market_titles: list[str]) -> list[str]:
+    """Combine curated roles with market job titles for the dropdown."""
+    seen = set()
+    options: list[str] = []
+
+    # Keep curated roles first
+    for r in curated_role_names:
+        if r and r not in seen:
+            options.append(r)
+            seen.add(r)
+
+    # Add market titles
+    for t in market_titles:
+        if t and t not in seen:
+            options.append(t)
+            seen.add(t)
+
+    return options
+
+
+def resolve_role_template(selected_title: str, curated_role_names: list[str]) -> str | None:
+    """Map an arbitrary job title to the closest curated role template."""
+    if not selected_title:
+        return None
+    if selected_title in curated_role_names:
+        return selected_title
+
+    title_lower = selected_title.lower()
+    # Prefer substring matches (more intuitive)
+    for role in curated_role_names:
+        if role and role.lower() in title_lower:
+            return role
+
+    # Fallback to fuzzy match
+    matches = difflib.get_close_matches(selected_title, curated_role_names, n=1, cutoff=0.25)
+    return matches[0] if matches else None
+
+
+def get_role_info_for_selection(
+    selected_title: str,
+    job_roles: dict,
+    curated_role_names: list[str],
+    combined_skills_data: dict,
+) -> tuple[dict, str | None]:
+    """Return a role_info dict for a selected dropdown value.
+
+    For curated roles, returns their data directly.
+    For market titles, returns the closest curated role template (or a safe fallback).
+    """
+    if selected_title in job_roles:
+        return job_roles[selected_title], selected_title
+
+    template = resolve_role_template(selected_title, curated_role_names)
+    if template and template in job_roles:
+        role_info = dict(job_roles[template])
+        desc = role_info.get("description", "") or ""
+        suffix = f"(Analyzed using skills template: {template})"
+        role_info["description"] = (desc + "\n\n" + suffix).strip()
+        return role_info, template
+
+    # Ultimate fallback: use top market skills as a generic baseline
+    skills_by_freq = combined_skills_data.get("skills_by_frequency", []) or []
+    top_skills = [s.get("skill") for s in skills_by_freq if isinstance(s, dict) and s.get("skill")]
+    top_skills = [str(s).strip() for s in top_skills if str(s).strip()]
+    required = top_skills[:8]
+    optional = top_skills[8:25]
+    return {
+        "description": "Market job title selected (no exact template found). Using common in-demand skills.",
+        "required_skills": required,
+        "optional_skills": optional,
+    }, None
+
+
+@st.cache_data(show_spinner=False)
+def derive_role_skills_from_live_jobs(job_descriptions: list[str]) -> dict:
+    """Derive required/optional skills from live job descriptions.
+
+    Uses the existing taxonomy-based `SkillExtractor` (no LLM / no demo data).
+    """
+    # Load extractor with taxonomy/synonyms from config
+    try:
+        with open("config.yaml", "r", encoding="utf-8") as f:
+            cfg = yaml.safe_load(f) or {}
+    except Exception:
+        cfg = {}
+
+    taxonomy_path = (cfg.get("skills") or {}).get("taxonomy_path")
+    synonyms_path = (cfg.get("skills") or {}).get("synonyms_path")
+    extractor = SkillExtractor(skill_taxonomy_path=taxonomy_path, skill_synonyms_path=synonyms_path)
+
+    from collections import Counter
+    counts: Counter = Counter()
+    for desc in job_descriptions:
+        text = str(desc or "")
+        if not text.strip():
+            continue
+        # SkillExtractor expects a Resume object normally; use the internal text extractor
+        skills = extractor._extract_from_text(text)
+        for s in skills:
+            s = str(s).strip()
+            if s:
+                counts[s] += 1
+
+    ranked = [s for s, _ in counts.most_common()]
+    required = ranked[:10]
+    optional = ranked[10:30]
+    return {
+        "required_skills": required,
+        "optional_skills": optional,
+        "skill_counts": dict(counts),
+    }
+
+
+def get_active_role_info(selected_role: str, job_roles: dict, curated_role_names: list[str]) -> dict:
+    """Get the role_info used for analysis.
+
+    Priority:
+    1) Use the role info computed during real-time selection (stored in session_state)
+    2) Use closest curated template
+    3) Derive from live jobs currently in session (if present)
+    """
+    cached = st.session_state.get("selected_role_info")
+    if cached and st.session_state.get("selected_role") == selected_role:
+        return cached
+
+    template = resolve_role_template(selected_role, curated_role_names)
+    if template and template in job_roles:
+        role_info = dict(job_roles[template])
+        desc = role_info.get("description", "") or ""
+        role_info["description"] = (desc + f"\n\n(Analyzed using skills template: {template})").strip()
+        return role_info
+
+    jobs_live = st.session_state.get("realtime_jobs", []) or []
+    descriptions = [str((j or {}).get("description", "")) for j in jobs_live]
+    if any(d.strip() for d in descriptions):
+        derived = derive_role_skills_from_live_jobs(descriptions)
+        return {
+            "description": "Skills derived from live Adzuna job descriptions for this search.",
+            "required_skills": derived.get("required_skills", []),
+            "optional_skills": derived.get("optional_skills", []),
+        }
+
+    return {
+        "description": "No role template or live job data available for skill derivation.",
+        "required_skills": [],
+        "optional_skills": [],
+    }
+
+
 def load_job_roles():
     """Load job roles from YAML files."""
     job_roles = {}
@@ -301,10 +578,11 @@ def main():
     has_score = 'readiness_score' in st.session_state.get('analysis_results', {})
     has_suitability = 'suitability' in st.session_state.get('analysis_results', {})
     has_roadmap = 'roadmap' in st.session_state.get('analysis_results', {})
+    has_interview = bool(st.session_state.get('interview_state', {}).get('started'))
     
-    completion_status = [has_resume, has_role, has_gaps, has_score, has_suitability, has_roadmap]
+    completion_status = [has_resume, has_role, has_gaps, has_score, has_suitability, has_roadmap, has_interview]
     completed_count = sum(completion_status)
-    progress_pct = (completed_count / 6) * 100
+    progress_pct = (completed_count / 7) * 100
     
     # Progress bar at top
     st.markdown(f"""
@@ -323,6 +601,7 @@ def main():
             <div class="progress-step {'step-completed' if has_score else 'step-current' if has_gaps and not has_score else 'step-pending'}">4</div>
             <div class="progress-step {'step-completed' if has_suitability else 'step-current' if has_score and not has_suitability else 'step-pending'}">5</div>
             <div class="progress-step {'step-completed' if has_roadmap else 'step-current' if has_suitability and not has_roadmap else 'step-pending'}">6</div>
+            <div class="progress-step {'step-completed' if has_interview else 'step-current' if has_roadmap and not has_interview else 'step-pending'}">7</div>
         </div>
         <div style="display: flex; justify-content: space-around; margin-top: 10px; font-size: 0.85rem;">
             <span>Resume</span>
@@ -331,27 +610,27 @@ def main():
             <span>Score</span>
             <span>Suitability</span>
             <span>Roadmap</span>
+            <span>Interview</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
     # Main navigation tabs
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
         "📄 Resume Upload",
         "🎯 Select Role", 
         "📊 Skill Gaps",
         "⭐ Readiness Score",
         "🔍 Role Suitability",
-        "🗺️ Learning Roadmap"
+        "🗺️ Learning Roadmap",
+        "🧠 Interview & Practice AI"
     ])
     
     # Load job roles
     job_roles = load_job_roles()
-    role_names = list(job_roles.keys()) if job_roles else []
+    curated_role_names = list(job_roles.keys()) if job_roles else []
     
-    # Load combined skills and job titles from LinkedIn data
-    combined_skills_data = load_combined_skills()
-    combined_titles_data = load_combined_job_titles()
+    # Note: Role selection is now real-time (Adzuna-driven) to avoid demo/offline data.
     
     # Initialize job market analyzer
     try:
@@ -823,18 +1102,114 @@ Projects ({len(projects)}):
             with col2:
                 if has_role:
                     st.success(f"✅ Selected: {st.session_state.selected_role}")
-            
-            selected_role = st.selectbox(
-                "Choose a job role:",
-                role_names,
-                help="Select the job role you're interested in",
-                key="role_selectbox"
+
+            st.markdown("---")
+            st.subheader("🔎 Real-Time Role Search")
+            st.caption("This list is built from live Adzuna job results (no offline/demo titles).")
+
+            q_col1, q_col2 = st.columns([2, 1])
+            with q_col1:
+                realtime_query = st.text_input(
+                    "Job title / keywords",
+                    value=st.session_state.get("realtime_role_query", ""),
+                    placeholder="e.g., Staff Product Manager, Data Engineer, PCC Developer",
+                    help="Used to fetch real-time job listings and generate selectable titles",
+                    key="realtime_role_query",
+                )
+            with q_col2:
+                realtime_location = st.text_input(
+                    "Location",
+                    value=st.session_state.get("realtime_role_location", "India"),
+                    placeholder="India",
+                    help="Adzuna search location",
+                    key="realtime_role_location",
+                )
+
+            fetch_clicked = st.button("🔄 Fetch Real-Time Titles", type="secondary")
+
+            if fetch_clicked:
+                if not job_market or not job_market.is_available():
+                    st.error("Real-time API not available. Configure Adzuna API keys to enable live search.")
+                elif not realtime_query or not realtime_query.strip():
+                    st.warning("Please enter a job title / keywords to search.")
+                else:
+                    with st.spinner("Fetching live jobs from Adzuna..."):
+                        jobs_live = job_market.get_jobs_for_role(
+                            realtime_query.strip(),
+                            location=realtime_location.strip() or "India",
+                            limit=50,
+                        )
+                        stats_live = job_market.get_market_statistics(
+                            realtime_query.strip(),
+                            location=realtime_location.strip() or "India",
+                        )
+
+                    st.session_state["realtime_jobs"] = jobs_live
+                    st.session_state["realtime_stats"] = stats_live
+
+                    # Derive unique titles from the fetched jobs
+                    titles = []
+                    seen = set()
+                    for j in jobs_live or []:
+                        t = str((j or {}).get("title", "")).strip()
+                        if t and t not in seen:
+                            titles.append(t)
+                            seen.add(t)
+                    st.session_state["realtime_titles"] = titles
+
+            realtime_titles = st.session_state.get("realtime_titles", []) or []
+            jobs_live = st.session_state.get("realtime_jobs", []) or []
+            stats_live = st.session_state.get("realtime_stats", {}) or {}
+
+            if stats_live and stats_live.get("total_jobs", 0) > 0:
+                st.info(f"💡 Adzuna reports {stats_live.get('total_jobs', 0):,} jobs for this search")
+
+            # Search-within-results (client-side filter)
+            local_filter = st.text_input(
+                "Filter fetched titles",
+                value="",
+                placeholder="Type to filter the fetched titles",
+                help="Filters only the titles returned from the live fetch",
+                key="realtime_titles_filter",
             )
-            
+
+            filtered_titles = realtime_titles
+            if local_filter and local_filter.strip():
+                q = local_filter.strip().lower()
+                filtered_titles = [t for t in realtime_titles if q in t.lower()]
+
+            if filtered_titles:
+                selected_role = st.selectbox(
+                    "Choose a job title (from live results):",
+                    filtered_titles,
+                    help="These titles come from real-time job listings",
+                    key="role_selectbox",
+                )
+            else:
+                selected_role = realtime_query.strip() if realtime_query else ""
+                if not selected_role:
+                    st.warning("Fetch titles or type a job title to proceed.")
+
             st.session_state.selected_role = selected_role
-            
+
             if selected_role:
-                role_info = job_roles[selected_role]
+                # Prefer curated template when close match exists; otherwise derive skills from live job descriptions
+                template = resolve_role_template(selected_role, curated_role_names)
+                if template and template in job_roles:
+                    role_info = dict(job_roles[template])
+                    desc = role_info.get("description", "") or ""
+                    role_info["description"] = (desc + f"\n\n(Analyzed using skills template: {template})").strip()
+                else:
+                    descriptions = [str((j or {}).get("description", "")) for j in (jobs_live or [])]
+                    derived = derive_role_skills_from_live_jobs(descriptions)
+                    role_info = {
+                        "description": "Skills derived from live Adzuna job descriptions for this search.",
+                        "required_skills": derived.get("required_skills", []),
+                        "optional_skills": derived.get("optional_skills", []),
+                    }
+
+                # Persist the resolved info for other tabs
+                st.session_state["selected_role_info"] = role_info
                 
                 st.subheader(f"📋 Role: {selected_role}")
                 st.write(f"**Description:** {role_info.get('description', 'N/A')}")
@@ -857,60 +1232,16 @@ Projects ({len(projects)}):
                 
                 if st.button("✅ Confirm Selection", type="primary"):
                     st.success(f"✅ Role '{selected_role}' selected! Proceed to 'Skill Gaps' tab.")
-                
-                # Show LinkedIn data insights
-                st.markdown("---")
-                st.subheader("📊 LinkedIn Job Market Insights (India)")
-                
-                col1, col2, col3 = st.columns(3)
-                
-                with col1:
-                    st.markdown(f"""
-                    <div class="stat-card">
-                        <h2 style="margin: 0; font-size: 2rem;">{combined_titles_data['total_titles']:,}</h2>
-                        <p style="margin: 5px 0; opacity: 0.9;">Job Titles in Database</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col2:
-                    st.markdown(f"""
-                    <div class="stat-card">
-                        <h2 style="margin: 0; font-size: 2rem;">{combined_skills_data['total_skills']}</h2>
-                        <p style="margin: 5px 0; opacity: 0.9;">Unique Skills Identified</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col3:
-                    st.markdown(f"""
-                    <div class="stat-card">
-                        <h2 style="margin: 0; font-size: 2rem;">8,876</h2>
-                        <p style="margin: 5px 0; opacity: 0.9;">Total Job Listings</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                # Show top skills for the market
-                if combined_skills_data['skills_by_frequency']:
-                    st.markdown("**🔝 Top 15 In-Demand Skills in India:**")
-                    top_skills = combined_skills_data['skills_by_frequency'][:15]
-                    
-                    cols = st.columns(3)
-                    for idx, skill_data in enumerate(top_skills):
-                        with cols[idx % 3]:
-                            st.markdown(f"""
-                            <div class="skill-badge">
-                                {skill_data['skill']} ({skill_data['count']:,} jobs)
-                            </div>
-                            """, unsafe_allow_html=True)
-                
-                # Show real-time job market data via API
+
+                # Real-time job market data via API (no demo/offline metrics)
                 st.markdown("---")
                 st.subheader("🌐 Real-Time Job Market API (Adzuna)")
                 
                 if job_market and job_market.is_available():
                     # Fetch all available jobs
                     with st.spinner("🔍 Fetching real-time job listings from Adzuna API..."):
-                        # Fetch more jobs (up to 50 - API limit)
-                        jobs = job_market.get_jobs_for_role(selected_role, location="India", limit=50)
+                        # Fetch more jobs (best-effort; API may cap results)
+                        jobs = job_market.get_jobs_for_role(selected_role, location="India", limit=100)
                         stats = job_market.get_market_statistics(selected_role, location="India")
                     
                     # Store jobs in session state
@@ -1040,7 +1371,7 @@ Projects ({len(projects)}):
         else:
             resume_data = st.session_state.resume_data
             selected_role = st.session_state.selected_role
-            role_info = job_roles[selected_role]
+            role_info = get_active_role_info(selected_role, job_roles, curated_role_names)
             
             resume_skills = resume_data.get('skills', [])
             required_skills = role_info.get('required_skills', [])
@@ -1298,24 +1629,25 @@ Projects ({len(projects)}):
         else:
             gap_results = st.session_state.analysis_results['skill_gaps']
             selected_role = st.session_state.selected_role
-            role_info = job_roles[selected_role]
+            role_info = get_active_role_info(selected_role, job_roles, curated_role_names)
             
             missing_skills = gap_results.get('missing_required', []) + gap_results.get('missing_preferred', [])
             
             if not missing_skills:
                 st.success("🎉 No missing skills! You're ready for this role!")
             else:
-                roadmap_days = st.slider(
-                    "Roadmap Duration (days)",
-                    min_value=7,
-                    max_value=60,
-                    value=30,
-                    step=7
+                roadmap_weeks = st.slider(
+                    "Roadmap Duration (weeks)",
+                    min_value=4,
+                    max_value=12,
+                    value=12,
+                    step=1,
+                    help="12 weeks ≈ 3 months (week-wise plan)"
                 )
                 
                 if st.button("🗺️ Generate Learning Roadmap", type="primary"):
                     with st.spinner("Generating personalized roadmap..."):
-                        generator = PersonalizedRoadmapGenerator(roadmap_days=roadmap_days)
+                        generator = PersonalizedRoadmapGenerator(roadmap_days=int(roadmap_weeks) * 7)
                         roadmap = generator.generate_roadmap(
                             missing_skills=missing_skills,
                             target_role=selected_role,
@@ -1335,31 +1667,58 @@ Projects ({len(projects)}):
                     st.subheader("📚 Skill-wise Learning Plans")
                     
                     for plan in roadmap['skill_plans']:
-                        with st.expander(f"{plan['skill']} ({plan['days']} days, Days {plan['start_day']}-{plan['end_day']})"):
-                            st.write("**Tasks:**")
-                            for task in plan['tasks']:
-                                st.write(f"Day {task['day']}: {task['task']} ({task['type']})")
-                            
-                            st.write("**Resources:**")
-                            for resource in plan['resources']:
-                                st.write(f"• {resource}")
+                        # Backward-compatible: older cached roadmaps may not have week fields
+                        weeks = plan.get('weeks')
+                        if isinstance(weeks, int) and weeks > 0:
+                            header = f"{plan['skill']} ({weeks} weeks, Weeks {plan.get('start_week', 0)}-{plan.get('end_week', 0)})"
+                        else:
+                            header = f"{plan['skill']}"
+
+                        with st.expander(header):
+                            st.write("**Tools:**")
+                            for tool in plan.get('tools', []):
+                                st.write(f"• {tool}")
+
+                            st.write("**Week-wise plan:**")
+                            weekly_plan = plan.get('weekly_plan')
+                            if isinstance(weekly_plan, list) and weekly_plan:
+                                for w in weekly_plan:
+                                    if not isinstance(w, dict):
+                                        continue
+                                    st.markdown(f"**Week {w.get('week', '')}: {w.get('focus', '')}**")
+                                    deliverable = w.get('deliverable')
+                                    if deliverable:
+                                        st.write(f"Deliverable: {deliverable}")
+                                    for t in w.get('tasks', []):
+                                        st.write(f"• {t}")
+                            else:
+                                # Older roadmap format: day-based tasks
+                                tasks = plan.get('tasks', [])
+                                if tasks:
+                                    st.info("Roadmap format updated. Regenerate to see week-wise plan.")
+                                    for task in tasks:
+                                        if isinstance(task, dict):
+                                            st.write(f"• Day {task.get('day', '')}: {task.get('task', '')} ({task.get('type', '')})")
+                                        else:
+                                            st.write(f"• {task}")
+                                else:
+                                    st.write("No plan details available. Please regenerate the roadmap.")
+
+                            st.write("**Clickable learning resources:**")
+                            for r in plan.get('resources', []):
+                                # Backward-compatible: older roadmaps used plain strings
+                                if isinstance(r, dict):
+                                    title = r.get('title', 'Resource')
+                                    url = r.get('url', '')
+                                    platform = r.get('platform', '')
+                                    if url:
+                                        st.markdown(f"- [{platform}: {title}]({url})")
+                                    else:
+                                        st.write(f"- {platform}: {title}")
+                                else:
+                                    st.write(f"• {r}")
                     
-                    # Timeline view
-                    st.subheader("📅 Day-by-Day Timeline")
-                    timeline = roadmap['timeline']
-                    
-                    # Group by day
-                    days_dict = {}
-                    for item in timeline:
-                        day = item['day']
-                        if day not in days_dict:
-                            days_dict[day] = []
-                        days_dict[day].append(item)
-                    
-                    for day in sorted(days_dict.keys()):
-                        st.write(f"**Day {day}:**")
-                        for item in days_dict[day]:
-                            st.write(f"  • {item['task']} ({item['skill']})")
+                    # No day-by-day timeline (week-wise is the source of truth)
                     
                     # Download roadmap
                     roadmap_json = json.dumps(roadmap, indent=2, default=str)
@@ -1369,6 +1728,145 @@ Projects ({len(projects)}):
                         file_name=f"roadmap_{selected_role}_{datetime.now().strftime('%Y%m%d')}.json",
                         mime="application/json"
                     )
+
+    # Tab 7: Interview & Practice AI
+    with tab7:
+        st.markdown('<div class="sub-header">🧠 Interview & Practice AI (Advanced)</div>', unsafe_allow_html=True)
+
+        # Ensure we have gaps to drive skill-based prep
+        gap_results = st.session_state.get('analysis_results', {}).get('skill_gaps', {})
+        missing_skills = gap_results.get('missing_required', []) + gap_results.get('missing_preferred', [])
+
+        role_label = st.session_state.get('selected_role') or "Data Scientist"
+
+        if 'interview_state' not in st.session_state:
+            st.session_state.interview_state = {
+                "started": False,
+                "role": role_label,
+                "current_question": "",
+                "history": [],
+            }
+
+        provider_options = ["Gemini", "SambaNova", "OpenAI"]
+        default_provider = _default_ai_provider()
+        default_index = provider_options.index(default_provider) if default_provider in provider_options else 0
+        ai_provider = st.selectbox(
+            "AI Provider",
+            options=provider_options,
+            index=default_index,
+            help="Uses provider API keys from env/secrets (no keys are stored in code)",
+        )
+
+        # Show configuration status (no secrets displayed)
+        cfg = {
+            "Gemini": _has_config_value("GOOGLE_GEMINI_API_KEY"),
+            "SambaNova": _has_config_value("SAMBANOVA_API_KEY"),
+            "OpenAI": _has_config_value("OPENAI_API_KEY"),
+        }
+        if not cfg.get(ai_provider, False):
+            st.warning(
+                f"{ai_provider} is not configured. Add the required API key in Streamlit Secrets or as an environment variable."
+            )
+
+        st.write("**Step 6.1 – AI Interview Simulator**")
+        st.caption("Mock interview chatbot: live questions + feedback on your answers.")
+
+        col_a, col_b = st.columns([1, 2])
+        with col_a:
+            if st.button("▶️ Start / Restart Interview"):
+                try:
+                    first_q = start_interview(role=role_label, provider=ai_provider)
+                    st.session_state.interview_state = {
+                        "started": True,
+                        "role": role_label,
+                        "provider": ai_provider,
+                        "current_question": first_q,
+                        "history": [
+                            {"role": "assistant", "content": first_q},
+                        ],
+                    }
+                    st.rerun()
+                except Exception as e:
+                    st.error(str(e))
+
+        with col_b:
+            st.text_input("Interview role", value=role_label, disabled=True)
+
+        state = st.session_state.interview_state
+        # Keep provider in sync with the selector
+        state["provider"] = ai_provider
+        if state.get("started") and state.get("history"):
+            for msg in state["history"]:
+                if msg.get("role") == "user":
+                    st.chat_message("user").write(msg.get("content", ""))
+                else:
+                    st.chat_message("assistant").write(msg.get("content", ""))
+
+            user_answer = st.chat_input("Type your answer and press Enter")
+            if user_answer:
+                state["history"].append({"role": "user", "content": user_answer})
+                try:
+                    result = interview_turn(
+                        role=state.get("role", role_label),
+                        question=state.get("current_question", ""),
+                        answer=user_answer,
+                        missing_skills=missing_skills if missing_skills else None,
+                        provider=state.get("provider", ai_provider),
+                    )
+                    feedback = result.get("feedback", "").strip()
+                    next_q = result.get("next_question", "").strip()
+
+                    if feedback:
+                        state["history"].append({"role": "assistant", "content": f"Feedback:\n{feedback}"})
+                    if next_q:
+                        state["current_question"] = next_q
+                        state["history"].append({"role": "assistant", "content": next_q})
+
+                    st.session_state.interview_state = state
+                    st.rerun()
+                except Exception as e:
+                    msg = str(e)
+                    if "insufficient_quota" in msg or ("429" in msg and "quota" in msg.lower()):
+                        st.error(
+                            "OpenAI quota/billing is exceeded for this API key. "
+                            "Switch provider to Gemini or SambaNova, or enable billing in your OpenAI account."
+                        )
+                    else:
+                        st.error(msg)
+        else:
+            st.info(
+                "Click 'Start / Restart Interview' to begin. "
+                "To enable AI, set OPENAI_API_KEY (OpenAI) or GOOGLE_GEMINI_API_KEY (Gemini) "
+                "as an environment variable or add it in Streamlit Secrets."
+            )
+
+        st.divider()
+        st.write("**Step 6.2 – Skill-Based Question Generator**")
+        st.caption("Generates questions only from your missing skills for targeted preparation.")
+
+        if not missing_skills:
+            st.info("Complete Skill Gaps first to generate skill-based questions.")
+        else:
+            st.write(f"Missing skills detected: {', '.join(missing_skills[:10])}{'...' if len(missing_skills) > 10 else ''}")
+            qps = st.slider("Questions per skill", min_value=1, max_value=5, value=3, step=1)
+            if st.button("🧩 Generate Skill-Based Questions"):
+                try:
+                    questions_by_skill = generate_skill_questions(
+                        role=role_label,
+                        missing_skills=missing_skills,
+                        questions_per_skill=int(qps),
+                        provider=ai_provider,
+                    )
+                    st.session_state.analysis_results['skill_questions'] = questions_by_skill
+                except Exception as e:
+                    st.error(str(e))
+
+            questions_by_skill = st.session_state.analysis_results.get('skill_questions')
+            if questions_by_skill:
+                for skill, qs in questions_by_skill.items():
+                    st.markdown(f"**{skill}**")
+                    for q in qs:
+                        st.write(f"• {q}")
 
 
 if __name__ == "__main__":

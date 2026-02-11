@@ -1,25 +1,20 @@
 """
 PDF Resume Parser Module
 
-This module parses resume PDFs and extracts structured information including:
+Extracts structured information from resume PDFs:
 - Skills
 - Education
 - Experience
 - Projects
-
-Uses spaCy for NLP-based entity extraction and pdfplumber for PDF text extraction.
-
-Author: AI Career Analyzer
 """
 
-import re
 import json
-from typing import Dict, List, Optional
-from pathlib import Path
+import re
+from typing import Dict, List, Optional, Tuple
 
-# Try to import PDF parsing libraries (both are FREE and open source)
 try:
     import pdfplumber
+
     PDFPLUMBER_AVAILABLE = True
 except ImportError:
     PDFPLUMBER_AVAILABLE = False
@@ -27,19 +22,18 @@ except ImportError:
 
 try:
     import PyPDF2
+
     PYPDF2_AVAILABLE = True
 except ImportError:
     PYPDF2_AVAILABLE = False
 
-# Try to import spaCy for NLP processing
 try:
     import spacy
+
     SPACY_AVAILABLE = True
     try:
-        # Try to load the English model
         nlp = spacy.load("en_core_web_sm")
     except OSError:
-        # Model not installed - will work but with limited functionality
         nlp = None
         print("Warning: spaCy model not loaded. Run: python -m spacy download en_core_web_sm")
 except ImportError:
@@ -49,506 +43,564 @@ except ImportError:
 
 
 class PDFResumeParser:
-    """
-    PDF Resume Parser - Extracts structured information from resume PDFs.
-    
-    How it works:
-    1. Extracts text from PDF using pdfplumber
-    2. Uses spaCy to identify entities (names, organizations, dates)
-    3. Uses regex patterns to extract structured information
-    4. Organizes data into JSON format
-    """
-    
+    """PDF Resume Parser with robust section-based extraction."""
+
     def __init__(self):
-        """
-        Initialize the PDF resume parser.
-        Sets up NLP model if available.
-        """
-        self.nlp = nlp  # spaCy model (if available)
-        
-        # Common section headers to look for in resumes
-        # These help identify where different information is located
+        self.nlp = nlp
         self.section_keywords = {
-            "skills": ["skills", "technical skills", "competencies", "expertise", "technologies"],
-            "education": ["education", "academic", "qualifications", "degree", "university"],
-            "experience": ["experience", "work experience", "employment", "work history", "professional experience"],
-            "projects": ["projects", "portfolio", "work samples", "key projects"],
+            "skills": [
+                "skills",
+                "technical skills",
+                "core skills",
+                "competencies",
+                "expertise",
+                "tools and technologies",
+                "technologies",
+            ],
+            "education": [
+                "education",
+                "academic background",
+                "academic qualifications",
+                "qualifications",
+            ],
+            "experience": [
+                "experience",
+                "work experience",
+                "professional experience",
+                "employment history",
+                "work history",
+            ],
+            "projects": [
+                "projects",
+                "project experience",
+                "academic projects",
+                "key projects",
+                "portfolio",
+            ],
             "certifications": ["certifications", "certificates", "licenses", "credentials"],
+            "achievements": ["achievements", "awards", "honors"],
         }
-        
-        # Common degree patterns
         self.degree_patterns = [
-            r'\b(BS|B\.S\.|Bachelor|BA|B\.A\.|B\.Sc\.|BSc)\b',
-            r'\b(MS|M\.S\.|Master|MA|M\.A\.|M\.Sc\.|MSc|M\.Tech|MTech)\b',
-            r'\b(PhD|Ph\.D\.|Doctorate|D\.Sc\.)\b',
+            r"\b(BS|B\.S\.|Bachelor|BA|B\.A\.|B\.Sc\.|BSc|B\.?Tech|B\.?E)\b",
+            r"\b(MS|M\.S\.|Master|MA|M\.A\.|M\.Sc\.|MSc|M\.Tech|MTech|M\.?E|MBA)\b",
+            r"\b(PhD|Ph\.D\.|Doctorate|D\.Sc\.)\b",
         ]
-    
+        self.skill_aliases = {
+            "py": "Python",
+            "python3": "Python",
+            "js": "JavaScript",
+            "nodejs": "Node.js",
+            "reactjs": "React",
+            "nextjs": "Next.js",
+            "ts": "TypeScript",
+            "github": "GitHub",
+            "gitlab": "GitLab",
+            "postgres": "PostgreSQL",
+            "postgresql": "PostgreSQL",
+            "mysql": "MySQL",
+            "mongodb": "MongoDB",
+            "scikitlearn": "Scikit-learn",
+            "sklearn": "Scikit-learn",
+            "opencv": "OpenCV",
+            "numpy": "NumPy",
+            "tensorflow": "TensorFlow",
+            "pytorch": "PyTorch",
+            "fastapi": "FastAPI",
+            "powerbi": "Power BI",
+            "nlp": "NLP",
+            "ml": "Machine Learning",
+            "ai": "AI",
+            "aws": "AWS",
+            "gcp": "GCP",
+            "azure": "Azure",
+        }
+
     def parse_pdf(self, pdf_path: str) -> Dict:
-        """
-        Main method to parse a PDF resume.
-        
-        Args:
-            pdf_path: Path to the PDF file
-            
-        Returns:
-            Dictionary with structured resume data:
-            {
-                "skills": [],
-                "education": [],
-                "experience": [],
-                "projects": []
-            }
-        """
-        # Step 1: Extract text from PDF
         resume_text = self._extract_text_from_pdf(pdf_path)
-        
         if not resume_text:
             raise ValueError(f"Could not extract text from PDF: {pdf_path}")
-        
-        # Step 2: Extract structured information using multiple methods
-        result = {
+
+        return {
             "skills": self._extract_skills(resume_text),
             "education": self._extract_education(resume_text),
             "experience": self._extract_experience(resume_text),
             "projects": self._extract_projects(resume_text),
+            "name": self._extract_name(resume_text),
+            "email": self._extract_email(resume_text),
+            "phone": self._extract_phone(resume_text),
         }
-        
-        # Step 3: Add basic information if available
-        result["name"] = self._extract_name(resume_text)
-        result["email"] = self._extract_email(resume_text)
-        result["phone"] = self._extract_phone(resume_text)
-        
-        return result
-    
+
     def _extract_text_from_pdf(self, pdf_path: str) -> str:
-        """
-        Extract raw text from PDF file.
-        
-        Uses pdfplumber (preferred) or PyPDF2 (fallback) - both are FREE.
-        
-        Args:
-            pdf_path: Path to PDF file
-            
-        Returns:
-            Extracted text as string
-        """
         text = ""
-        
-        # Method 1: Try pdfplumber (better text extraction)
+
         if PDFPLUMBER_AVAILABLE:
             try:
                 with pdfplumber.open(pdf_path) as pdf:
-                    # Extract text from all pages
                     for page in pdf.pages:
-                        page_text = page.extract_text()
+                        page_text = page.extract_text(x_tolerance=2, y_tolerance=3)
+                        if self._looks_like_collapsed_text(page_text):
+                            reconstructed = self._extract_text_from_words(page)
+                            if reconstructed:
+                                page_text = reconstructed
                         if page_text:
                             text += page_text + "\n"
-                return text.strip()
+                return self._normalize_text(text.strip())
             except Exception as e:
                 print(f"Error using pdfplumber: {e}")
-                # Fall through to PyPDF2
-        
-        # Method 2: Fallback to PyPDF2
+
         if PYPDF2_AVAILABLE:
             try:
-                with open(pdf_path, 'rb') as file:
+                with open(pdf_path, "rb") as file:
                     pdf_reader = PyPDF2.PdfReader(file)
-                    # Extract text from all pages
                     for page in pdf_reader.pages:
-                        text += page.extract_text() + "\n"
-                return text.strip()
+                        text += (page.extract_text() or "") + "\n"
+                return self._normalize_text(text.strip())
             except Exception as e:
                 print(f"Error using PyPDF2: {e}")
-        
+
         raise ValueError("Could not extract text. Install pdfplumber: pip install pdfplumber")
-    
+
     def _extract_skills(self, text: str) -> List[str]:
-        """
-        Extract skills from resume text.
-        
-        How it works:
-        1. Looks for a "Skills" section
-        2. Extracts items from that section (comma/semicolon/bullet separated)
-        3. Also scans entire text for common technical terms
-        4. Uses spaCy to identify technical entities if available
-        
-        Args:
-            text: Resume text
-            
-        Returns:
-            List of skill names
-        """
-        skills = set()  # Use set to avoid duplicates
-        
-        # Step 1: Find the Skills section
+        skills = set()
         skills_section = self._find_section(text, "skills")
-        
+
         if skills_section:
-            # Step 2: Extract skills from the section
-            # Skills are often separated by commas, semicolons, or bullet points
-            skill_items = re.split(r'[,;•\-\n]', skills_section)
-            
-            for item in skill_items:
-                item = item.strip()
-                # Filter out empty strings and very short items
-                if item and len(item) > 2 and len(item) < 50:
-                    # Remove common prefixes
-                    item = re.sub(r'^(proficient in|experienced with|knowledge of)\s+', '', item, flags=re.IGNORECASE)
-                    skills.add(item)
-        
-        # Step 3: Extract common technical skills from entire text using patterns
-        # This helps catch skills mentioned elsewhere in the resume
+            for line in skills_section.splitlines():
+                clean_line = line.strip()
+                if not clean_line:
+                    continue
+                clean_line = re.sub(
+                    r"^(languages?|frameworks?|tools?|technologies|databases?|concepts?)\s*:\s*",
+                    "",
+                    clean_line,
+                    flags=re.IGNORECASE,
+                )
+                skill_items = re.split(r"[,;|/\u2022]", clean_line)
+                for item in skill_items:
+                    normalized = self._normalize_skill_token(item)
+                    if normalized:
+                        skills.add(normalized)
+
         technical_patterns = {
-            r'\bpython\b': 'Python',
-            r'\bjava\b': 'Java',
-            r'\bjavascript\b': 'JavaScript',
-            r'\btypescript\b': 'TypeScript',
-            r'\bsql\b': 'SQL',
-            r'\bhtml\b': 'HTML',
-            r'\bcss\b': 'CSS',
-            r'\baws\b': 'AWS',
-            r'\bdocker\b': 'Docker',
-            r'\bkubernetes\b': 'Kubernetes',
-            r'\btensorflow\b': 'TensorFlow',
-            r'\bpytorch\b': 'PyTorch',
-            r'\bkeras\b': 'Keras',
-            r'\bscikit-learn\b': 'Scikit-learn',
-            r'\bgit\b': 'Git',
-            r'\bmachine learning\b': 'Machine Learning',
-            r'\bdeep learning\b': 'Deep Learning',
-            r'\bdata science\b': 'Data Science',
+            r"\bpython\b": "Python",
+            r"\bjava\b": "Java",
+            r"\bjavascript\b": "JavaScript",
+            r"\btypescript\b": "TypeScript",
+            r"\breact(?:\.js|js)?\b": "React",
+            r"\bnode(?:\.js|js)?\b": "Node.js",
+            r"\bnext(?:\.js|js)?\b": "Next.js",
+            r"\bsql\b": "SQL",
+            r"\bhtml\b": "HTML",
+            r"\bcss\b": "CSS",
+            r"\baws\b": "AWS",
+            r"\bazure\b": "Azure",
+            r"\bgcp\b": "GCP",
+            r"\bdocker\b": "Docker",
+            r"\bkubernetes\b": "Kubernetes",
+            r"\btensorflow\b": "TensorFlow",
+            r"\bpytorch\b": "PyTorch",
+            r"\bkeras\b": "Keras",
+            r"\b(?:scikit[\s\-]?learn|sklearn)\b": "Scikit-learn",
+            r"\bgit\b": "Git",
+            r"\bmachine\s*learning\b": "Machine Learning",
+            r"\bdeep\s*learning\b": "Deep Learning",
+            r"\bdata\s*science\b": "Data Science",
+            r"\bnlp\b": "NLP",
+            r"\bpower\s*bi\b": "Power BI",
+            r"\btableau\b": "Tableau",
+            r"\bfastapi\b": "FastAPI",
+            r"\bflask\b": "Flask",
+            r"\bdjango\b": "Django",
+            r"\bpandas\b": "Pandas",
+            r"\bnumpy\b": "NumPy",
         }
-        
+
         text_lower = text.lower()
         for pattern, skill_name in technical_patterns.items():
             if re.search(pattern, text_lower):
                 skills.add(skill_name)
-        
-        # Step 4: Use spaCy to identify technical entities (if available)
+
         if self.nlp:
             doc = self.nlp(text)
-            # Look for proper nouns and technical terms
             for ent in doc.ents:
-                if ent.label_ in ["ORG", "PRODUCT"]:
-                    # Check if it looks like a technology name
-                    if self._is_technology(ent.text):
-                        skills.add(ent.text)
-        
-        return sorted(list(skills))
-    
+                if ent.label_ in ["ORG", "PRODUCT"] and self._is_technology(ent.text):
+                    normalized = self._normalize_skill_token(ent.text)
+                    if normalized:
+                        skills.add(normalized)
+
+        return sorted(skills)
+
     def _extract_education(self, text: str) -> List[Dict]:
-        """
-        Extract education information from resume.
-        
-        How it works:
-        1. Finds the Education section
-        2. Extracts degree names (BS, MS, PhD, etc.)
-        3. Extracts institution names using spaCy
-        4. Extracts dates/years
-        
-        Args:
-            text: Resume text
-            
-        Returns:
-            List of education entries, each with degree, institution, year (if found)
-        """
         education_list = []
-        
-        # Step 1: Find the Education section
-        education_section = self._find_section(text, "education")
-        
-        if not education_section:
-            # If no explicit section, search entire text
-            education_section = text
-        
-        # Step 2: Extract degrees using patterns
+        education_section = self._find_section(text, "education") or text
+
         degrees_found = []
         for pattern in self.degree_patterns:
-            matches = re.finditer(pattern, education_section, re.IGNORECASE)
-            for match in matches:
+            for match in re.finditer(pattern, education_section, re.IGNORECASE):
                 degrees_found.append(match.group())
-        
-        # Step 3: Extract institution names using spaCy (if available)
+
         institutions = []
         if self.nlp:
             doc = self.nlp(education_section)
             for ent in doc.ents:
-                if ent.label_ == "ORG":  # Organization entity
+                if ent.label_ == "ORG":
                     institutions.append(ent.text)
-        
-        # Step 4: Extract years (graduation dates)
-        year_pattern = r'\b(19|20)\d{2}\b'
-        years = re.findall(year_pattern, education_section)
-        years = [f"{year[0]}{year[1]}" if isinstance(year, tuple) else year for year in years]
-        
-        # Step 5: Combine into structured format
-        # Create one entry per degree found
+
+        years = re.findall(r"\b(?:19|20)\d{2}\b", education_section)
         for i, degree in enumerate(degrees_found):
-            edu_entry = {
-                "degree": degree,
-                "institution": institutions[i] if i < len(institutions) else None,
-                "year": years[i] if i < len(years) else None,
-            }
-            education_list.append(edu_entry)
-        
-        # If no structured data found, try to extract lines from education section
+            education_list.append(
+                {
+                    "degree": degree,
+                    "institution": institutions[i] if i < len(institutions) else None,
+                    "year": years[i] if i < len(years) else None,
+                }
+            )
+
         if not education_list and education_section:
-            # Split into lines and try to extract from first few lines
-            lines = education_section.split('\n')[:5]  # First 5 lines
-            for line in lines:
-                line = line.strip()
-                if line and len(line) > 10:  # Meaningful line
-                    education_list.append({"degree": None, "institution": line, "year": None})
-        
+            lines = [ln.strip() for ln in education_section.splitlines() if ln.strip()]
+            for line in lines[:8]:
+                degree_match = re.search(
+                    r"(Bachelor|Master|B\.?Tech|M\.?Tech|B\.?E|M\.?E|B\.?Sc|M\.?Sc|MBA|Ph\.?D)",
+                    line,
+                    re.IGNORECASE,
+                )
+                year_match = re.search(
+                    r"\b(?:19|20)\d{2}(?:\s*[-\u2013\u2014]\s*(?:19|20)\d{2}|[-\u2013\u2014]\s*(?:Present|Current))?\b",
+                    line,
+                    re.IGNORECASE,
+                )
+                if degree_match or year_match or re.search(
+                    r"(university|college|institute|school)", line, re.IGNORECASE
+                ):
+                    education_list.append(
+                        {
+                            "degree": degree_match.group(0) if degree_match else None,
+                            "institution": line,
+                            "year": year_match.group(0) if year_match else None,
+                        }
+                    )
+
         return education_list
-    
+
     def _extract_experience(self, text: str) -> List[Dict]:
-        """
-        Extract work experience from resume.
-        
-        How it works:
-        1. Finds the Experience section
-        2. Uses spaCy to identify organizations and dates
-        3. Extracts job titles using patterns
-        4. Groups information by position
-        
-        Args:
-            text: Resume text
-            
-        Returns:
-            List of experience entries, each with title, company, dates
-        """
         experience_list = []
-        
-        # Step 1: Find the Experience section
         experience_section = self._find_section(text, "experience")
-        
         if not experience_section:
             return experience_list
-        
-        # Step 2: Split into individual positions (usually separated by dates or company names)
-        # Look for patterns like "2020 - 2021" or "Company Name"
-        position_separators = r'(\d{4}\s*[-–—]\s*\d{4}|\d{4}\s*[-–—]\s*Present|\w+\s+\d{4})'
-        positions = re.split(position_separators, experience_section)
-        
-        # Step 3: Extract information from each position
-        companies = []
-        dates = []
-        
-        if self.nlp:
-            doc = self.nlp(experience_section)
-            # Extract organizations (companies)
-            for ent in doc.ents:
-                if ent.label_ == "ORG":
-                    companies.append(ent.text)
-            # Extract dates
-            for ent in doc.ents:
-                if ent.label_ == "DATE":
-                    dates.append(ent.text)
-        
-        # Step 4: Extract job titles (usually before company names)
-        # Common patterns: "Software Engineer at Company" or "Position | Company"
-        title_pattern = r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+(?:at|@|—|-|\|)\s+'
-        titles = re.findall(title_pattern, experience_section)
-        
-        # Step 5: Combine into structured format
-        # Create entries based on what we found
-        max_items = max(len(companies), len(dates), len(titles))
-        
-        for i in range(min(max_items, 10)):  # Limit to 10 entries
-            exp_entry = {
-                "title": titles[i] if i < len(titles) else None,
-                "company": companies[i] if i < len(companies) else None,
-                "dates": dates[i] if i < len(dates) else None,
+
+        lines = [ln.strip() for ln in experience_section.splitlines() if ln.strip()]
+        chunks: List[str] = []
+        current: List[str] = []
+        for line in lines:
+            is_header_like = bool(
+                re.search(r"\b(?:19|20)\d{2}\b", line)
+                or re.search(r"\b(?:present|current)\b", line, re.IGNORECASE)
+                or re.search(r"\b(?:at|@)\b", line)
+                or "|" in line
+            )
+            if is_header_like and current:
+                chunks.append(" ".join(current))
+                current = [line]
+            else:
+                current.append(line)
+        if current:
+            chunks.append(" ".join(current))
+
+        for chunk in chunks[:10]:
+            title, company = self._extract_title_company(chunk)
+            date_match = re.search(
+                r"((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)?\.?\s*(?:19|20)\d{2}\s*[-\u2013\u2014]\s*(?:Present|Current|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)?\.?\s*(?:19|20)\d{2}))",
+                chunk,
+                re.IGNORECASE,
+            )
+            if not date_match:
+                date_match = re.search(
+                    r"\b(?:19|20)\d{2}\s*[-\u2013\u2014]\s*(?:19|20)\d{2}\b", chunk
+                )
+
+            entry = {
+                "title": title,
+                "company": company,
+                "dates": date_match.group(1) if date_match else None,
             }
-            if any(exp_entry.values()):  # Only add if we found something
-                experience_list.append(exp_entry)
-        
+            if entry["title"] or entry["company"] or entry["dates"]:
+                experience_list.append(entry)
+
         return experience_list
-    
+
     def _extract_projects(self, text: str) -> List[str]:
-        """
-        Extract projects from resume.
-        
-        How it works:
-        1. Finds the Projects section
-        2. Splits into individual projects (usually bullet points or separate lines)
-        3. Cleans up each project description
-        
-        Args:
-            text: Resume text
-            
-        Returns:
-            List of project descriptions
-        """
         projects = []
-        
-        # Step 1: Find the Projects section
         projects_section = self._find_section(text, "projects")
-        
         if not projects_section:
             return projects
-        
-        # Step 2: Split into individual projects
-        # Projects are often separated by bullet points, dashes, or new lines with numbers
-        project_items = re.split(r'[\n•\-]\s*(?=\w)', projects_section)
-        
-        # Step 3: Clean and filter projects
-        for item in project_items:
-            item = item.strip()
-            # Filter out empty strings and very short items
-            if item and len(item) > 10:  # Meaningful project description
-                # Remove common prefixes
-                item = re.sub(r'^(\d+\.|•|-)\s*', '', item)
-                projects.append(item)
-        
-        return projects
-    
+
+        lines = [ln.strip() for ln in projects_section.splitlines() if ln.strip()]
+        current = ""
+        for line in lines:
+            is_new_project = bool(re.match(r"^\s*(?:[-*\u2022]\s+|\d+[.)]\s+)", line))
+            clean_line = re.sub(r"^\s*(?:[-*\u2022]\s+|\d+[.)]\s+)", "", line).strip()
+            if is_new_project and current:
+                if len(current) > 10:
+                    projects.append(current)
+                current = clean_line
+            elif current and self._looks_like_project_title(clean_line):
+                if len(current) > 10:
+                    projects.append(current)
+                current = clean_line
+            elif current:
+                current = f"{current} {clean_line}".strip()
+            else:
+                current = clean_line
+        if current and len(current) > 10:
+            projects.append(current)
+
+        cleaned_projects = []
+        seen = set()
+        for item in projects:
+            item = re.sub(r"\s+", " ", item).strip(" -|:")
+            if len(item) < 12:
+                continue
+            key = item.lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            cleaned_projects.append(item)
+
+        merged_projects: List[str] = []
+        for item in cleaned_projects:
+            if self._looks_like_project_title(item):
+                merged_projects.append(item)
+            elif merged_projects:
+                merged_projects[-1] = f"{merged_projects[-1]} {item}".strip()
+            else:
+                merged_projects.append(item)
+
+        return merged_projects
+
     def _find_section(self, text: str, section_type: str) -> Optional[str]:
-        """
-        Find a specific section in the resume text.
-        
-        How it works:
-        1. Looks for section headers using keywords
-        2. Extracts text until the next section header
-        
-        Args:
-            text: Resume text
-            section_type: Type of section to find (e.g., "skills", "education")
-            
-        Returns:
-            Section text or None if not found
-        """
-        keywords = self.section_keywords.get(section_type, [])
-        
-        # Step 1: Find where the section starts
-        start_idx = None
-        for keyword in keywords:
-            # Look for section header (case-insensitive)
-            pattern = rf'({keyword}[\s:]*\n)'
-            match = re.search(pattern, text, re.IGNORECASE)
-            if match:
-                start_idx = match.end()
+        keywords = [self._normalize_heading(k) for k in self.section_keywords.get(section_type, [])]
+        lines = text.splitlines()
+        start_index = None
+        first_line_remainder = ""
+
+        for i, raw_line in enumerate(lines):
+            line = raw_line.strip()
+            if not line:
+                continue
+            norm_line = self._normalize_heading(line.replace(":", " "))
+            for kw in keywords:
+                if norm_line == kw or norm_line.startswith(kw + " "):
+                    start_index = i + 1
+                    if ":" in line:
+                        first_line_remainder = line.split(":", 1)[1].strip()
+                    break
+            if start_index is not None:
                 break
-        
-        if start_idx is None:
+
+        if start_index is None:
             return None
-        
-        # Step 2: Find where the section ends (next section header)
-        # Look for other section keywords after the start
-        remaining_text = text[start_idx:]
-        end_idx = len(remaining_text)
-        
-        # Find the next section header
-        all_keywords = []
-        for kw_list in self.section_keywords.values():
-            all_keywords.extend(kw_list)
-        
-        for keyword in all_keywords:
-            if keyword not in keywords:  # Different section
-                pattern = rf'({keyword}[\s:]*\n)'
-                match = re.search(pattern, remaining_text, re.IGNORECASE)
-                if match:
-                    end_idx = min(end_idx, match.start())
-        
-        # Step 3: Extract section text
-        section_text = remaining_text[:end_idx].strip()
+
+        collected = []
+        if first_line_remainder:
+            collected.append(first_line_remainder)
+        for j in range(start_index, len(lines)):
+            candidate = lines[j].strip()
+            if not candidate:
+                if collected:
+                    collected.append("")
+                continue
+            if self._is_section_header_line(candidate):
+                break
+            collected.append(candidate)
+
+        section_text = "\n".join(collected).strip()
         return section_text if section_text else None
-    
+
     def _extract_name(self, text: str) -> Optional[str]:
-        """
-        Extract name from resume (usually first line).
-        
-        Args:
-            text: Resume text
-            
-        Returns:
-            Name or None
-        """
-        lines = text.split('\n')
+        lines = text.split("\n")
         if lines:
             first_line = lines[0].strip()
-            # Simple heuristic: first line that's not too long and has capital letters
-            if len(first_line) < 50 and any(c.isupper() for c in first_line):
+            if len(first_line) < 60 and any(c.isupper() for c in first_line):
                 return first_line
         return None
-    
+
     def _extract_email(self, text: str) -> Optional[str]:
-        """
-        Extract email address from text.
-        
-        Args:
-            text: Resume text
-            
-        Returns:
-            Email or None
-        """
-        pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-        match = re.search(pattern, text)
+        match = re.search(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", text)
         return match.group() if match else None
-    
+
     def _extract_phone(self, text: str) -> Optional[str]:
-        """
-        Extract phone number from text.
-        
-        Args:
-            text: Resume text
-            
-        Returns:
-            Phone number or None
-        """
         patterns = [
-            r'\b\d{3}-\d{3}-\d{4}\b',  # 123-456-7890
-            r'\b\(\d{3}\)\s?\d{3}-\d{4}\b',  # (123) 456-7890
-            r'\b\d{10}\b',  # 1234567890
+            r"\+?\d{1,3}[\s-]?\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{4}",
+            r"\b\d{3}-\d{3}-\d{4}\b",
+            r"\b\(\d{3}\)\s?\d{3}-\d{4}\b",
+            r"\b\d{10}\b",
         ]
-        
         for pattern in patterns:
             match = re.search(pattern, text)
             if match:
                 return match.group()
-        
         return None
-    
+
     def _is_technology(self, text: str) -> bool:
-        """
-        Check if a text looks like a technology name.
-        
-        Simple heuristic - can be enhanced.
-        
-        Args:
-            text: Text to check
-            
-        Returns:
-            True if likely a technology name
-        """
-        # Common technology indicators
-        tech_indicators = ['cloud', 'framework', 'library', 'tool', 'platform']
+        tech_indicators = ["cloud", "framework", "library", "tool", "platform", "api", "sdk"]
         text_lower = text.lower()
         return any(indicator in text_lower for indicator in tech_indicators)
-    
+
+    def _looks_like_collapsed_text(self, text: Optional[str]) -> bool:
+        if not text:
+            return True
+        compact = re.sub(r"\s+", " ", text).strip()
+        if not compact:
+            return True
+        words = compact.split(" ")
+        avg_word_len = sum(len(w) for w in words) / max(len(words), 1)
+        space_ratio = compact.count(" ") / max(len(compact), 1)
+        return avg_word_len > 11 or space_ratio < 0.08
+
+    def _extract_text_from_words(self, page) -> str:
+        try:
+            words = page.extract_words(use_text_flow=True, keep_blank_chars=False)
+            if not words:
+                return ""
+            words = sorted(words, key=lambda w: (round(w["top"], 1), w["x0"]))
+            lines: List[List[dict]] = []
+            for word in words:
+                if not lines:
+                    lines.append([word])
+                    continue
+                if abs(lines[-1][-1]["top"] - word["top"]) <= 3:
+                    lines[-1].append(word)
+                else:
+                    lines.append([word])
+
+            out_lines: List[str] = []
+            for line_words in lines:
+                line_words = sorted(line_words, key=lambda w: w["x0"])
+                parts = []
+                prev = None
+                for w in line_words:
+                    if prev is not None:
+                        gap = w["x0"] - prev["x1"]
+                        if gap > 1.5:
+                            parts.append(" ")
+                    parts.append(w["text"])
+                    prev = w
+                out_lines.append("".join(parts))
+            return "\n".join(out_lines)
+        except Exception:
+            return ""
+
+    def _normalize_text(self, text: str) -> str:
+        if not text:
+            return text
+        normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+        normalized = normalized.replace("\u00a0", " ")
+        normalized = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", normalized)
+        normalized = re.sub(r"(?<=[A-Za-z])(?=\d)", " ", normalized)
+        normalized = re.sub(r"(?<=\d)(?=[A-Za-z])", " ", normalized)
+        normalized = re.sub(r"[ \t]+", " ", normalized)
+        normalized = re.sub(r"\n{3,}", "\n\n", normalized)
+        return normalized.strip()
+
+    def _normalize_heading(self, value: str) -> str:
+        return re.sub(r"[^a-z0-9 ]+", " ", value.lower()).strip()
+
+    def _is_section_header_line(self, line: str) -> bool:
+        normalized = self._normalize_heading(line.replace(":", " "))
+        if len(normalized.split()) > 5:
+            return False
+        for kw_list in self.section_keywords.values():
+            for kw in kw_list:
+                if normalized == self._normalize_heading(kw):
+                    return True
+        return False
+
+    def _normalize_skill_token(self, token: str) -> Optional[str]:
+        token = token.strip()
+        if not token:
+            return None
+
+        if ":" in token:
+            left, right = token.split(":", 1)
+            left = left.strip()
+            right = right.strip()
+            if right and (
+                re.search(
+                    r"(languages?|frameworks?|tools?|technologies|databases?|concepts?|libraries?)",
+                    left,
+                    re.IGNORECASE,
+                )
+                or len(right.split()) <= 5
+            ):
+                token = right
+
+        token = re.sub(
+            r"^(proficient in|experienced with|knowledge of|familiar with|strong in)\s+",
+            "",
+            token,
+            flags=re.IGNORECASE,
+        ).strip()
+        token = token.strip(" .:-")
+
+        if len(token) < 2 or len(token) > 40:
+            return None
+
+        key = re.sub(r"[^a-z0-9+.#]", "", token.lower())
+        if not key:
+            return None
+        if key in {"skills", "skill", "tools", "tool", "technology", "technologies", "api"}:
+            return None
+
+        canonical = self.skill_aliases.get(key)
+        if canonical:
+            return canonical
+
+        if re.fullmatch(r"[a-z]{1,2}", key):
+            return None
+
+        return token
+
+    def _extract_title_company(self, text: str) -> Tuple[Optional[str], Optional[str]]:
+        patterns = [
+            r"(?P<title>[A-Za-z][A-Za-z0-9 &/+.,()-]{2,80})\s+(?:at|@)\s+(?P<company>[A-Za-z][A-Za-z0-9 &/+.,()-]{1,80})",
+            r"(?P<title>[A-Za-z][A-Za-z0-9 &/+.,()-]{2,80})\s*[|]\s*(?P<company>[A-Za-z][A-Za-z0-9 &/+.,()-]{1,80})",
+            r"(?P<company>[A-Za-z][A-Za-z0-9 &/+.,()-]{1,80})\s*[-\u2013\u2014]\s*(?P<title>[A-Za-z][A-Za-z0-9 &/+.,()-]{2,80})",
+        ]
+        for pattern in patterns:
+            match = re.search(pattern, text)
+            if match:
+                title = match.groupdict().get("title")
+                company = match.groupdict().get("company")
+                if title:
+                    title = re.sub(r"\s+", " ", title).strip(" -|")
+                    title = re.sub(
+                        r"\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)?\.?\s*(?:19|20)\d{2}\b.*$",
+                        "",
+                        title,
+                        flags=re.IGNORECASE,
+                    ).strip(" -|")
+                if company:
+                    company = re.sub(r"\s+", " ", company).strip(" -|")
+                return title, company
+        return None, None
+
+    def _looks_like_project_title(self, text: str) -> bool:
+        if not text or len(text.split()) > 14:
+            return False
+        if text.endswith("."):
+            return False
+        if " - " in text or " : " in text or " | " in text:
+            return True
+        if "\u2013" in text or "\u2014" in text:
+            return True
+        title_case_words = sum(1 for w in text.split() if w[:1].isupper())
+        return title_case_words >= max(2, len(text.split()) // 2)
+
     def parse_to_json(self, pdf_path: str, output_path: Optional[str] = None) -> str:
-        """
-        Parse PDF and return/save as JSON.
-        
-        Args:
-            pdf_path: Path to PDF file
-            output_path: Optional path to save JSON file
-            
-        Returns:
-            JSON string of parsed data
-        """
-        # Parse the PDF
         result = self.parse_pdf(pdf_path)
-        
-        # Convert to JSON
         json_str = json.dumps(result, indent=2, ensure_ascii=False)
-        
-        # Save to file if output path provided
         if output_path:
-            with open(output_path, 'w', encoding='utf-8') as f:
+            with open(output_path, "w", encoding="utf-8") as f:
                 f.write(json_str)
             print(f"Saved parsed resume to: {output_path}")
-        
         return json_str
-

@@ -59,3 +59,6 @@ temp_resume.pdf
 # Environment variables (SECURITY)
 .env
 .env.local
+
+# Streamlit secrets (SECURITY)
+.streamlit/secrets.toml

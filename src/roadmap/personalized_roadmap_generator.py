@@ -1,27 +1,28 @@
-"""
-Personalized Learning Roadmap Generator
+"""Personalized Learning Roadmap Generator.
 
-Creates 30-day learning roadmaps with practical tasks to close skill gaps.
+Generates a week-wise roadmap (default: 12 weeks ≈ 3 months) per missing skill,
+including practical tasks and clickable learning resources.
 """
 
 from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 from src.models.analysis_result import LearningPath
+from src.roadmap.learning_resources import get_resource_links
 
 
 class PersonalizedRoadmapGenerator:
     """
-    Generate personalized 30-day learning roadmaps.
-    
-    Focuses on practical tasks rather than long courses.
+    Generate personalized, week-wise learning roadmaps.
+
+    Focuses on a practical plan + direct learning actions (clickable courses).
     """
     
-    def __init__(self, roadmap_days: int = 30):
+    def __init__(self, roadmap_days: int = 84):
         """
         Initialize roadmap generator.
         
         Args:
-            roadmap_days: Number of days for roadmap (default: 30)
+            roadmap_days: Number of days for roadmap (default: 84 = 12 weeks)
         """
         self.roadmap_days = roadmap_days
         self.skill_tasks = self._load_skill_tasks()
@@ -33,7 +34,7 @@ class PersonalizedRoadmapGenerator:
         required_skills: Optional[List[str]] = None
     ) -> Dict:
         """
-        Generate 30-day personalized learning roadmap.
+        Generate personalized learning roadmap.
         
         Args:
             missing_skills: List of missing skills to learn
@@ -42,9 +43,7 @@ class PersonalizedRoadmapGenerator:
             
         Returns:
             Dictionary with:
-            - roadmap: List of daily/weekly tasks
-            - skill_plans: Skill-wise learning plans
-            - timeline: Day-by-day breakdown
+            - skill_plans: Skill-wise learning plans (week-wise)
             - summary: Roadmap summary
         """
         # Prioritize skills (required first)
@@ -53,27 +52,23 @@ class PersonalizedRoadmapGenerator:
         else:
             prioritized_skills = missing_skills
         
-        # Generate skill-wise plans
-        skill_plans = []
-        total_days_allocated = 0
-        
+        # Generate skill-wise plans (allocate weeks across skills)
+        skill_plans: List[Dict] = []
+        total_weeks = max(1, self.roadmap_days // 7)
+        weeks_allocated = 0
+
         for skill in prioritized_skills:
-            if total_days_allocated >= self.roadmap_days:
+            if weeks_allocated >= total_weeks:
                 break
-            
-            # Estimate days needed (max 7 days per skill for 30-day roadmap)
-            days_needed = min(7, self._estimate_skill_days(skill))
-            remaining_days = self.roadmap_days - total_days_allocated
-            
-            if days_needed > remaining_days:
-                days_needed = remaining_days
-            
-            skill_plan = self._create_skill_plan(skill, days_needed, total_days_allocated + 1)
+
+            weeks_needed = min(4, self._estimate_skill_weeks(skill))
+            remaining_weeks = total_weeks - weeks_allocated
+            if weeks_needed > remaining_weeks:
+                weeks_needed = remaining_weeks
+
+            skill_plan = self._create_skill_plan(skill, weeks_needed, weeks_allocated + 1)
             skill_plans.append(skill_plan)
-            total_days_allocated += days_needed
-        
-        # Create day-by-day timeline
-        timeline = self._create_timeline(skill_plans)
+            weeks_allocated += weeks_needed
         
         # Generate summary
         summary = self._generate_summary(skill_plans, target_role)
@@ -81,12 +76,28 @@ class PersonalizedRoadmapGenerator:
         return {
             'target_role': target_role,
             'roadmap_days': self.roadmap_days,
+            'roadmap_weeks': total_weeks,
             'skill_plans': skill_plans,
-            'timeline': timeline,
+            # Backward-compatible: timeline no longer generated (week-wise is source of truth)
+            'timeline': [],
             'summary': summary,
             'total_skills': len(skill_plans),
             'estimated_completion': (datetime.now() + timedelta(days=self.roadmap_days)).strftime("%Y-%m-%d")
         }
+
+    def _estimate_skill_weeks(self, skill: str) -> int:
+        """Estimate weeks needed to learn a skill (simple heuristic)."""
+        skill_lower = (skill or "").lower()
+
+        if any(term in skill_lower for term in ['deep learning', 'neural network', 'transformer']):
+            return 4
+        if any(term in skill_lower for term in ['machine learning', 'tensorflow', 'pytorch']):
+            return 3
+        if any(term in skill_lower for term in ['aws', 'docker', 'kubernetes', 'cloud']):
+            return 2
+        if any(term in skill_lower for term in ['statistics', 'data analysis', 'sql']):
+            return 2
+        return 2
     
     def _prioritize_skills(
         self,
@@ -117,20 +128,113 @@ class PersonalizedRoadmapGenerator:
     def _create_skill_plan(
         self,
         skill: str,
-        days: int,
-        start_day: int
+        weeks: int,
+        start_week: int
     ) -> Dict:
-        """Create a learning plan for a specific skill."""
-        tasks = self._get_practical_tasks(skill, days)
-        
+        """Create a week-wise learning plan for a specific skill."""
+        weekly_plan = self._get_weekly_plan(skill, weeks, start_week)
+        tools = self._get_tools_for_skill(skill)
+
+        links = get_resource_links(skill)
+        resources = [
+            {"platform": r.platform, "title": r.title, "url": r.url}
+            for r in links
+        ]
+
         return {
             'skill': skill,
-            'days': days,
-            'start_day': start_day,
-            'end_day': start_day + days - 1,
-            'tasks': tasks,
-            'resources': self._get_learning_resources(skill)
+            'weeks': weeks,
+            'start_week': start_week,
+            'end_week': start_week + weeks - 1,
+            'weekly_plan': weekly_plan,
+            'tools': tools,
+            'resources': resources,
         }
+
+    def _get_tools_for_skill(self, skill: str) -> List[str]:
+        skill_lower = (skill or "").lower()
+        tools = ["Notes + weekly review checklist"]
+
+        if any(x in skill_lower for x in ["tensorflow", "pytorch", "machine learning", "deep learning"]):
+            tools = [
+                "Python 3.x",
+                "Jupyter Notebook / VS Code",
+                "NumPy + Pandas",
+                "GPU optional (if available)",
+            ]
+            if "tensorflow" in skill_lower:
+                tools.append("TensorFlow + Keras")
+            if "pytorch" in skill_lower:
+                tools.append("PyTorch")
+        elif "sql" in skill_lower:
+            tools = ["PostgreSQL or MySQL", "SQL client (DBeaver/pgAdmin)", "Sample dataset (CSV)"]
+        elif "python" in skill_lower:
+            tools = ["Python 3.x", "VS Code", "pip/uv", "pytest"]
+
+        return tools
+
+    def _get_weekly_plan(self, skill: str, weeks: int, start_week: int) -> List[Dict]:
+        """Generate a practical, week-wise plan."""
+        s = (skill or "").strip()
+        s_lower = s.lower()
+
+        plan: List[Dict] = []
+        for i in range(weeks):
+            w = start_week + i
+
+            if "tensorflow" in s_lower:
+                focus = [
+                    "Setup + tensors + basics",
+                    "Keras models + training loop",
+                    "CNNs + evaluation",
+                    "Mini project + review",
+                ][min(i, 3)]
+                deliverable = [
+                    "Working local environment + first TF notebook",
+                    "Train a simple classifier and track metrics",
+                    "Train/evaluate a CNN (e.g., image classification)",
+                    "One small end-to-end TF project on GitHub",
+                ][min(i, 3)]
+            elif "sql" in s_lower:
+                focus = [
+                    "SELECT basics + filtering",
+                    "JOINs + grouping",
+                    "Window functions + optimization",
+                    "Dashboard-style queries + case studies",
+                ][min(i, 3)]
+                deliverable = [
+                    "10 practice queries with correct outputs",
+                    "Solve 10 JOIN + aggregation problems",
+                    "Solve 10 window-function problems",
+                    "A mini SQL project (schema + queries + notes)",
+                ][min(i, 3)]
+            else:
+                focus = [
+                    "Fundamentals + setup",
+                    "Hands-on practice",
+                    "Intermediate concepts",
+                    "Mini project + review",
+                ][min(i, 3)]
+                deliverable = [
+                    f"Environment ready + notes for {s}",
+                    f"Practice exercises for {s}",
+                    f"Intermediate exercises for {s}",
+                    f"Mini project demonstrating {s}",
+                ][min(i, 3)]
+
+            plan.append(
+                {
+                    "week": w,
+                    "focus": focus,
+                    "deliverable": deliverable,
+                    "tasks": [
+                        f"Watch/complete one course module for {s}",
+                        f"Implement 2–3 hands-on exercises for {s}",
+                        "Write a short summary + key mistakes/lessons",
+                    ],
+                }
+            )
+        return plan
     
     def _get_practical_tasks(self, skill: str, days: int) -> List[Dict]:
         """Get practical tasks for learning a skill."""
@@ -250,22 +354,25 @@ class PersonalizedRoadmapGenerator:
     def _generate_summary(self, skill_plans: List[Dict], target_role: str) -> str:
         """Generate roadmap summary."""
         total_skills = len(skill_plans)
-        total_days = sum(plan['days'] for plan in skill_plans)
+        total_weeks = sum(plan.get('weeks', 0) for plan in skill_plans)
         
         summary = f"""
-30-Day Learning Roadmap for {target_role}
+    12-Week (3-Month) Learning Roadmap for {target_role}
 
 OVERVIEW:
 - Target Role: {target_role}
 - Skills to Learn: {total_skills}
-- Timeline: {total_days} days
+- Timeline: {total_weeks} weeks
 - Start Date: {datetime.now().strftime('%Y-%m-%d')}
-- Completion Date: {(datetime.now() + timedelta(days=total_days)).strftime('%Y-%m-%d')}
+- Completion Date: {(datetime.now() + timedelta(days=self.roadmap_days)).strftime('%Y-%m-%d')}
 
 SKILLS COVERED:
 """
         for i, plan in enumerate(skill_plans, 1):
-            summary += f"{i}. {plan['skill']} ({plan['days']} days, Days {plan['start_day']}-{plan['end_day']})\n"
+            summary += (
+                f"{i}. {plan['skill']} ({plan.get('weeks', 0)} weeks, "
+                f"Weeks {plan.get('start_week', 0)}-{plan.get('end_week', 0)})\n"
+            )
         
         summary += "\nAPPROACH:\n"
         summary += "- Focus on practical tasks and projects\n"

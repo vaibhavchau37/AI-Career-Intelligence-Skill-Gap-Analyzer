@@ -7,6 +7,8 @@ Optional AI-powered enhancements for job analysis.
 import os
 from typing import Optional, Dict, List
 
+from src.api.openai_client import chat_complete
+
 
 class AIEnhancer:
     """
@@ -120,22 +122,15 @@ class AIEnhancer:
     def _openai_request(self, prompt: str) -> str:
         """Make request to OpenAI API."""
         try:
-            import openai
-            openai.api_key = self.openai_key
-            
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
+            return chat_complete(
+                [
                     {"role": "system", "content": "You are a helpful career advisor."},
-                    {"role": "user", "content": prompt}
+                    {"role": "user", "content": prompt},
                 ],
-                max_tokens=200,
-                temperature=0.7
+                api_key=self.openai_key,
+                temperature=0.7,
+                max_tokens=220,
             )
-            
-            return response.choices[0].message.content.strip()
-        except ImportError:
-            raise ImportError("OpenAI library not installed. Install with: pip install openai")
         except Exception as e:
             raise Exception(f"OpenAI API error: {e}")
     

@@ -30,7 +30,7 @@ streamlit>=1.25.0
 requests>=2.31.0
 
 # Optional: AI Enhancements
-# openai>=1.0.0  # Uncomment if using OpenAI
+openai>=1.0.0
 # google-generativeai>=0.3.0  # Uncomment if using Gemini
 python-dotenv>=1.0.0  # For environment variables
 
