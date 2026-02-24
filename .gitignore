@@ -60,6 +60,10 @@ temp_*
 data/raw/*.csv
 data/raw/*.xlsx
 
+# Generated data files (derived from raw CSVs — not tracked)
+data/combined_*.json
+data/extracted_*.json
+
 # spaCy models (large files)
 *.tar.gz
 *.whl
