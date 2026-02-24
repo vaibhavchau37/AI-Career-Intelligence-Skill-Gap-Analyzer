@@ -14,6 +14,7 @@ def chat_complete(
     *,
     temperature: float = 0.4,
     max_tokens: int = 600,
+    api_key: Optional[str] = None,
 ) -> str:
     provider_norm = (provider or "").strip().lower()
 
@@ -24,6 +25,7 @@ def chat_complete(
             messages,
             temperature=temperature,
             max_tokens=max_tokens,
+            api_key=api_key or None,
         )
 
     if provider_norm in {"gemini", "google"}:
@@ -33,6 +35,7 @@ def chat_complete(
             messages,
             temperature=temperature,
             max_tokens=max_tokens,
+            api_key=api_key or None,
         )
 
     if provider_norm in {"sambanova", "sn"}:
@@ -42,6 +45,7 @@ def chat_complete(
             messages,
             temperature=temperature,
             max_tokens=max_tokens,
+            api_key=api_key or None,
         )
 
     raise RuntimeError("Unknown AI provider. Use 'OpenAI', 'Gemini', or 'SambaNova'.")

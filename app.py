@@ -4,15 +4,27 @@ AI Career Intelligence & Skill Gap Analyzer - Streamlit Web App
 A clean, simple, college-presentation ready web interface for career analysis.
 """
 
+import os
+import sys
+import json
+import time
+import yaml
+import difflib
+import html
+from pathlib import Path
+from datetime import datetime
+
 import streamlit as st
 
 # Local dev convenience: load environment variables from .env (ignored by git)
 try:
     from dotenv import load_dotenv
-
     load_dotenv()
 except Exception:
     pass
+
+# Add src to path
+sys.path.insert(0, str(Path(__file__).parent))
 
 
 def _has_config_value(key_name: str) -> bool:
@@ -32,18 +44,6 @@ def _default_ai_provider() -> str:
     if _has_config_value("SAMBANOVA_API_KEY"):
         return "SambaNova"
     return "OpenAI"
-import sys
-from pathlib import Path
-import json
-import time
-import yaml
-import os
-import difflib
-import html
-from datetime import datetime
-
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent))
 
 from src.core.pdf_resume_parser import PDFResumeParser
 from src.core.skill_gap_analyzer_tfidf import SkillGapAnalyzerTFIDF
@@ -54,11 +54,13 @@ from src.roadmap.personalized_roadmap_generator import PersonalizedRoadmapGenera
 from src.api.interview_ai import start_interview, interview_turn, generate_skill_questions
 from src.api.job_market_analyzer import JobMarketAnalyzer
 
+# Tracking & History
 try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass  # dotenv not installed, will use environment variables directly
+    from src.utils.tracking_ui import render_tracking_tab
+    _TRACKING_OK = True
+except Exception as _tracking_err:
+    _TRACKING_OK  = False
+    _TRACKING_ERR = str(_tracking_err)
 
 # Page configuration
 st.set_page_config(
@@ -68,149 +70,653 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for better styling
+# ── Global CSS (Figma / Spline Design System) ───────────────────────────────
 st.markdown("""
 <style>
-    .main-header {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #1f77b4;
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-    .sub-header {
-        font-size: 1.5rem;
-        color: #2c3e50;
-        margin-top: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    .score-box {
-        background-color: #f0f2f6;
-        padding: 1.5rem;
-        border-radius: 10px;
-        border-left: 5px solid #1f77b4;
-        margin: 1rem 0;
-    }
-    .skill-match {
-        color: #28a745;
-        font-weight: bold;
-    }
-    .skill-missing {
-        color: #dc3545;
-        font-weight: bold;
-    }
-    .stButton>button {
-        width: 100%;
-        background-color: #1f77b4;
-        color: white;
-        font-weight: bold;
-    }
-    .nav-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 20px;
-        border-radius: 10px;
-        color: white;
-        margin-bottom: 20px;
-    }
-    .progress-step {
-        display: inline-block;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        text-align: center;
-        line-height: 30px;
-        margin: 0 5px;
-        font-weight: bold;
-    }
-    .step-completed {
-        background-color: #28a745;
-        color: white;
-    }
-    .step-current {
-        background-color: #1f77b4;
-        color: white;
-    }
-    .step-pending {
-        background-color: #e0e0e0;
-        color: #6c757d;
-    }
-    .resume-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 25px;
-        border-radius: 15px;
-        color: white;
-        margin: 20px 0;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .info-card {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        border-left: 4px solid #1f77b4;
-        margin: 10px 0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .skill-badge {
-        display: inline-block;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 5px 12px;
-        border-radius: 20px;
-        margin: 5px;
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
-    .experience-card {
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 8px;
-        border-left: 3px solid #28a745;
-        margin: 10px 0;
-    }
-    .project-card {
-        background: #fff3cd;
-        padding: 15px;
-        border-radius: 8px;
-        border-left: 3px solid #ffc107;
-        margin: 10px 0;
-    }
-    .education-card {
-        background: #d1ecf1;
-        padding: 15px;
-        border-radius: 8px;
-        border-left: 3px solid #17a2b8;
-        margin: 10px 0;
-    }
-    .stat-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .scanning-animation {
-        display: inline-block;
-        animation: scan 2s infinite;
-    }
-    @keyframes scan {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.3; }
-    }
-    .upload-area {
-        border: 3px dashed #1f77b4;
-        border-radius: 10px;
-        padding: 40px;
-        text-align: center;
-        background: #f0f2f6;
-        transition: all 0.3s;
-    }
-    .upload-area:hover {
-        background: #e0e7f0;
-        border-color: #764ba2;
-    }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ═══════════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════════ */
+:root {
+  --bg:           #07090f;
+  --surface:      rgba(255,255,255,0.03);
+  --surface-hi:   rgba(255,255,255,0.06);
+  --border:       rgba(255,255,255,0.07);
+  --border-hi:    rgba(255,255,255,0.14);
+  --primary:      #6366f1;
+  --primary-glow: rgba(99,102,241,0.35);
+  --accent:       #06b6d4;
+  --accent-glow:  rgba(6,182,212,0.30);
+  --success:      #10b981;
+  --success-glow: rgba(16,185,129,0.30);
+  --warning:      #f59e0b;
+  --danger:       #ef4444;
+  --text-primary: #f1f5f9;
+  --text-secondary:#94a3b8;
+  --text-muted:   #475569;
+}
+
+/* ═══════════════════════════════════════════════════
+   BASE / RESET
+═══════════════════════════════════════════════════ */
+* { box-sizing: border-box; }
+html, body, [data-testid="stAppViewContainer"] {
+    background: var(--bg) !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+[data-testid="stHeader"]         { background: transparent !important; }
+[data-testid="stToolbar"]        { display: none !important; }
+[data-testid="stDecoration"]     { display: none !important; }
+#MainMenu                        { display: none !important; }
+footer                           { display: none !important; }
+[data-testid="stAppViewContainer"] { background: var(--bg) !important; }
+
+/* ── Animated gradient-mesh background ── */
+[data-testid="stAppViewContainer"]::before {
+    content: "";
+    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+        radial-gradient(ellipse 900px 600px at 10% 20%,  rgba(99,102,241,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 700px 500px at 85% 10%,  rgba(6,182,212,0.09)  0%, transparent 65%),
+        radial-gradient(ellipse 600px 700px at 50% 85%,  rgba(16,185,129,0.07) 0%, transparent 60%),
+        var(--bg);
+}
+
+/* ═══════════════════════════════════════════════════
+   TYPOGRAPHY
+═══════════════════════════════════════════════════ */
+.stMarkdown p, .stMarkdown li, .stMarkdown span { color: var(--text-secondary) !important; }
+.stMarkdown h1, .stMarkdown h2, .stMarkdown h3 { color: var(--text-primary) !important; }
+
+/* ═══════════════════════════════════════════════════
+   APP HERO HEADER
+═══════════════════════════════════════════════════ */
+.main-header {
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    border: 1px solid var(--border-hi);
+    border-radius: 20px;
+    padding: 36px 40px 28px;
+    text-align: center;
+    margin-bottom: 24px;
+    box-shadow: 0 0 0 1px rgba(99,102,241,0.1), 0 24px 64px rgba(0,0,0,0.6);
+}
+.main-header::before {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+        radial-gradient(ellipse 500px 300px at 15% 50%, rgba(99,102,241,0.25) 0%, transparent 60%),
+        radial-gradient(ellipse 400px 200px at 85% 30%, rgba(6,182,212,0.15)  0%, transparent 60%);
+}
+.main-header h1 {
+    position: relative; z-index: 1;
+    margin: 0; font-size: 2.35rem; font-weight: 900;
+    letter-spacing: -1px; line-height: 1.15;
+    background: linear-gradient(135deg, #fff 30%, #a5b4fc 70%, #67e8f9 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.main-header h1 .hdr-icon {
+    display: inline-block;
+    -webkit-text-fill-color: initial;
+    background: none; -webkit-background-clip: unset; background-clip: unset;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.55));
+    margin-right: 6px;
+}
+.main-header .subtitle {
+    position: relative; z-index: 1;
+    color: rgba(255,255,255,0.45); font-size: 0.9rem;
+    margin-top: 8px; letter-spacing: 0.4px;
+}
+.main-header .hero-chips {
+    position: relative; z-index: 1;
+    display: flex; gap: 8px; justify-content: center;
+    flex-wrap: wrap; margin-top: 14px;
+}
+.hero-chip {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.7);
+    padding: 4px 14px; border-radius: 99px; font-size: 0.78rem;
+    backdrop-filter: blur(8px);
+}
+
+/* ═══════════════════════════════════════════════════
+   PROGRESS TRACKER (Spline-style nodes)
+═══════════════════════════════════════════════════ */
+.nav-card {
+    background: rgba(255,255,255,0.025);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--border-hi);
+    border-radius: 18px;
+    padding: 22px 32px 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.pt-top {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+}
+.pt-title {
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--text-muted);
+}
+.pt-count {
+    font-size: 0.85rem; font-weight: 700;
+    color: var(--primary); background: rgba(99,102,241,0.12);
+    padding: 3px 12px; border-radius: 99px;
+    border: 1px solid rgba(99,102,241,0.25);
+}
+.pt-bar-wrap {
+    height: 4px; border-radius: 99px;
+    background: rgba(255,255,255,0.08);
+    overflow: visible; margin-bottom: 20px;
+    position: relative;
+}
+.pt-bar-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    box-shadow: 0 0 12px var(--primary-glow);
+    transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+}
+.pt-bar-fill::after {
+    content: "";
+    position: absolute; right: -5px; top: -4px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 14px var(--accent-glow);
+}
+.pt-steps {
+    display: flex; justify-content: space-between;
+    align-items: flex-start; position: relative;
+}
+.pt-steps::before {
+    content: ""; position: absolute;
+    top: 19px; left: 5%; right: 5%; height: 2px;
+    background: rgba(255,255,255,0.06); z-index: 0;
+}
+.pt-step {
+    display: flex; flex-direction: column;
+    align-items: center; flex: 1;
+    position: relative; z-index: 1; cursor: default;
+}
+.pt-circle {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700;
+    transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+}
+/* Done state */
+.pt-done .pt-circle {
+    background: linear-gradient(135deg, #059669, #10b981);
+    border: 2px solid rgba(16,185,129,0.5);
+    color: white;
+    box-shadow: 0 0 16px var(--success-glow), 0 4px 12px rgba(0,0,0,0.3);
+}
+.pt-done .pt-circle::after {
+    content: "✓"; position: absolute; font-size: 1rem; font-weight: 800;
+}
+/* Active/current state */
+.pt-active .pt-circle {
+    background: linear-gradient(135deg, var(--primary), #818cf8);
+    border: 2px solid rgba(165,180,252,0.6);
+    color: white;
+    box-shadow: 0 0 20px var(--primary-glow), 0 4px 14px rgba(0,0,0,0.4);
+    animation: node-pulse 2.5s ease-in-out infinite;
+}
+@keyframes node-pulse {
+    0%,100% { box-shadow: 0 0 20px var(--primary-glow), 0 4px 14px rgba(0,0,0,0.4); transform: scale(1);   }
+    50%      { box-shadow: 0 0 32px var(--primary-glow), 0 4px 18px rgba(0,0,0,0.4); transform: scale(1.05); }
+}
+/* Waiting state */
+.pt-wait .pt-circle {
+    background: rgba(255,255,255,0.04);
+    border: 2px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.25);
+}
+.pt-label {
+    font-size: 0.68rem; margin-top: 7px;
+    text-align: center; max-width: 58px; line-height: 1.3;
+    color: var(--text-muted); font-weight: 500;
+}
+.pt-done   .pt-label { color: var(--success); font-weight: 600; }
+.pt-active .pt-label { color: #a5b4fc;         font-weight: 700; }
+
+/* ═══════════════════════════════════════════════════
+   TABS (Frosted glass pill)
+═══════════════════════════════════════════════════ */
+.stTabs [data-baseweb="tab-list"] {
+    background: rgba(255,255,255,0.035) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 14px !important;
+    padding: 5px 6px !important;
+    gap: 2px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05) !important;
+}
+.stTabs [data-baseweb="tab"] {
+    border-radius: 10px !important;
+    color: var(--text-muted) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.78rem !important; font-weight: 500 !important;
+    padding: 7px 14px !important;
+    transition: all 0.2s ease !important;
+    border: 1px solid transparent !important;
+}
+.stTabs [data-baseweb="tab"]:hover:not([aria-selected="true"]) {
+    color: var(--text-secondary) !important;
+    background: rgba(255,255,255,0.05) !important;
+}
+.stTabs [aria-selected="true"] {
+    background: linear-gradient(135deg, var(--primary), #818cf8) !important;
+    color: white !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 14px var(--primary-glow) !important;
+    border-color: rgba(165,180,252,0.3) !important;
+}
+.stTabs [data-baseweb="tab-highlight"] { display: none !important; }
+.stTabs [data-baseweb="tab-border"]    { display: none !important; }
+
+/* ═══════════════════════════════════════════════════
+   GLASSMORPHISM CARDS
+═══════════════════════════════════════════════════ */
+.glass-card {
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--border-hi);
+    border-radius: 16px; padding: 20px 22px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    color: var(--text-secondary);
+}
+.glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.info-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-hi);
+    border-left: 3px solid var(--primary);
+    border-radius: 12px; padding: 16px 20px;
+    margin: 10px 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    color: var(--text-secondary);
+}
+.score-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-hi);
+    border-left: 4px solid var(--primary);
+    border-radius: 12px; padding: 1.2rem 1.4rem;
+    margin: 1rem 0; color: var(--text-secondary);
+    box-shadow: 0 0 0 1px rgba(99,102,241,0.08);
+}
+
+/* ═══════════════════════════════════════════════════
+   STAT CARDS (Spline-depth tiles)
+═══════════════════════════════════════════════════ */
+.stat-card {
+    position: relative; overflow: hidden;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-hi);
+    border-radius: 16px; padding: 22px 16px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease;
+}
+.stat-card::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 120px 80px at 50% -20%, rgba(99,102,241,0.18) 0%, transparent 60%);
+}
+.stat-card:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 12px 32px rgba(0,0,0,0.5); }
+.stat-card h2 {
+    position: relative; z-index: 1;
+    font-size: 2.2rem; font-weight: 900; margin: 0;
+    background: linear-gradient(135deg, #fff, #a5b4fc);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.stat-card p { position: relative; z-index: 1; margin: 5px 0 0; font-size: 0.78rem; color: var(--text-muted); }
+
+/* ═══════════════════════════════════════════════════
+   EXPERIENCE / PROJECT / EDUCATION CARDS
+═══════════════════════════════════════════════════ */
+.experience-card {
+    background: rgba(16,185,129,0.04);
+    border: 1px solid rgba(16,185,129,0.15);
+    border-left: 3px solid var(--success);
+    border-radius: 12px; padding: 14px 18px; margin: 10px 0;
+    color: var(--text-secondary);
+    transition: border-color 0.2s, background 0.2s;
+}
+.experience-card:hover { background: rgba(16,185,129,0.07); border-color: rgba(16,185,129,0.3); }
+.project-card {
+    background: rgba(245,158,11,0.04);
+    border: 1px solid rgba(245,158,11,0.15);
+    border-left: 3px solid var(--warning);
+    border-radius: 12px; padding: 14px 18px; margin: 10px 0;
+    color: var(--text-secondary);
+    transition: border-color 0.2s, background 0.2s;
+}
+.project-card:hover { background: rgba(245,158,11,0.07); border-color: rgba(245,158,11,0.3); }
+.education-card {
+    background: rgba(6,182,212,0.04);
+    border: 1px solid rgba(6,182,212,0.15);
+    border-left: 3px solid var(--accent);
+    border-radius: 12px; padding: 14px 18px; margin: 10px 0;
+    color: var(--text-secondary);
+    transition: border-color 0.2s, background 0.2s;
+}
+.education-card:hover { background: rgba(6,182,212,0.07); border-color: rgba(6,182,212,0.3); }
+.resume-card {
+    background: linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(5,150,105,0.1) 100%);
+    border: 1px solid rgba(16,185,129,0.25);
+    border-radius: 14px; padding: 20px 24px; margin: 16px 0;
+    color: #d1fae5;
+    box-shadow: 0 4px 20px rgba(16,185,129,0.15);
+}
+
+/* ═══════════════════════════════════════════════════
+   SKILL BADGES
+═══════════════════════════════════════════════════ */
+.skill-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(129,140,248,0.15));
+    border: 1px solid rgba(99,102,241,0.3);
+    color: #a5b4fc;
+    padding: 4px 12px; border-radius: 99px;
+    margin: 3px; font-size: 0.78rem; font-weight: 500;
+    letter-spacing: 0.3px;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+}
+.skill-badge:hover { background: rgba(99,102,241,0.3); border-color: rgba(99,102,241,0.5); color: white; }
+.skill-match   { color: var(--success) !important; font-weight: 700; }
+.skill-missing { color: var(--danger)  !important; font-weight: 700; }
+
+/* ═══════════════════════════════════════════════════
+   TAB HERO BANNERS
+═══════════════════════════════════════════════════ */
+.tab-hero {
+    position: relative; overflow: hidden;
+    border-radius: 18px;
+    padding: 26px 28px 22px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border-hi);
+    box-shadow: 0 4px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.tab-hero::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 300px 200px at 100% 50%, rgba(255,255,255,0.04) 0%, transparent 60%);
+}
+.tab-hero-inner {
+    display: flex; align-items: flex-start; gap: 16px;
+    position: relative; z-index: 1;
+}
+.tab-hero-icon {
+    font-size: 2.4rem; line-height: 1; flex-shrink: 0;
+    filter: drop-shadow(0 0 12px rgba(255,255,255,0.25));
+}
+.tab-hero-text { flex: 1; min-width: 0; }
+.tab-hero-text h2 {
+    margin: 0 0 4px; font-size: 1.45rem; font-weight: 800;
+    letter-spacing: -0.5px; line-height: 1.2;
+    color: #fff;
+}
+.tab-hero-text p {
+    margin: 0; font-size: 0.85rem; color: rgba(255,255,255,0.55) !important;
+    line-height: 1.5;
+}
+.tab-hero-badge {
+    flex-shrink: 0; align-self: flex-start;
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 14px; border-radius: 99px;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.3px;
+    backdrop-filter: blur(8px);
+}
+.badge-done    { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.35); }
+.badge-active  { background: rgba(99,102,241,0.18); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.4); }
+.badge-waiting { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.35); border: 1px solid rgba(255,255,255,0.1); }
+
+/* Per-tab accent colours */
+.tab-hero-resume   { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
+.tab-hero-role     { background: linear-gradient(135deg, #0c1a0c 0%, #052e16 100%); }
+.tab-hero-gaps     { background: linear-gradient(135deg, #12111e 0%, #1e1240 100%); }
+.tab-hero-score    { background: linear-gradient(135deg, #161005 0%, #2d1f06 100%); }
+.tab-hero-suit     { background: linear-gradient(135deg, #061020 0%, #0c2340 100%); }
+.tab-hero-roadmap  { background: linear-gradient(135deg, #07131a 0%, #0e2732 100%); }
+.tab-hero-interview{ background: linear-gradient(135deg, #13061f 0%, #260d40 100%); }
+.tab-hero-tracking { background: linear-gradient(135deg, #0e0e1a 0%, #1a1a35 100%); }
+
+/* ── Tab section titles (inside tabs) ── */
+.tab-section-title {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1rem; font-weight: 700;
+    color: var(--text-primary);
+    margin: 28px 0 12px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.2px;
+}
+.tab-section-title .tst-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+/* keep .sub-header as fallback alias */
+.sub-header { font-size: 1rem; font-weight: 700; color: var(--text-primary);
+              margin: 24px 0 12px; padding-bottom: 8px;
+              border-bottom: 1px solid var(--border); }
+
+/* ═══════════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════════ */
+.stButton > button {
+    background: linear-gradient(135deg, var(--primary), #818cf8) !important;
+    color: white !important; font-weight: 600 !important;
+    border: 1px solid rgba(165,180,252,0.3) !important;
+    border-radius: 10px !important;
+    padding: 0.55rem 1.4rem !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.85rem !important;
+    letter-spacing: 0.2px !important;
+    box-shadow: 0 4px 14px var(--primary-glow), inset 0 1px 0 rgba(255,255,255,0.15) !important;
+    transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important;
+}
+.stButton > button:hover  { transform: translateY(-2px) scale(1.02) !important; box-shadow: 0 8px 22px var(--primary-glow) !important; }
+.stButton > button:active { transform: translateY(0) scale(0.99) !important; }
+
+/* ═══════════════════════════════════════════════════
+   UPLOAD AREA
+═══════════════════════════════════════════════════ */
+.upload-area {
+    border: 1.5px dashed rgba(99,102,241,0.4);
+    border-radius: 18px;
+    padding: 44px 32px;
+    text-align: center;
+    background: radial-gradient(ellipse 300px 200px at 50% 0%, rgba(99,102,241,0.06) 0%, transparent 60%),
+                rgba(255,255,255,0.015);
+    backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
+    color: var(--text-secondary);
+    position: relative; overflow: hidden;
+}
+.upload-area::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 200px 150px at 50% 50%, rgba(99,102,241,0.05) 0%, transparent 70%);
+    transition: opacity 0.3s;
+}
+.upload-area:hover {
+    border-color: rgba(99,102,241,0.7);
+    background: rgba(99,102,241,0.06);
+    box-shadow: 0 0 30px rgba(99,102,241,0.1);
+    transform: scale(1.005);
+}
+
+/* ═══════════════════════════════════════════════════
+   FORM INPUTS
+═══════════════════════════════════════════════════ */
+[data-testid="stFileUploader"] label { color: var(--text-secondary) !important; }
+[data-testid="stFileUploader"] section {
+    background: var(--surface) !important;
+    border-color: var(--border-hi) !important;
+    border-radius: 12px !important;
+}
+.stTextInput input {
+    background: rgba(255,255,255,0.04) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-hi) !important;
+    border-radius: 10px !important;
+    font-family: 'Inter', sans-serif !important;
+}
+.stTextInput input:focus { border-color: rgba(99,102,241,0.5) !important; box-shadow: 0 0 0 3px rgba(99,102,241,0.12) !important; }
+.stSelectbox > div > div {
+    background: rgba(255,255,255,0.04) !important;
+    border-color: var(--border-hi) !important;
+    border-radius: 10px !important;
+    color: var(--text-primary) !important;
+}
+.stTextArea textarea {
+    background: rgba(255,255,255,0.04) !important;
+    border-color: var(--border-hi) !important;
+    border-radius: 10px !important;
+    color: var(--text-primary) !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   METRICS
+═══════════════════════════════════════════════════ */
+[data-testid="metric-container"] {
+    background: rgba(255,255,255,0.03) !important;
+    border: 1px solid var(--border-hi) !important;
+    border-radius: 12px !important;
+    padding: 14px !important;
+}
+[data-testid="stMetricValue"] { color: #a5b4fc !important; font-weight: 800 !important; }
+[data-testid="stMetricLabel"] { color: var(--text-muted) !important; font-size: 0.78rem !important; }
+
+/* ═══════════════════════════════════════════════════
+   EXPANDERS / CONTAINERS
+═══════════════════════════════════════════════════ */
+[data-testid="stExpander"] {
+    background: rgba(255,255,255,0.025) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+}
+[data-testid="stExpander"] summary { color: var(--text-secondary) !important; }
+
+/* ═══════════════════════════════════════════════════
+   ALERTS
+═══════════════════════════════════════════════════ */
+[data-testid="stAlert"] {
+    border-radius: 12px !important;
+    border-width: 1px !important;
+    font-size: 0.88rem !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   CHAT MESSAGES (Interview tab)
+═══════════════════════════════════════════════════ */
+[data-testid="stChatMessage"] {
+    background: rgba(255,255,255,0.025) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 16px !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   PROGRESS BAR (Streamlit native)
+═══════════════════════════════════════════════════ */
+[data-testid="stProgress"] > div > div > div {
+    background: linear-gradient(90deg, var(--primary), var(--accent)) !important;
+    border-radius: 99px !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   SCANNING ANIMATION
+═══════════════════════════════════════════════════ */
+.scanning-animation {
+    display: inline-block;
+    animation: scan 1.8s cubic-bezier(0.4,0,0.6,1) infinite;
+}
+@keyframes scan {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.25; }
+}
+
+/* ═══════════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+
+/* ═══════════════════════════════════════════════════
+   DIVIDER
+═══════════════════════════════════════════════════ */
+hr { border-color: var(--border) !important; margin: 20px 0 !important; }
+
+/* ═══════════════════════════════════════════════════
+   SECTION SEPARATOR (decorative)
+═══════════════════════════════════════════════════ */
+.section-sep {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-hi), transparent);
+    margin: 24px 0;
+}
+
+/* ═══════════════════════════════════════════════════
+   INTERVIEW TAB EXTRA
+═══════════════════════════════════════════════════ */
+.interview-header {
+    background: linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(6,182,212,0.10) 100%);
+    border: 1px solid rgba(99,102,241,0.2);
+    color: var(--text-primary); padding: 20px 24px; border-radius: 16px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 24px rgba(99,102,241,0.1);
+}
+.interview-stat {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-hi);
+    border-radius: 12px; padding: 16px 10px; text-align: center;
+    transition: transform 0.2s;
+}
+.interview-stat:hover { transform: translateY(-2px); }
+.interview-stat .val { font-size: 1.9rem; font-weight: 800; color: #a5b4fc; }
+.interview-stat .lbl { font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; }
+.score-chip {
+    display: inline-block; padding: 3px 10px; border-radius: 99px;
+    font-size: 0.78rem; font-weight: 600; font-family: 'Inter', sans-serif;
+}
+.score-high  { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+.score-mid   { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+.score-low   { background: rgba(239,68,68,0.15);  color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+.feedback-card {
+    background: rgba(99,102,241,0.06);
+    border: 1px solid rgba(99,102,241,0.18);
+    border-radius: 12px; padding: 14px 18px; margin: 8px 0;
+}
+.feedback-card ul { margin: 8px 0 0; padding-left: 18px; }
+.feedback-card li { margin-bottom: 5px; font-size: 0.88rem; color: var(--text-secondary); }
+.tip-box {
+    background: rgba(16,185,129,0.06);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 12px; padding: 14px 18px; font-size: 0.88rem; color: #6ee7b7;
+}
+.skill-q-card {
+    background: rgba(245,158,11,0.05);
+    border: 1px solid rgba(245,158,11,0.18);
+    border-radius: 10px; padding: 12px 16px; margin: 6px 0;
+    font-size: 0.88rem; color: var(--text-secondary);
+    transition: background 0.2s;
+}
+.skill-q-card:hover { background: rgba(245,158,11,0.09); }
 </style>
 """, unsafe_allow_html=True)
+
+
 
 
 def load_combined_skills():
@@ -559,9 +1065,20 @@ def load_job_roles():
 def main():
     """Main Streamlit app."""
     
-    # Header
-    st.markdown('<div class="main-header">🎯 AI Career Intelligence & Skill Gap Analyzer</div>', 
-                unsafe_allow_html=True)
+    # ── App Header ──────────────────────────────────────────────────────────
+    st.markdown("""
+    <div class="main-header">
+        <h1><span class="hdr-icon">🎯</span> AI Career Intelligence &amp; Skill Gap Analyzer</h1>
+        <div class="subtitle">Your personalized AI-powered career co-pilot — from resume to role readiness</div>
+        <div class="hero-chips">
+            <span class="hero-chip">📄 Resume Parsing</span>
+            <span class="hero-chip">📊 Skill Gap Analysis</span>
+            <span class="hero-chip">⭐ Readiness Scoring</span>
+            <span class="hero-chip">🗺️ Learning Roadmap</span>
+            <span class="hero-chip">🧠 AI Mock Interview</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Initialize session state
     if 'resume_data' not in st.session_state:
@@ -584,46 +1101,58 @@ def main():
     completed_count = sum(completion_status)
     progress_pct = (completed_count / 7) * 100
     
-    # Progress bar at top
+    # ── Progress Tracker ────────────────────────────────────────────────────
+    def _step_class(done: bool, active: bool) -> str:
+        if done:   return "pt-done"
+        if active: return "pt-active"
+        return "pt-wait"
+
+    def _step_icon(done: bool, active: bool, num: int) -> str:
+        if done:   return "✓"
+        if active: return str(num)
+        return str(num)
+
+    steps_info = [
+        (has_resume,     has_resume or True,           "📄", "Resume"),
+        (has_role,       has_resume,                   "🎯", "Role"),
+        (has_gaps,       has_role,                     "📊", "Gaps"),
+        (has_score,      has_gaps,                     "⭐", "Score"),
+        (has_suitability,has_score,                    "🔍", "Suitability"),
+        (has_roadmap,    has_suitability,               "🗺️", "Roadmap"),
+        (has_interview,  has_roadmap,                   "🧠", "Interview"),
+    ]
+    # Build step HTML
+    steps_html = "".join(
+        f'<div class="pt-step {_step_class(done, prev and not done)}">'
+        f'  <div class="pt-circle">{_step_icon(done, prev and not done, i+1)}</div>'
+        f'  <div class="pt-label">{label}</div>'
+        f'</div>'
+        for i, (done, prev, icon, label) in enumerate(steps_info)
+    )
+
     st.markdown(f"""
     <div class="nav-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h3 style="margin: 0; color: white;">Progress Tracker</h3>
-            <span style="font-size: 1.2rem; font-weight: bold;">{completed_count}/6 Steps</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size:1.05rem; font-weight:700; color:rgba(255,255,255,0.9);">📍 Progress Tracker</span>
+            <span style="font-size:0.95rem; font-weight:700; color:#79c0ff;">{completed_count} / 7 Steps</span>
         </div>
-        <div style="background-color: rgba(255,255,255,0.3); height: 15px; border-radius: 8px; overflow: hidden; margin-bottom: 15px;">
-            <div style="background-color: white; height: 100%; width: {progress_pct}%; transition: width 0.3s; border-radius: 8px;"></div>
+        <div class="pt-bar-wrap">
+            <div class="pt-bar-fill" style="width:{round(progress_pct)}%"></div>
         </div>
-        <div style="display: flex; justify-content: space-around; align-items: center;">
-            <div class="progress-step {'step-completed' if has_resume else 'step-current' if not has_resume else 'step-pending'}">1</div>
-            <div class="progress-step {'step-completed' if has_role else 'step-current' if has_resume and not has_role else 'step-pending'}">2</div>
-            <div class="progress-step {'step-completed' if has_gaps else 'step-current' if has_role and not has_gaps else 'step-pending'}">3</div>
-            <div class="progress-step {'step-completed' if has_score else 'step-current' if has_gaps and not has_score else 'step-pending'}">4</div>
-            <div class="progress-step {'step-completed' if has_suitability else 'step-current' if has_score and not has_suitability else 'step-pending'}">5</div>
-            <div class="progress-step {'step-completed' if has_roadmap else 'step-current' if has_suitability and not has_roadmap else 'step-pending'}">6</div>
-            <div class="progress-step {'step-completed' if has_interview else 'step-current' if has_roadmap and not has_interview else 'step-pending'}">7</div>
-        </div>
-        <div style="display: flex; justify-content: space-around; margin-top: 10px; font-size: 0.85rem;">
-            <span>Resume</span>
-            <span>Role</span>
-            <span>Gaps</span>
-            <span>Score</span>
-            <span>Suitability</span>
-            <span>Roadmap</span>
-            <span>Interview</span>
-        </div>
+        <div class="pt-steps">{steps_html}</div>
     </div>
     """, unsafe_allow_html=True)
     
     # Main navigation tabs
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
         "📄 Resume Upload",
-        "🎯 Select Role", 
+        "🎯 Select Role",
         "📊 Skill Gaps",
         "⭐ Readiness Score",
         "🔍 Role Suitability",
         "🗺️ Learning Roadmap",
-        "🧠 Interview & Practice AI"
+        "🧠 Interview & Practice AI",
+        "📈 Tracking & History",
     ])
     
     # Load job roles
@@ -641,21 +1170,34 @@ def main():
     
     # Tab 1: Resume Upload
     with tab1:
-        st.markdown('<div class="sub-header">📄 Upload Your Resume</div>', unsafe_allow_html=True)
+        _b1 = "badge-done" if has_resume else "badge-active"
+        _t1 = "✅ Resume Loaded" if has_resume else "⬆️ Upload Resume"
+        st.markdown(f"""
+        <div class="tab-hero tab-hero-resume">
+          <div class="tab-hero-inner">
+            <div class="tab-hero-icon">📄</div>
+            <div class="tab-hero-text">
+              <h2>Resume Upload</h2>
+              <p>Upload your PDF resume — our AI instantly extracts skills, experience, education &amp; projects and builds your profile.</p>
+            </div>
+            <span class="tab-hero-badge {_b1}">{_t1}</span>
+          </div>
+        </div>""", unsafe_allow_html=True)
         
         # Upload section with enhanced UI
         if not has_resume:
             st.markdown("""
             <div class="upload-area">
-                <h3 style="color: #1f77b4; margin-bottom: 10px;">📤 Ready to Upload Your Resume?</h3>
-                <p style="color: #666;">Upload your resume in PDF format to begin comprehensive analysis</p>
+                <div style="font-size:3rem; margin-bottom:10px">📄</div>
+                <h3 style="color:#58a6ff; margin:0 0 8px">🚀 Analyze Your Career Readiness</h3>
+                <p style="color:#8b949e; margin:0">Upload your resume PDF &bull; AI extracts skills, experience &amp; education instantly</p>
             </div>
             """, unsafe_allow_html=True)
         
         col1, col2, col3 = st.columns([2, 1, 1])
         with col1:
             if not has_resume:
-                st.info("📋 **Instructions:** Upload your resume PDF. Our AI will scan and extract all relevant information including skills, experience, education, and projects.")
+                st.caption("Upload your resume PDF — our AI will extract skills, experience, education and projects.")
             else:
                 resume_data = st.session_state.resume_data
                 st.markdown(f"""
@@ -724,19 +1266,15 @@ def main():
                 status_text.empty()
                 progress_bar.empty()
                 
-                st.success("✅ Resume parsed successfully!")
+                st.caption("✅ Resume parsed — scroll down to view your profile.")
                 st.balloons()
-                
-                # Show immediate preview
-                st.markdown("---")
-                st.info("📋 **Resume parsed!** Your complete resume profile is displayed below. Scroll down to see all details.")
                 
                 # Update has_resume check for immediate display
                 has_resume = True
                 
             except Exception as e:
                 st.error(f"❌ Error parsing resume: {e}")
-                st.info("💡 **Troubleshooting:** Please ensure your PDF contains text (not just images). Try converting your resume to a text-based PDF.")
+                st.caption("Tip: make sure the PDF contains selectable text, not just scanned images.")
         
         # Display comprehensive resume information
         # Check if resume data exists in session state (more reliable than has_resume variable)
@@ -1082,27 +1620,31 @@ Projects ({len(projects)}):
                     st.write(factor)
                 
                 if quality_score >= 80:
-                    st.success("🎉 Excellent resume! Well-structured and comprehensive.")
+                    st.caption("🎉 Excellent resume — well-structured and comprehensive.")
                 elif quality_score >= 60:
-                    st.info("💡 Good resume! Consider adding more details.")
+                    st.caption("Good resume — consider adding more detail to sections.")
                 else:
-                    st.warning("⚠️ Resume needs improvement. Add more information for better analysis.")
+                    st.caption("⚠️ Resume needs more information for a better analysis.")
     
     # Tab 2: Select Target Role
     with tab2:
-        st.markdown('<div class="sub-header">🎯 Select Target Job Role</div>', unsafe_allow_html=True)
+        _b2 = "badge-done" if has_role else "badge-active"
+        _t2 = f"✅ {st.session_state.get('selected_role','Role Selected')}" if has_role else "Step 2 of 7"
+        st.markdown(f"""
+        <div class="tab-hero tab-hero-role">
+          <div class="tab-hero-inner">
+            <div class="tab-hero-icon">🎯</div>
+            <div class="tab-hero-text">
+              <h2>Select Target Role</h2>
+              <p>Choose the job role you&apos;re aiming for. We&apos;ll map it to required skills and tailor every analysis on this page to that role.</p>
+            </div>
+            <span class="tab-hero-badge {_b2}">{_t2}</span>
+          </div>
+        </div>""", unsafe_allow_html=True)
         
         if not has_resume:
             st.warning("⚠️ Please upload your resume first in the 'Resume Upload' tab!")
         else:
-            col1, col2 = st.columns([2, 1])
-            with col1:
-                st.info("🎯 Select the job role you want to analyze your resume against.")
-            
-            with col2:
-                if has_role:
-                    st.success(f"✅ Selected: {st.session_state.selected_role}")
-
             st.markdown("---")
             st.subheader("🔎 Real-Time Role Search")
             st.caption("This list is built from live Adzuna job results (no offline/demo titles).")
@@ -1133,6 +1675,12 @@ Projects ({len(projects)}):
                 elif not realtime_query or not realtime_query.strip():
                     st.warning("Please enter a job title / keywords to search.")
                 else:
+                    # Clear previous results so stale counts are never shown
+                    st.session_state.pop("realtime_jobs", None)
+                    st.session_state.pop("realtime_stats", None)
+                    st.session_state.pop("realtime_titles", None)
+                    st.session_state.pop("realtime_fetch_ts", None)
+
                     with st.spinner("Fetching live jobs from Adzuna..."):
                         jobs_live = job_market.get_jobs_for_role(
                             realtime_query.strip(),
@@ -1144,8 +1692,9 @@ Projects ({len(projects)}):
                             location=realtime_location.strip() or "India",
                         )
 
-                    st.session_state["realtime_jobs"] = jobs_live
-                    st.session_state["realtime_stats"] = stats_live
+                    st.session_state["realtime_jobs"]     = jobs_live
+                    st.session_state["realtime_stats"]    = stats_live
+                    st.session_state["realtime_fetch_ts"] = datetime.now().strftime("%d %b %Y  %H:%M:%S")
 
                     # Derive unique titles from the fetched jobs
                     titles = []
@@ -1158,11 +1707,13 @@ Projects ({len(projects)}):
                     st.session_state["realtime_titles"] = titles
 
             realtime_titles = st.session_state.get("realtime_titles", []) or []
-            jobs_live = st.session_state.get("realtime_jobs", []) or []
-            stats_live = st.session_state.get("realtime_stats", {}) or {}
+            jobs_live       = st.session_state.get("realtime_jobs",    []) or []
+            stats_live      = st.session_state.get("realtime_stats",   {}) or {}
+            fetch_ts        = st.session_state.get("realtime_fetch_ts", None)
 
             if stats_live and stats_live.get("total_jobs", 0) > 0:
-                st.info(f"💡 Adzuna reports {stats_live.get('total_jobs', 0):,} jobs for this search")
+                ts_label = f"  ·  fetched at {fetch_ts}" if fetch_ts else ""
+                st.caption(f"Adzuna reports {stats_live.get('total_jobs', 0):,} jobs for this search{ts_label}")
 
             # Search-within-results (client-side filter)
             local_filter = st.text_input(
@@ -1231,7 +1782,7 @@ Projects ({len(projects)}):
                         st.write(f"... and {len(optional) - 10} more")
                 
                 if st.button("✅ Confirm Selection", type="primary"):
-                    st.success(f"✅ Role '{selected_role}' selected! Proceed to 'Skill Gaps' tab.")
+                    st.caption(f"Role '{selected_role}' confirmed — proceed to Skill Gaps.")
 
                 # Real-time job market data via API (no demo/offline metrics)
                 st.markdown("---")
@@ -1260,9 +1811,9 @@ Projects ({len(projects)}):
                             st.metric("📋 Jobs Loaded", len(jobs), help="Number of jobs currently displayed")
                         with col3:
                             if total_jobs > len(jobs):
-                                st.info(f"💡 Showing {len(jobs)} of {total_jobs} jobs")
+                                st.caption(f"Showing {len(jobs)} of {total_jobs} jobs")
                             else:
-                                st.success("✅ All jobs loaded")
+                                st.caption("All jobs loaded")
                     
                     if jobs:
                         st.markdown("---")
@@ -1336,12 +1887,12 @@ Projects ({len(projects)}):
                             st.markdown("---")
                             st.caption(f"📋 Job {selected_job_index + 1} of {len(jobs)} - Use the dropdown above to navigate between jobs")
                         else:
-                            st.info("Select a job from the dropdown above to view details")
+                            st.caption("Select a job from the dropdown above to view details.")
                     else:
-                        st.info("No jobs found. The market may be competitive or try different keywords.")
+                        st.caption("No jobs found — market may be competitive or try different keywords.")
                 else:
                     st.warning("⚠️ Real-time job data not available")
-                    st.info("💡 To enable real-time job listings from India:")
+                    st.caption("To enable real-time job listings from India:")
                     with st.expander("📝 Setup Instructions"):
                         st.write("""
                         **1. Get Adzuna API Keys:**
@@ -1364,7 +1915,19 @@ Projects ({len(projects)}):
     
     # Tab 3: Skill Gap Analysis
     with tab3:
-        st.markdown('<div class="sub-header">📊 Skill Gap Analysis</div>', unsafe_allow_html=True)
+        _b3 = "badge-done" if has_gaps else ("badge-active" if has_role else "badge-waiting")
+        _t3 = "✅ Analysis Done" if has_gaps else ("Step 3 of 7" if has_role else "Complete Step 2 first")
+        st.markdown(f"""
+        <div class="tab-hero tab-hero-gaps">
+          <div class="tab-hero-inner">
+            <div class="tab-hero-icon">📊</div>
+            <div class="tab-hero-text">
+              <h2>Skill Gap Analysis</h2>
+              <p>See exactly which required &amp; preferred skills you have, which you&apos;re missing, and how your proficiency compares to the role benchmark.</p>
+            </div>
+            <span class="tab-hero-badge {_b3}">{_t3}</span>
+          </div>
+        </div>""", unsafe_allow_html=True)
         
         if not has_resume or not has_role:
             st.warning("⚠️ Please upload resume and select a target role first!")
@@ -1417,7 +1980,7 @@ Projects ({len(projects)}):
                                 unsafe_allow_html=True
                             )
                     else:
-                        st.info("No skills matched above threshold")
+                        st.caption("No skills matched above threshold.")
                     
                     # Missing required skills
                     st.subheader("❌ Missing Required Skills")
@@ -1432,7 +1995,7 @@ Projects ({len(projects)}):
                                 if skill in explanations:
                                     st.write(f"**{skill}:** {explanations[skill]}")
                     else:
-                        st.success("🎉 All required skills are present!")
+                        st.caption("🎉 All required skills are present!")
                     
                     # Missing preferred skills
                     if gap_results['missing_preferred']:
@@ -1444,7 +2007,19 @@ Projects ({len(projects)}):
     
     # Tab 4: Readiness Score
     with tab4:
-        st.markdown('<div class="sub-header">⭐ Job Readiness Score</div>', unsafe_allow_html=True)
+        _b4 = "badge-done" if has_score else ("badge-active" if has_gaps else "badge-waiting")
+        _t4 = "✅ Score Ready" if has_score else ("Step 4 of 7" if has_gaps else "Complete Step 3 first")
+        st.markdown(f"""
+        <div class="tab-hero tab-hero-score">
+          <div class="tab-hero-inner">
+            <div class="tab-hero-icon">⭐</div>
+            <div class="tab-hero-text">
+              <h2>Job Readiness Score</h2>
+              <p>Your overall readiness score (0–100) broken down across skills, experience, education &amp; projects — with actionable coaching tips.</p>
+            </div>
+            <span class="tab-hero-badge {_b4}">{_t4}</span>
+          </div>
+        </div>""", unsafe_allow_html=True)
         
         if not has_gaps:
             st.warning("⚠️ Please complete skill gap analysis first!")
@@ -1474,7 +2049,7 @@ Projects ({len(projects)}):
                     )
                     projects = [p.strip() for p in projects_input.split('\n') if p.strip()]
                 else:
-                    st.info(f"Found {len(projects)} projects from resume")
+                    st.caption(f"Found {len(projects)} projects in resume.")
             
             if st.button("📊 Calculate Readiness Score", type="primary"):
                 with st.spinner("Calculating readiness score..."):
@@ -1524,16 +2099,50 @@ Projects ({len(projects)}):
     
     # Tab 5: Role Suitability
     with tab5:
-        st.markdown('<div class="sub-header">🔍 Role Suitability Analysis</div>', unsafe_allow_html=True)
+        _b5 = "badge-done" if has_suitability else ("badge-active" if has_score else "badge-waiting")
+        _t5 = "✅ Analysis Done" if has_suitability else ("Step 5 of 7" if has_score else "Complete Step 4 first")
+        st.markdown(f"""
+        <div class="tab-hero tab-hero-suit">
+          <div class="tab-hero-inner">
+            <div class="tab-hero-icon">🔍</div>
+            <div class="tab-hero-text">
+              <h2>Role Suitability Analysis</h2>
+              <p>AI-powered prediction of how well your overall profile fits the target role, with a confidence score and a detailed strengths/gaps breakdown.</p>
+            </div>
+            <span class="tab-hero-badge {_b5}">{_t5}</span>
+          </div>
+        </div>""", unsafe_allow_html=True)
         
-        # Show job market overview
+        # Show job market overview – fetch live once per role, cache in session_state
         if job_market and job_market.is_available() and has_role:
-            st.info("💼 Real-time job market data available for India")
             selected_role = st.session_state.get('selected_role')
             if selected_role:
-                stats = job_market.get_market_statistics(selected_role, location="India")
+                cache_key    = f"suit_stats_{selected_role}"
+                cache_ts_key = f"suit_stats_ts_{selected_role}"
+
+                col_info, col_refresh = st.columns([5, 1])
+                with col_refresh:
+                    do_refresh = st.button("🔄 Refresh", key="suit_stats_refresh",
+                                           help="Re-fetch live job count from Adzuna")
+
+                if do_refresh or cache_key not in st.session_state:
+                    with st.spinner("Fetching live job count..."):
+                        _stats_fresh = job_market.get_market_statistics(selected_role, location="India")
+                    st.session_state[cache_key]    = _stats_fresh
+                    st.session_state[cache_ts_key] = datetime.now().strftime("%d %b %Y  %H:%M:%S")
+
+                stats    = st.session_state[cache_key]
+                stats_ts = st.session_state.get(cache_ts_key, "")
+
+                with col_info:
+                    if stats.get('total_jobs', 0) > 0:
+                        st.caption(f"Live job market data — India · last fetched {stats_ts}")
+                    else:
+                        st.caption("Live job market data available for India.")
+
                 if stats.get('total_jobs', 0) > 0:
-                    st.metric("Total Jobs in India", stats.get('total_jobs', 0))
+                    st.metric("Total Jobs in India", f"{stats.get('total_jobs', 0):,}",
+                              help=f"Live count from Adzuna for '{selected_role}' · {stats_ts}")
         
         if not has_resume:
             st.warning("⚠️ Please upload resume first!")
@@ -1599,7 +2208,7 @@ Projects ({len(projects)}):
                             if role['description']:
                                 st.write(f"**Description:** {role['description']}")
                 else:
-                    st.info("No roles meet the suitability threshold")
+                    st.caption("No roles meet the suitability threshold.")
                 
                 # Not suitable roles
                 st.subheader("❌ Not Recommended Roles")
@@ -1613,16 +2222,28 @@ Projects ({len(projects)}):
                             for reason in role['reasons']:
                                 st.write(f"• {reason}")
                 else:
-                    st.success("All analyzed roles are suitable!")
+                    st.caption("All analyzed roles are suitable.")
                 
                 # Recommendations
                 st.subheader("💡 Recommendations")
                 for rec in suitability_results['recommendations']:
-                    st.info(rec)
+                    st.caption(rec)
     
     # Tab 6: Learning Roadmap
     with tab6:
-        st.markdown('<div class="sub-header">🗺️ Personalized Learning Roadmap</div>', unsafe_allow_html=True)
+        _b6 = "badge-done" if has_roadmap else ("badge-active" if has_suitability else "badge-waiting")
+        _t6 = "✅ Roadmap Ready" if has_roadmap else ("Step 6 of 7" if has_suitability else "Complete Step 5 first")
+        st.markdown(f"""
+        <div class="tab-hero tab-hero-roadmap">
+          <div class="tab-hero-inner">
+            <div class="tab-hero-icon">🗺️</div>
+            <div class="tab-hero-text">
+              <h2>Personalized Learning Roadmap</h2>
+              <p>A step-by-step skill-building plan tailored to your gaps — with curated resources, timelines, and milestones to get you role-ready.</p>
+            </div>
+            <span class="tab-hero-badge {_b6}">{_t6}</span>
+          </div>
+        </div>""", unsafe_allow_html=True)
         
         if not has_gaps or not has_role:
             st.warning("⚠️ Please complete skill gap analysis and select a target role!")
@@ -1634,7 +2255,7 @@ Projects ({len(projects)}):
             missing_skills = gap_results.get('missing_required', []) + gap_results.get('missing_preferred', [])
             
             if not missing_skills:
-                st.success("🎉 No missing skills! You're ready for this role!")
+                st.caption("🎉 No missing skills — you're ready for this role!")
             else:
                 roadmap_weeks = st.slider(
                     "Roadmap Duration (weeks)",
@@ -1695,7 +2316,7 @@ Projects ({len(projects)}):
                                 # Older roadmap format: day-based tasks
                                 tasks = plan.get('tasks', [])
                                 if tasks:
-                                    st.info("Roadmap format updated. Regenerate to see week-wise plan.")
+                                    st.caption("Roadmap format updated — regenerate to see week-wise plan.")
                                     for task in tasks:
                                         if isinstance(task, dict):
                                             st.write(f"• Day {task.get('day', '')}: {task.get('task', '')} ({task.get('type', '')})")
@@ -1731,142 +2352,290 @@ Projects ({len(projects)}):
 
     # Tab 7: Interview & Practice AI
     with tab7:
-        st.markdown('<div class="sub-header">🧠 Interview & Practice AI (Advanced)</div>', unsafe_allow_html=True)
+        _b7 = 'badge-done' if has_interview else ('badge-active' if has_roadmap else 'badge-waiting')
+        _t7 = '✅ Interview Done' if has_interview else ('Step 7 of 7' if has_roadmap else 'Complete Step 6 first')
+        st.markdown(f"""
+        <div class=\"tab-hero tab-hero-interview\">
+          <div class=\"tab-hero-inner\">
+            <div class=\"tab-hero-icon\">🧠</div>
+            <div class=\"tab-hero-text\">
+              <h2>Interview &amp; Practice AI</h2>
+              <p>AI-powered mock interviews for your target role &mdash; real-time feedback, answer scoring, and a skill-targeted question bank.</p>
+            </div>
+            <span class=\"tab-hero-badge {_b7}\">{_t7}</span>
+          </div>
+        </div>""", unsafe_allow_html=True)
 
-        # Ensure we have gaps to drive skill-based prep
-        gap_results = st.session_state.get('analysis_results', {}).get('skill_gaps', {})
+
+        # ── Silently resolve API key ───────────────────────────────────
+        def _resolve_interview_provider() -> tuple[str, str]:
+            for prov, env_name in [("Gemini","GOOGLE_GEMINI_API_KEY"),("OpenAI","OPENAI_API_KEY"),("SambaNova","SAMBANOVA_API_KEY")]:
+                key = os.getenv(env_name, "")
+                if not key:
+                    try:    key = st.secrets.get(env_name, "") or ""
+                    except: key = ""
+                if key:
+                    return prov, key.strip()
+            return "", ""
+
+        _ai_provider, _api_key = _resolve_interview_provider()
+        _ai_ready = bool(_api_key)
+
+        gap_results   = st.session_state.get('analysis_results', {}).get('skill_gaps', {})
         missing_skills = gap_results.get('missing_required', []) + gap_results.get('missing_preferred', [])
-
-        role_label = st.session_state.get('selected_role') or "Data Scientist"
+        role_label     = st.session_state.get('selected_role') or "Data Scientist"
 
         if 'interview_state' not in st.session_state:
             st.session_state.interview_state = {
-                "started": False,
-                "role": role_label,
-                "current_question": "",
-                "history": [],
+                "started": False, "role": role_label,
+                "current_question": "", "history": [], "scores": [],
             }
 
-        provider_options = ["Gemini", "SambaNova", "OpenAI"]
-        default_provider = _default_ai_provider()
-        default_index = provider_options.index(default_provider) if default_provider in provider_options else 0
-        ai_provider = st.selectbox(
-            "AI Provider",
-            options=provider_options,
-            index=default_index,
-            help="Uses provider API keys from env/secrets (no keys are stored in code)",
-        )
-
-        # Show configuration status (no secrets displayed)
-        cfg = {
-            "Gemini": _has_config_value("GOOGLE_GEMINI_API_KEY"),
-            "SambaNova": _has_config_value("SAMBANOVA_API_KEY"),
-            "OpenAI": _has_config_value("OPENAI_API_KEY"),
-        }
-        if not cfg.get(ai_provider, False):
-            st.warning(
-                f"{ai_provider} is not configured. Add the required API key in Streamlit Secrets or as an environment variable."
-            )
-
-        st.write("**Step 6.1 – AI Interview Simulator**")
-        st.caption("Mock interview chatbot: live questions + feedback on your answers.")
-
-        col_a, col_b = st.columns([1, 2])
-        with col_a:
-            if st.button("▶️ Start / Restart Interview"):
-                try:
-                    first_q = start_interview(role=role_label, provider=ai_provider)
-                    st.session_state.interview_state = {
-                        "started": True,
-                        "role": role_label,
-                        "provider": ai_provider,
-                        "current_question": first_q,
-                        "history": [
-                            {"role": "assistant", "content": first_q},
-                        ],
-                    }
-                    st.rerun()
-                except Exception as e:
-                    st.error(str(e))
-
-        with col_b:
-            st.text_input("Interview role", value=role_label, disabled=True)
-
         state = st.session_state.interview_state
-        # Keep provider in sync with the selector
-        state["provider"] = ai_provider
+        state["provider"] = _ai_provider
+        state["api_key"]   = _api_key
+
+        # derive stats
+        history   = state.get("history", [])
+        q_count   = sum(1 for m in history if m["role"] == "assistant"
+                        and not m["content"].startswith("**Feedback"))
+        a_count   = sum(1 for m in history if m["role"] == "user")
+        scores    = state.get("scores", [])
+        avg_score = round(sum(scores) / len(scores), 1) if scores else 0
+
+        # ── Header banner ──────────────────────────────────────────
+        st.markdown(f"""
+        <div class="interview-header">
+            <span style="font-size:2rem">🧠</span>
+            <div>
+                <h2>AI Interview Simulator</h2>
+                <p>Role: <strong>{role_label}</strong> &nbsp;•&nbsp;
+                   Questions asked: <strong>{q_count}</strong> &nbsp;•&nbsp;
+                   Answers given: <strong>{a_count}</strong>
+                   {'&nbsp;&bull;&nbsp; Avg score: <strong>' + str(avg_score) + '/10</strong>' if avg_score else ''}
+                </p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # ── Stats row (shown after at least 1 turn) ──────────────────────
+        if a_count > 0:
+            sc1, sc2, sc3, sc4 = st.columns(4)
+            with sc1:
+                st.markdown(f'<div class="interview-stat"><div class="val">{q_count}</div><div class="lbl">Questions</div></div>', unsafe_allow_html=True)
+            with sc2:
+                st.markdown(f'<div class="interview-stat"><div class="val">{a_count}</div><div class="lbl">Answers</div></div>', unsafe_allow_html=True)
+            with sc3:
+                score_color = "#28a745" if avg_score >= 7 else "#ffc107" if avg_score >= 5 else "#dc3545"
+                st.markdown(f'<div class="interview-stat"><div class="val" style="color:{score_color}">{avg_score if avg_score else "-"}</div><div class="lbl">Avg Score /10</div></div>', unsafe_allow_html=True)
+            with sc4:
+                best = max(scores) if scores else 0
+                st.markdown(f'<div class="interview-stat"><div class="val" style="color:#7c83fd">{best if best else "-"}</div><div class="lbl">Best Score /10</div></div>', unsafe_allow_html=True)
+            st.write("")
+
+        # ── Controls row ────────────────────────────────────────────
+        btn_col, role_col, clear_col = st.columns([2, 3, 1])
+        with btn_col:
+            start_clicked = st.button("▶️ Start / Restart Interview", use_container_width=True)
+        with role_col:
+            st.text_input("Interviewing for", value=role_label, disabled=True, label_visibility="collapsed")
+        with clear_col:
+            if st.button("🔄 Clear", use_container_width=True, help="Clear chat history"):
+                st.session_state.interview_state = {
+                    "started": False, "role": role_label,
+                    "current_question": "", "history": [], "scores": [],
+                    "provider": _ai_provider, "api_key": _api_key,
+                }
+                st.rerun()
+
+        if start_clicked:
+            if not _ai_ready:
+                st.error("❌ AI service is not configured. Contact the administrator.")
+            else:
+                with st.spinner("🎬 Starting your interview..."):
+                    try:
+                        first_q = start_interview(role=role_label, provider=_ai_provider, api_key=_api_key)
+                        st.session_state.interview_state = {
+                            "started": True, "role": role_label,
+                            "provider": _ai_provider, "api_key": _api_key,
+                            "current_question": first_q,
+                            "history": [{"role": "assistant", "content": first_q}],
+                            "scores": [],
+                        }
+                        st.rerun()
+                    except Exception as e:
+                        _em = str(e)
+                        if "quota" in _em.lower() or "429" in _em:
+                            st.error("⚠️ AI service is temporarily at capacity. Please try again in a moment.")
+                        elif "401" in _em or "403" in _em:
+                            st.error("❌ AI authentication failed. Please contact the administrator.")
+                        else:
+                            st.error(f"❌ Could not start interview: {_em}")
+
+        # ── Tips box (before first start) ───────────────────────────
+        if not state.get("started"):
+            st.markdown("""
+            <div class="tip-box">
+            <strong>💡 Tips for a great interview:</strong>
+            <ul style="margin:6px 0 0 0; padding-left:18px;">
+                <li>Answer with real examples using the STAR method (Situation, Task, Action, Result).</li>
+                <li>Keep answers concise — 2-4 sentences per point.</li>
+                <li>It’s okay to say “I’m not sure, but I would approach it by...”</li>
+                <li>Complete the Skill Gaps tab first for more targeted questions.</li>
+            </ul>
+            </div>
+            """, unsafe_allow_html=True)
+            st.write("")
+
+        # ── Chat history ────────────────────────────────────────────
         if state.get("started") and state.get("history"):
             for msg in state["history"]:
-                if msg.get("role") == "user":
-                    st.chat_message("user").write(msg.get("content", ""))
-                else:
-                    st.chat_message("assistant").write(msg.get("content", ""))
+                role_msg = msg.get("role", "assistant")
+                content  = msg.get("content", "")
+                score    = msg.get("score", 0)
 
-            user_answer = st.chat_input("Type your answer and press Enter")
+                if role_msg == "user":
+                    st.chat_message("user").write(content)
+                elif content.startswith("**Feedback"):
+                    # Render feedback as a styled card
+                    with st.chat_message("assistant"):
+                        lines = content.replace("**Feedback:**\n", "").strip().split("\n")
+                        bullet_html = "".join(
+                            f"<li>{ln.lstrip('- ').strip()}</li>"
+                            for ln in lines if ln.strip()
+                        )
+                        score_html = ""
+                        if score and int(score) > 0:
+                            sc_class = "score-high" if score >= 7 else "score-mid" if score >= 5 else "score-low"
+                            score_html = f'<span class="score-chip {sc_class}">⭐ Score: {score}/10</span>'
+                        st.markdown(f"""
+                        <div class="feedback-card">
+                            <strong>💬 Feedback</strong> {score_html}
+                            <ul>{bullet_html}</ul>
+                        </div>
+                        """, unsafe_allow_html=True)
+                else:
+                    st.chat_message("assistant").write(content)
+
+            # Answer input
+            user_answer = st.chat_input(f"Your answer for the {role_label} interview...")
             if user_answer:
                 state["history"].append({"role": "user", "content": user_answer})
-                try:
-                    result = interview_turn(
-                        role=state.get("role", role_label),
-                        question=state.get("current_question", ""),
-                        answer=user_answer,
-                        missing_skills=missing_skills if missing_skills else None,
-                        provider=state.get("provider", ai_provider),
-                    )
-                    feedback = result.get("feedback", "").strip()
-                    next_q = result.get("next_question", "").strip()
-
-                    if feedback:
-                        state["history"].append({"role": "assistant", "content": f"Feedback:\n{feedback}"})
-                    if next_q:
-                        state["current_question"] = next_q
-                        state["history"].append({"role": "assistant", "content": next_q})
-
-                    st.session_state.interview_state = state
-                    st.rerun()
-                except Exception as e:
-                    msg = str(e)
-                    if "insufficient_quota" in msg or ("429" in msg and "quota" in msg.lower()):
-                        st.error(
-                            "OpenAI quota/billing is exceeded for this API key. "
-                            "Switch provider to Gemini or SambaNova, or enable billing in your OpenAI account."
+                with st.spinner("🤔 Evaluating your answer..."):
+                    try:
+                        result = interview_turn(
+                            role=state.get("role", role_label),
+                            question=state.get("current_question", ""),
+                            answer=user_answer,
+                            missing_skills=missing_skills if missing_skills else None,
+                            provider=state.get("provider", _ai_provider),
+                            api_key=state.get("api_key") or _api_key,
                         )
-                    else:
-                        st.error(msg)
-        else:
-            st.info(
-                "Click 'Start / Restart Interview' to begin. "
-                "To enable AI, set OPENAI_API_KEY (OpenAI) or GOOGLE_GEMINI_API_KEY (Gemini) "
-                "as an environment variable or add it in Streamlit Secrets."
-            )
+                        feedback  = result.get("feedback", "").strip()
+                        next_q    = result.get("next_question", "").strip()
+                        score_val = int(result.get("score", 0) or 0)
 
+                        if score_val > 0:
+                            state.setdefault("scores", []).append(score_val)
+
+                        if feedback:
+                            state["history"].append({
+                                "role": "assistant",
+                                "content": f"**Feedback:**\n{feedback}",
+                                "score": score_val,
+                            })
+                        if next_q:
+                            state["current_question"] = next_q
+                            state["history"].append({"role": "assistant", "content": next_q})
+
+                        st.session_state.interview_state = state
+                        st.rerun()
+                    except Exception as e:
+                        _msg = str(e)
+                        if "quota" in _msg.lower() or "429" in _msg:
+                            st.error("⚠️ AI service is temporarily unavailable. Please try again in a moment.")
+                        else:
+                            st.error(f"❌ Error processing answer: {_msg}")
+
+        # ── Skill-Based Question Generator ────────────────────────────
         st.divider()
-        st.write("**Step 6.2 – Skill-Based Question Generator**")
-        st.caption("Generates questions only from your missing skills for targeted preparation.")
+        st.markdown("### 🧩 Skill-Based Question Bank")
+        st.caption("AI-generated practice questions targeted at your identified skill gaps.")
 
         if not missing_skills:
-            st.info("Complete Skill Gaps first to generate skill-based questions.")
+            st.caption("Complete Skill Gaps (Tab 3) first to unlock targeted practice questions.")
         else:
-            st.write(f"Missing skills detected: {', '.join(missing_skills[:10])}{'...' if len(missing_skills) > 10 else ''}")
-            qps = st.slider("Questions per skill", min_value=1, max_value=5, value=3, step=1)
-            if st.button("🧩 Generate Skill-Based Questions"):
-                try:
-                    questions_by_skill = generate_skill_questions(
-                        role=role_label,
-                        missing_skills=missing_skills,
-                        questions_per_skill=int(qps),
-                        provider=ai_provider,
-                    )
-                    st.session_state.analysis_results['skill_questions'] = questions_by_skill
-                except Exception as e:
-                    st.error(str(e))
+            # Skill gap badges
+            badges = "".join(
+                f'<span class="skill-badge">{s}</span>'
+                for s in missing_skills[:12]
+            )
+            st.markdown(f'<div style="margin-bottom:10px">{badges}</div>', unsafe_allow_html=True)
+
+            qps = st.select_slider(
+                "Questions per skill",
+                options=[1, 2, 3, 4, 5],
+                value=3,
+                help="Number of practice questions to generate per skill gap"
+            )
+            if st.button("⚡ Generate Question Bank", use_container_width=False):
+                if not _ai_ready:
+                    st.error("❌ AI service is not configured. Contact the administrator.")
+                else:
+                    with st.spinner(f"Generating {qps} questions per skill..."):
+                        try:
+                            questions_by_skill = generate_skill_questions(
+                                role=role_label,
+                                missing_skills=missing_skills,
+                                questions_per_skill=int(qps),
+                                provider=_ai_provider,
+                                api_key=_api_key,
+                            )
+                            st.session_state.analysis_results['skill_questions'] = questions_by_skill
+                            st.caption(f"✅ Generated questions for {len(questions_by_skill)} skills.")
+                        except Exception as e:
+                            _em = str(e)
+                            if "quota" in _em.lower() or "429" in _em:
+                                st.error("⚠️ AI quota reached. Please try again later.")
+                            else:
+                                st.error(f"❌ {_em}")
 
             questions_by_skill = st.session_state.analysis_results.get('skill_questions')
             if questions_by_skill:
+                total_q = sum(len(v) for v in questions_by_skill.values())
+                st.caption(f"📚 **{total_q} questions** across **{len(questions_by_skill)} skills**")
                 for skill, qs in questions_by_skill.items():
-                    st.markdown(f"**{skill}**")
-                    for q in qs:
-                        st.write(f"• {q}")
+                    with st.expander(f"🎯  {skill}  ({len(qs)} questions)", expanded=False):
+                        for idx, q in enumerate(qs, 1):
+                            st.markdown(
+                                f'<div class="skill-q-card"><strong>Q{idx}.</strong> {q}</div>',
+                                unsafe_allow_html=True
+                            )
+
+    # ── Tab 8: Tracking & History ──────────────────────────────────────────
+    with tab8:
+        st.markdown("""
+        <div class=\"tab-hero tab-hero-tracking\">
+          <div class=\"tab-hero-inner\">
+            <div class=\"tab-hero-icon\">📈</div>
+            <div class=\"tab-hero-text\">
+              <h2>Tracking &amp; History</h2>
+              <p>Visual analytics of your career progress &mdash; score trends, skill growth charts, and a full analysis history log.</p>
+            </div>
+            <span class=\"tab-hero-badge badge-active\">📊 Live</span>
+          </div>
+        </div>""", unsafe_allow_html=True)
+        if _TRACKING_OK:
+            render_tracking_tab(
+                analysis_results=st.session_state.get("analysis_results", {}),
+                selected_role=st.session_state.get("selected_role"),
+            )
+        else:
+            st.error(f"Tracking module unavailable: {_TRACKING_ERR}")
+            st.info(
+                "Ensure `src/utils/tracking_ui.py` and "
+                "`src/database/history_manager.py` are present."
+            )
 
 
 if __name__ == "__main__":

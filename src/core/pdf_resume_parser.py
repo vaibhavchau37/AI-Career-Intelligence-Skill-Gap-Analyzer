@@ -425,7 +425,7 @@ class PDFResumeParser:
         return None
 
     def _extract_email(self, text: str) -> Optional[str]:
-        match = re.search(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", text)
+        match = re.search(r"\b[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}\b", text)
         return match.group() if match else None
 
     def _extract_phone(self, text: str) -> Optional[str]:
@@ -493,6 +493,21 @@ class PDFResumeParser:
     def _normalize_text(self, text: str) -> str:
         if not text:
             return text
+
+        # Protect email addresses and phone numbers so letter-digit splitting
+        # rules below don't corrupt them (e.g. "john508@gmail.com" → "john 508@gmail.com").
+        _EMAIL_RE = re.compile(r'[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}')
+        _PHONE_RE = re.compile(r'(?:\+?\d[\d\s\-().]{6,}\d)')
+        placeholders: dict = {}
+
+        def _protect(m: re.Match) -> str:
+            key = f"__PROTECTED_{len(placeholders)}__"
+            placeholders[key] = m.group()
+            return key
+
+        text = _EMAIL_RE.sub(_protect, text)
+        text = _PHONE_RE.sub(_protect, text)
+
         normalized = text.replace("\r\n", "\n").replace("\r", "\n")
         normalized = normalized.replace("\u00a0", " ")
         normalized = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", normalized)
@@ -500,6 +515,11 @@ class PDFResumeParser:
         normalized = re.sub(r"(?<=\d)(?=[A-Za-z])", " ", normalized)
         normalized = re.sub(r"[ \t]+", " ", normalized)
         normalized = re.sub(r"\n{3,}", "\n\n", normalized)
+
+        # Restore protected tokens
+        for key, original in placeholders.items():
+            normalized = normalized.replace(key, original)
+
         return normalized.strip()
 
     def _normalize_heading(self, value: str) -> str:
