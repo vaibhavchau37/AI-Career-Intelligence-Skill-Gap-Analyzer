@@ -50,7 +50,15 @@ Thumbs.db
 *.log
 output/
 results/
-temp_resume.pdf
+temp_*.pdf
+temp_*
+
+# SQLite databases (runtime-generated)
+*.db
+
+# Raw data files (large)
+data/raw/*.csv
+data/raw/*.xlsx
 
 # spaCy models (large files)
 *.tar.gz

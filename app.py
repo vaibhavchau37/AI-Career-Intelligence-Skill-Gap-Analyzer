@@ -820,7 +820,7 @@ def load_market_job_titles() -> dict:
 
         # a) Noisy dataset: `job` column
         try:
-            df = pd.read_csv("linkdin_Job_data.csv", usecols=["job"], dtype=str)
+            df = pd.read_csv("data/raw/linkdin_Job_data.csv", usecols=["job"], dtype=str)
             for raw in df["job"].dropna().tolist():
                 t = simplify_linkedin_job_field(raw)
                 if not t:
@@ -833,7 +833,7 @@ def load_market_job_titles() -> dict:
 
         # b) Cleaner dataset: `title` column
         try:
-            df = pd.read_csv("LinkedIn_Jobs_Data_India.csv", usecols=["title"], dtype=str)
+            df = pd.read_csv("data/raw/LinkedIn_Jobs_Data_India.csv", usecols=["title"], dtype=str)
             for raw in df["title"].dropna().tolist():
                 t = normalize_title(raw)
                 if not t:
