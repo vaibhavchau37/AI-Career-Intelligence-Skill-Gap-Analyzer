@@ -1,6 +1,6 @@
 """LLM routing utilities.
 
-Provides a single chat_complete() that can use OpenAI or Gemini.
+Provides a single chat_complete() that can use OpenAI, Gemini, SambaNova, or Mistral.
 """
 
 from __future__ import annotations
@@ -17,6 +17,16 @@ def chat_complete(
     api_key: Optional[str] = None,
 ) -> str:
     provider_norm = (provider or "").strip().lower()
+
+    if provider_norm in {"mistral"}:
+        from src.api.mistral_client import chat_complete as mistral_chat
+
+        return mistral_chat(
+            messages,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            api_key=api_key or None,
+        )
 
     if provider_norm in {"openai", "gpt"}:
         from src.api.openai_client import chat_complete as openai_chat
@@ -48,4 +58,4 @@ def chat_complete(
             api_key=api_key or None,
         )
 
-    raise RuntimeError("Unknown AI provider. Use 'OpenAI', 'Gemini', or 'SambaNova'.")
+    raise RuntimeError("Unknown AI provider. Use 'Mistral', 'OpenAI', 'Gemini', or 'SambaNova'.")

@@ -62,6 +62,21 @@ except Exception as _tracking_err:
     _TRACKING_OK  = False
     _TRACKING_ERR = str(_tracking_err)
 
+# Authentication System
+try:
+    from src.auth.streamlit_auth import (
+        render_auth_page,
+        is_authenticated,
+        get_current_user,
+        logout,
+        render_user_menu,
+        render_welcome_header
+    )
+    _AUTH_OK = True
+except Exception as _auth_err:
+    _AUTH_OK = False
+    _AUTH_ERR = str(_auth_err)
+
 # Page configuration
 st.set_page_config(
     page_title="AI Career Intelligence Analyzer",
@@ -668,51 +683,266 @@ hr { border-color: var(--border) !important; margin: 20px 0 !important; }
 }
 
 /* ═══════════════════════════════════════════════════
-   INTERVIEW TAB EXTRA
+   INTERVIEW TAB — FULL REDESIGN
 ═══════════════════════════════════════════════════ */
-.interview-header {
-    background: linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(6,182,212,0.10) 100%);
-    border: 1px solid rgba(99,102,241,0.2);
-    color: var(--text-primary); padding: 20px 24px; border-radius: 16px;
-    margin-bottom: 18px;
-    box-shadow: 0 4px 24px rgba(99,102,241,0.1);
+
+/* Animations */
+@keyframes iv-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,0.35)} 50%{box-shadow:0 0 0 10px rgba(99,102,241,0)} }
+@keyframes iv-floatin { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+@keyframes iv-glow { 0%,100%{opacity:0.7} 50%{opacity:1} }
+@keyframes iv-spin { to{transform:rotate(360deg)} }
+@keyframes iv-score-fill { from{stroke-dashoffset:220} to{stroke-dashoffset:var(--dash-offset)} }
+
+/* Provider badge */
+.iv-provider-badge {
+    display:inline-flex; align-items:center; gap:6px;
+    background:linear-gradient(135deg,rgba(255,119,0,0.15),rgba(255,68,0,0.1));
+    border:1px solid rgba(255,119,0,0.3); border-radius:99px;
+    padding:4px 12px; font-size:0.72rem; font-weight:600; color:#fdba74;
+    letter-spacing:0.04em;
 }
-.interview-stat {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--border-hi);
-    border-radius: 12px; padding: 16px 10px; text-align: center;
-    transition: transform 0.2s;
+
+/* ── Welcome / Start Screen ── */
+.iv-welcome-card {
+    background:linear-gradient(135deg,rgba(99,102,241,0.1) 0%,rgba(6,182,212,0.07) 60%,rgba(16,185,129,0.05) 100%);
+    border:1px solid rgba(99,102,241,0.25); border-radius:20px;
+    padding:32px 28px; margin:4px 0 20px; animation:iv-floatin 0.5s ease;
+    box-shadow:0 8px 40px rgba(99,102,241,0.12);
 }
-.interview-stat:hover { transform: translateY(-2px); }
-.interview-stat .val { font-size: 1.9rem; font-weight: 800; color: #a5b4fc; }
-.interview-stat .lbl { font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; }
-.score-chip {
-    display: inline-block; padding: 3px 10px; border-radius: 99px;
-    font-size: 0.78rem; font-weight: 600; font-family: 'Inter', sans-serif;
+.iv-welcome-title {
+    font-size:1.45rem; font-weight:700; color:var(--text-primary);
+    margin:0 0 6px; letter-spacing:-0.02em;
 }
-.score-high  { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
-.score-mid   { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
-.score-low   { background: rgba(239,68,68,0.15);  color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
-.feedback-card {
-    background: rgba(99,102,241,0.06);
-    border: 1px solid rgba(99,102,241,0.18);
-    border-radius: 12px; padding: 14px 18px; margin: 8px 0;
+.iv-welcome-sub { font-size:0.88rem; color:var(--text-muted); margin:0 0 22px; }
+.iv-features-grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-bottom:24px;
 }
-.feedback-card ul { margin: 8px 0 0; padding-left: 18px; }
-.feedback-card li { margin-bottom: 5px; font-size: 0.88rem; color: var(--text-secondary); }
-.tip-box {
-    background: rgba(16,185,129,0.06);
-    border: 1px solid rgba(16,185,129,0.2);
-    border-radius: 12px; padding: 14px 18px; font-size: 0.88rem; color: #6ee7b7;
+.iv-feature {
+    background:rgba(255,255,255,0.03); border:1px solid var(--border);
+    border-radius:14px; padding:14px 16px; display:flex; flex-direction:column; gap:5px;
+    transition:border-color 0.2s,transform 0.2s;
 }
-.skill-q-card {
-    background: rgba(245,158,11,0.05);
-    border: 1px solid rgba(245,158,11,0.18);
-    border-radius: 10px; padding: 12px 16px; margin: 6px 0;
-    font-size: 0.88rem; color: var(--text-secondary);
-    transition: background 0.2s;
+.iv-feature:hover { border-color:rgba(99,102,241,0.4); transform:translateY(-2px); }
+.iv-feature-icon { font-size:1.35rem; }
+.iv-feature-title { font-size:0.82rem; font-weight:600; color:var(--text-primary); }
+.iv-feature-desc  { font-size:0.74rem; color:var(--text-muted); line-height:1.4; }
+.iv-star-tip {
+    background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.18);
+    border-radius:14px; padding:14px 18px;
 }
-.skill-q-card:hover { background: rgba(245,158,11,0.09); }
+.iv-star-tip-title { font-size:0.82rem; font-weight:700; color:#6ee7b7; margin:0 0 8px; }
+.iv-star-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+.iv-star-item {
+    background:rgba(16,185,129,0.04); border:1px solid rgba(16,185,129,0.1);
+    border-radius:10px; padding:8px 12px; font-size:0.78rem; color:var(--text-secondary);
+}
+.iv-star-item strong { color:#a7f3d0; display:block; margin-bottom:2px; font-size:0.76rem; }
+
+/* ── Session header bar ── */
+.iv-session-bar {
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+    background:linear-gradient(135deg,rgba(99,102,241,0.12) 0%,rgba(6,182,212,0.08) 100%);
+    border:1px solid rgba(99,102,241,0.22); border-radius:16px;
+    padding:16px 22px; margin-bottom:16px; animation:iv-floatin 0.4s ease;
+}
+.iv-session-role {
+    display:flex; align-items:center; gap:10px;
+}
+.iv-role-icon {
+    width:40px; height:40px; border-radius:12px;
+    background:linear-gradient(135deg,#6366f1,#06b6d4);
+    display:flex; align-items:center; justify-content:center; font-size:1.15rem;
+    box-shadow:0 4px 12px rgba(99,102,241,0.35);
+}
+.iv-role-text .role-name { font-size:1rem; font-weight:700; color:var(--text-primary); line-height:1.2; }
+.iv-role-text .role-sub  { font-size:0.73rem; color:var(--text-muted); margin-top:2px; }
+.iv-session-meta { display:flex; gap:16px; align-items:center; }
+.iv-meta-pill {
+    background:rgba(255,255,255,0.05); border:1px solid var(--border-hi);
+    border-radius:99px; padding:5px 14px; font-size:0.76rem; color:var(--text-muted);
+    display:flex; align-items:center; gap:5px;
+}
+.iv-meta-pill span { color:var(--text-primary); font-weight:600; }
+
+/* ── Stats cards ── */
+.iv-stats-row {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px;
+}
+.iv-stat {
+    background:rgba(255,255,255,0.03); border:1px solid var(--border-hi);
+    border-radius:14px; padding:16px 14px; text-align:center;
+    transition:transform 0.2s, box-shadow 0.2s;
+    position:relative; overflow:hidden;
+}
+.iv-stat::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    border-radius:2px 2px 0 0; background:var(--iv-stat-color,#6366f1);
+}
+.iv-stat:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,0.2); }
+.iv-stat .s-val { font-size:2rem; font-weight:800; color:var(--iv-stat-color,#a5b4fc); line-height:1; }
+.iv-stat .s-lbl { font-size:0.7rem; color:var(--text-muted); margin-top:5px; text-transform:uppercase; letter-spacing:0.05em; }
+.iv-stat .s-icon { font-size:1rem; margin-bottom:4px; }
+
+/* ── Score ring (SVG) ── */
+.iv-score-ring-wrap {
+    display:inline-flex; flex-direction:column; align-items:center; gap:4px;
+}
+.iv-score-ring svg { transform:rotate(-90deg); }
+.iv-score-ring-num { font-size:1.3rem; font-weight:800; line-height:1; }
+.iv-score-ring-lbl { font-size:0.65rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; }
+
+/* ── Progress bar ── */
+.iv-progress-wrap { margin:0 0 18px; }
+.iv-progress-label {
+    display:flex; justify-content:space-between; margin-bottom:6px;
+    font-size:0.74rem; color:var(--text-muted);
+}
+.iv-progress-track {
+    height:6px; background:rgba(255,255,255,0.07); border-radius:99px; overflow:hidden;
+}
+.iv-progress-fill {
+    height:100%; border-radius:99px;
+    background:linear-gradient(90deg,#6366f1,#06b6d4,#10b981);
+    transition:width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ── Chat bubbles ── */
+.iv-chat-q {
+    display:flex; gap:12px; align-items:flex-start; margin:12px 0; animation:iv-floatin 0.35s ease;
+}
+.iv-chat-q .iv-avatar {
+    width:36px; height:36px; min-width:36px; border-radius:12px;
+    background:linear-gradient(135deg,#6366f1,#06b6d4);
+    display:flex; align-items:center; justify-content:center; font-size:1rem;
+    box-shadow:0 2px 8px rgba(99,102,241,0.4);
+}
+.iv-chat-q .iv-bubble {
+    background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.25);
+    border-radius:0 16px 16px 16px; padding:14px 18px;
+    font-size:0.9rem; color:var(--text-primary); line-height:1.6; flex:1;
+    box-shadow:0 2px 12px rgba(99,102,241,0.1);
+}
+.iv-chat-q .iv-bubble .q-label {
+    font-size:0.7rem; font-weight:600; color:#818cf8; text-transform:uppercase;
+    letter-spacing:0.07em; margin-bottom:6px;
+}
+.iv-chat-a {
+    display:flex; gap:12px; align-items:flex-start; margin:12px 0;
+    justify-content:flex-end; animation:iv-floatin 0.35s ease;
+}
+.iv-chat-a .iv-avatar {
+    width:36px; height:36px; min-width:36px; border-radius:12px;
+    background:linear-gradient(135deg,#0ea5e9,#10b981);
+    display:flex; align-items:center; justify-content:center; font-size:1rem;
+    box-shadow:0 2px 8px rgba(14,165,233,0.4);
+}
+.iv-chat-a .iv-bubble {
+    background:rgba(14,165,233,0.08); border:1px solid rgba(14,165,233,0.2);
+    border-radius:16px 0 16px 16px; padding:14px 18px;
+    font-size:0.9rem; color:var(--text-primary); line-height:1.6; flex:1;
+    max-width:88%;
+}
+.iv-chat-a .iv-bubble .q-label {
+    font-size:0.7rem; font-weight:600; color:#38bdf8; text-transform:uppercase;
+    letter-spacing:0.07em; margin-bottom:6px;
+}
+
+/* ── Feedback card ── */
+.iv-feedback-wrap { animation:iv-floatin 0.4s ease; margin:10px 0; }
+.iv-feedback-card {
+    background:rgba(255,255,255,0.025); border:1px solid rgba(99,102,241,0.2);
+    border-radius:16px; overflow:hidden;
+}
+.iv-feedback-header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 18px; background:rgba(99,102,241,0.1);
+    border-bottom:1px solid rgba(99,102,241,0.15);
+}
+.iv-feedback-header .fb-title { font-size:0.85rem; font-weight:700; color:#a5b4fc; }
+.iv-feedback-body { padding:14px 18px; display:flex; flex-direction:column; gap:10px; }
+.iv-fb-section { border-radius:10px; padding:10px 14px; }
+.iv-fb-strength { background:rgba(16,185,129,0.07); border:1px solid rgba(16,185,129,0.18); }
+.iv-fb-improve  { background:rgba(245,158,11,0.07); border:1px solid rgba(245,158,11,0.18); }
+.iv-fb-tip      { background:rgba(99,102,241,0.07); border:1px solid rgba(99,102,241,0.18); }
+.iv-fb-label { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:5px; }
+.iv-fb-strength .iv-fb-label { color:#6ee7b7; }
+.iv-fb-improve  .iv-fb-label { color:#fcd34d; }
+.iv-fb-tip      .iv-fb-label { color:#a5b4fc; }
+.iv-fb-text { font-size:0.84rem; color:var(--text-secondary); line-height:1.55; }
+.iv-fb-text li { margin-bottom:3px; }
+
+/* Score chip inline */
+.iv-score-chip {
+    display:inline-flex; align-items:center; gap:5px;
+    border-radius:99px; padding:4px 12px; font-size:0.78rem; font-weight:700;
+}
+.iv-sc-high { background:rgba(16,185,129,0.15); color:#6ee7b7; border:1px solid rgba(16,185,129,0.3); }
+.iv-sc-mid  { background:rgba(245,158,11,0.15); color:#fcd34d; border:1px solid rgba(245,158,11,0.3); }
+.iv-sc-low  { background:rgba(239,68,68,0.15);  color:#fca5a5; border:1px solid rgba(239,68,68,0.3); }
+
+/* ── Session summary ── */
+.iv-summary-card {
+    background:linear-gradient(135deg,rgba(99,102,241,0.12),rgba(6,182,212,0.08));
+    border:1px solid rgba(99,102,241,0.25); border-radius:18px;
+    padding:24px 28px; margin:12px 0; animation:iv-floatin 0.5s ease;
+    text-align:center;
+}
+.iv-summary-card h3 { font-size:1.15rem; font-weight:700; margin:0 0 4px; }
+.iv-summary-card p  { font-size:0.83rem; color:var(--text-muted); margin:0 0 18px; }
+.iv-summary-metrics { display:flex; justify-content:center; gap:24px; flex-wrap:wrap; }
+.iv-sum-metric .sm-val { font-size:1.7rem; font-weight:800; color:#a5b4fc; }
+.iv-sum-metric .sm-lbl { font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; }
+
+/* ── Question bank ── */
+.iv-qbank-header {
+    display:flex; align-items:center; gap:10px; margin:8px 0 16px;
+}
+.iv-qbank-header h3 { margin:0; font-size:1.05rem; font-weight:700; }
+.iv-qbank-badge {
+    background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3);
+    color:#fcd34d; border-radius:99px; padding:2px 10px; font-size:0.72rem; font-weight:600;
+}
+.iv-skill-pill {
+    display:inline-block; background:rgba(99,102,241,0.12);
+    border:1px solid rgba(99,102,241,0.25); border-radius:99px;
+    padding:3px 11px; font-size:0.74rem; color:#a5b4fc; margin:0 4px 5px 0;
+}
+.iv-qbank-skill-header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 16px;
+    background:rgba(245,158,11,0.07); border-radius:12px 12px 0 0;
+    border:1px solid rgba(245,158,11,0.18); border-bottom:none;
+    font-size:0.85rem; font-weight:600; color:#fcd34d;
+}
+.iv-q-item {
+    background:rgba(255,255,255,0.025);
+    border:1px solid var(--border); border-top:none;
+    padding:11px 16px; font-size:0.85rem; color:var(--text-secondary); line-height:1.5;
+    transition:background 0.2s;
+    display:flex; gap:10px; align-items:flex-start;
+}
+.iv-q-item:last-child { border-radius:0 0 12px 12px; border-bottom:1px solid var(--border); }
+.iv-q-item:hover { background:rgba(245,158,11,0.04); }
+.iv-q-num {
+    min-width:22px; height:22px; border-radius:6px;
+    background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.25);
+    font-size:0.7rem; font-weight:700; color:#fcd34d;
+    display:flex; align-items:center; justify-content:center; margin-top:1px;
+}
+.iv-q-group { margin-bottom:16px; }
+
+/* legacy aliases kept for backwards compat */
+.score-chip { display:inline-block; padding:3px 10px; border-radius:99px; font-size:0.78rem; font-weight:600; }
+.score-high { background:rgba(16,185,129,0.15); color:#6ee7b7; border:1px solid rgba(16,185,129,0.3); }
+.score-mid  { background:rgba(245,158,11,0.15);  color:#fcd34d; border:1px solid rgba(245,158,11,0.3); }
+.score-low  { background:rgba(239,68,68,0.15);   color:#fca5a5; border:1px solid rgba(239,68,68,0.3); }
+.tip-box { background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2); border-radius:12px; padding:14px 18px; }
+.feedback-card { background:rgba(99,102,241,0.06); border:1px solid rgba(99,102,241,0.18); border-radius:12px; padding:14px 18px; margin:8px 0; }
+.skill-q-card  { background:rgba(245,158,11,0.05); border:1px solid rgba(245,158,11,0.18); border-radius:10px; padding:12px 16px; margin:6px 0; font-size:0.88rem; color:var(--text-secondary); }
+.interview-stat { background:rgba(255,255,255,0.03); border:1px solid var(--border-hi); border-radius:12px; padding:16px 10px; text-align:center; }
+.interview-stat .val { font-size:1.9rem; font-weight:800; color:#a5b4fc; }
+.interview-stat .lbl { font-size:0.72rem; color:var(--text-muted); margin-top:3px; }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -879,7 +1109,66 @@ def load_job_roles():
 
 def main():
     """Main Streamlit app."""
-    
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # AUTHENTICATION CHECK
+    # ══════════════════════════════════════════════════════════════════════════
+    if _AUTH_OK:
+        if not is_authenticated():
+            # Show authentication page (login/signup)
+            render_auth_page()
+            st.stop()  # Don't render the rest of the app
+        
+        # User is authenticated - get user info for personalization
+        current_user = get_current_user()
+    else:
+        current_user = None
+        # Auth module not available - continue without auth
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # USER WELCOME BAR (only shown when authenticated)
+    # ══════════════════════════════════════════════════════════════════════════
+    if current_user:
+        # Create a top bar with user info and logout
+        user_col1, user_col2, user_col3 = st.columns([3, 6, 3])
+        with user_col1:
+            st.markdown(f"""
+            <div style="
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 8px 0;
+            ">
+                <div style="
+                    width: 36px;
+                    height: 36px;
+                    background: linear-gradient(135deg, #6366f1, #818cf8);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 0.95rem;
+                    font-weight: 700;
+                    color: white;
+                ">{current_user['name'][0].upper()}</div>
+                <div>
+                    <div style="font-size: 0.85rem; font-weight: 600; color: #f1f5f9;">
+                        {current_user['name']}
+                    </div>
+                    <div style="font-size: 0.7rem; color: rgba(255,255,255,0.5);">
+                        {current_user.get('career_goal', '') or 'Career Explorer'}
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with user_col3:
+            logout_col1, logout_col2 = st.columns([2, 1])
+            with logout_col2:
+                if st.button("🚪 Logout", key="app_logout_btn", help="Sign out of your account"):
+                    logout()
+                    st.rerun()
+
     # ── App Header ──────────────────────────────────────────────────────────
     st.markdown("""
     <div class="main-header">
@@ -1192,10 +1481,12 @@ def main():
                     
                     col1, col2 = st.columns([3, 1])
                     with col1:
-                        title = exp.get('title', 'N/A')
-                        company = exp.get('company', '')
-                        if company:
+                        title = exp.get('title') or 'N/A'
+                        company = exp.get('company') or ''
+                        if company and title != 'N/A':
                             st.markdown(f"**{i}. {title}** at **{company}**")
+                        elif company:
+                            st.markdown(f"**{i}. {company}**")
                         else:
                             st.markdown(f"**{i}. {title}**")
                     
@@ -1227,8 +1518,8 @@ def main():
                 for i, edu in enumerate(education, 1):
                     st.markdown('<div class="education-card">', unsafe_allow_html=True)
                     
-                    degree = edu.get('degree', '')
-                    institution = edu.get('institution', '')
+                    degree = edu.get('degree') or ''
+                    institution = edu.get('institution') or ''
                     if degree and institution:
                         st.markdown(f"**{i}. {degree}** from **{institution}**")
                     elif degree:
@@ -2184,6 +2475,17 @@ Projects ({len(projects)}):
 
         # ── Silently resolve API key ───────────────────────────────────
         def _resolve_interview_provider() -> tuple[str, str]:
+            # 1. Mistral — always available via bundled default key
+            from src.api.mistral_client import _DEFAULT_KEY as _MISTRAL_DEFAULT
+            mistral_key = os.getenv("MISTRAL_API_KEY", "")
+            if not mistral_key:
+                try:    mistral_key = st.secrets.get("MISTRAL_API_KEY", "") or ""
+                except: mistral_key = ""
+            if not mistral_key:
+                mistral_key = _MISTRAL_DEFAULT
+            if mistral_key:
+                return "Mistral", mistral_key.strip()
+            # 2. Fallback to other configured providers
             for prov, env_name in [("Gemini","GOOGLE_GEMINI_API_KEY"),("OpenAI","OPENAI_API_KEY"),("SambaNova","SAMBANOVA_API_KEY")]:
                 key = os.getenv(env_name, "")
                 if not key:
@@ -2211,221 +2513,363 @@ Projects ({len(projects)}):
         state["api_key"]   = _api_key
 
         # derive stats
-        history   = state.get("history", [])
-        q_count   = sum(1 for m in history if m["role"] == "assistant"
-                        and not m["content"].startswith("**Feedback"))
-        a_count   = sum(1 for m in history if m["role"] == "user")
-        scores    = state.get("scores", [])
-        avg_score = round(sum(scores) / len(scores), 1) if scores else 0
+        history    = state.get("history", [])
+        q_count    = sum(1 for m in history if m["role"] == "assistant" and not m["content"].startswith("**Feedback"))
+        a_count    = sum(1 for m in history if m["role"] == "user")
+        scores     = state.get("scores", [])
+        avg_score  = round(sum(scores) / len(scores), 1) if scores else 0
+        best_score = max(scores) if scores else 0
+        _prov_icons = {"Mistral": "\U0001f525", "Gemini": "\u264a", "OpenAI": "\u26a1", "SambaNova": "\U0001f680"}
+        _provider_icon = _prov_icons.get(_ai_provider, "\U0001f916")
 
-        # ── Header banner ──────────────────────────────────────────
-        st.markdown(f"""
-        <div class="interview-header">
-            <span style="font-size:2rem">🧠</span>
-            <div>
-                <h2>AI Interview Simulator</h2>
-                <p>Role: <strong>{role_label}</strong> &nbsp;•&nbsp;
-                   Questions asked: <strong>{q_count}</strong> &nbsp;•&nbsp;
-                   Answers given: <strong>{a_count}</strong>
-                   {'&nbsp;&bull;&nbsp; Avg score: <strong>' + str(avg_score) + '/10</strong>' if avg_score else ''}
-                </p>
+        # ── Welcome Screen (not yet started) ────────────────────────
+        if not state.get("started"):
+            _prov_badge = f'<span class="iv-provider-badge">{_provider_icon} Powered by {_ai_provider} AI</span>'
+            st.markdown(f"""
+            <div class="iv-welcome-card">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+                    <div>
+                        <div class="iv-welcome-title">AI Mock Interview Simulator</div>
+                        <div class="iv-welcome-sub">Practice for <strong style="color:var(--text-primary)">{role_label}</strong> with real-time AI feedback and scoring.</div>
+                    </div>
+                    {_prov_badge}
+                </div>
+                <div class="iv-features-grid">
+                    <div class="iv-feature">
+                        <div class="iv-feature-icon">&#127919;</div>
+                        <div class="iv-feature-title">Role-Targeted Questions</div>
+                        <div class="iv-feature-desc">Questions tailored to your exact job role and identified skill gaps.</div>
+                    </div>
+                    <div class="iv-feature">
+                        <div class="iv-feature-icon">&#11088;</div>
+                        <div class="iv-feature-title">Live Answer Scoring</div>
+                        <div class="iv-feature-desc">Every answer rated 1&#8211;10 with structured feedback on strengths and improvements.</div>
+                    </div>
+                    <div class="iv-feature">
+                        <div class="iv-feature-icon">&#128172;</div>
+                        <div class="iv-feature-title">3-Part Feedback</div>
+                        <div class="iv-feature-desc">Breakdown: what worked, what to fix, and a pro interviewer tip.</div>
+                    </div>
+                    <div class="iv-feature">
+                        <div class="iv-feature-icon">&#128202;</div>
+                        <div class="iv-feature-title">Session Analytics</div>
+                        <div class="iv-feature-desc">Track your average score, best answer, and improvement trend.</div>
+                    </div>
+                </div>
+                <div class="iv-star-tip">
+                    <div class="iv-star-tip-title">Use the STAR Method for best results</div>
+                    <div class="iv-star-grid">
+                        <div class="iv-star-item"><strong>S &#8212; Situation</strong> Set the scene and context of your example.</div>
+                        <div class="iv-star-item"><strong>T &#8212; Task</strong> Describe your responsibility or challenge.</div>
+                        <div class="iv-star-item"><strong>A &#8212; Action</strong> Explain the specific steps you took.</div>
+                        <div class="iv-star-item"><strong>R &#8212; Result</strong> Share the measurable outcome achieved.</div>
+                    </div>
+                </div>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
 
-        # ── Stats row (shown after at least 1 turn) ──────────────────────
-        if a_count > 0:
-            sc1, sc2, sc3, sc4 = st.columns(4)
-            with sc1:
-                st.markdown(f'<div class="interview-stat"><div class="val">{q_count}</div><div class="lbl">Questions</div></div>', unsafe_allow_html=True)
-            with sc2:
-                st.markdown(f'<div class="interview-stat"><div class="val">{a_count}</div><div class="lbl">Answers</div></div>', unsafe_allow_html=True)
-            with sc3:
-                score_color = "#28a745" if avg_score >= 7 else "#ffc107" if avg_score >= 5 else "#dc3545"
-                st.markdown(f'<div class="interview-stat"><div class="val" style="color:{score_color}">{avg_score if avg_score else "-"}</div><div class="lbl">Avg Score /10</div></div>', unsafe_allow_html=True)
-            with sc4:
-                best = max(scores) if scores else 0
-                st.markdown(f'<div class="interview-stat"><div class="val" style="color:#7c83fd">{best if best else "-"}</div><div class="lbl">Best Score /10</div></div>', unsafe_allow_html=True)
-            st.write("")
+        # ── Session bar (active session) ─────────────────────────────
+        if state.get("started"):
+            _avg_pill = f'<div class="iv-meta-pill">Avg&nbsp;<span>{avg_score}/10</span></div>' if avg_score else ''
+            st.markdown(f"""
+            <div class="iv-session-bar">
+                <div class="iv-session-role">
+                    <div class="iv-role-icon">&#129504;</div>
+                    <div class="iv-role-text">
+                        <div class="role-name">{role_label}</div>
+                        <div class="role-sub">Mock Interview Session</div>
+                    </div>
+                </div>
+                <div class="iv-session-meta">
+                    <div class="iv-meta-pill">Questions&nbsp;<span>{q_count}</span></div>
+                    <div class="iv-meta-pill">Answers&nbsp;<span>{a_count}</span></div>
+                    {_avg_pill}
+                    <span class="iv-provider-badge">{_provider_icon} {_ai_provider}</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            # Stats row + progress bar
+            if a_count > 0:
+                _sc = "#10b981" if avg_score >= 7 else "#f59e0b" if avg_score >= 5 else "#ef4444"
+                st.markdown(f"""
+                <div class="iv-stats-row">
+                    <div class="iv-stat" style="--iv-stat-color:#6366f1">
+                        <div class="s-icon">&#10067;</div>
+                        <div class="s-val">{q_count}</div>
+                        <div class="s-lbl">Questions</div>
+                    </div>
+                    <div class="iv-stat" style="--iv-stat-color:#06b6d4">
+                        <div class="s-icon">&#128172;</div>
+                        <div class="s-val">{a_count}</div>
+                        <div class="s-lbl">Answers</div>
+                    </div>
+                    <div class="iv-stat" style="--iv-stat-color:{_sc}">
+                        <div class="s-icon">&#11088;</div>
+                        <div class="s-val" style="color:{_sc}">{avg_score if avg_score else "&#8212;"}</div>
+                        <div class="s-lbl">Avg Score /10</div>
+                    </div>
+                    <div class="iv-stat" style="--iv-stat-color:#6366f1">
+                        <div class="s-icon">&#127942;</div>
+                        <div class="s-val" style="color:#6366f1">{best_score if best_score else "&#8212;"}</div>
+                        <div class="s-lbl">Best Score</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                _pct = min(a_count / 10 * 100, 100)
+                st.markdown(f"""
+                <div class="iv-progress-wrap">
+                    <div class="iv-progress-label">
+                        <span>Session Progress</span><span>{a_count}/10 answers</span>
+                    </div>
+                    <div class="iv-progress-track">
+                        <div class="iv-progress-fill" style="width:{_pct:.0f}%"></div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
 
         # ── Controls row ────────────────────────────────────────────
-        btn_col, role_col, clear_col = st.columns([2, 3, 1])
-        with btn_col:
-            start_clicked = st.button("▶️ Start / Restart Interview", use_container_width=True)
-        with role_col:
-            st.text_input("Interviewing for", value=role_label, disabled=True, label_visibility="collapsed")
-        with clear_col:
-            if st.button("🔄 Clear", use_container_width=True, help="Clear chat history"):
-                st.session_state.interview_state = {
-                    "started": False, "role": role_label,
-                    "current_question": "", "history": [], "scores": [],
-                    "provider": _ai_provider, "api_key": _api_key,
-                }
-                st.rerun()
+        if not state.get("started"):
+            _c1, _c2 = st.columns([3, 1])
+            with _c1:
+                start_clicked = st.button("▶️ Start / Restart Interview", use_container_width=True)
+            with _c2:
+                if st.button('Reset', use_container_width=True, key='iv_reset_welcome'):
+                    st.session_state.interview_state = {
+                        'started': False, 'role': role_label, 'current_question': '',
+                        'history': [], 'scores': [], 'provider': _ai_provider, 'api_key': _api_key,
+                    }
+                    st.rerun()
+        else:
+            start_clicked = False
+            _cr1, _cr2 = st.columns([1, 1])
+            with _cr1:
+                if st.button('Restart Interview', use_container_width=True):
+                    with st.spinner('Restarting interview...'):
+                        try:
+                            _fq = start_interview(role=role_label, provider=_ai_provider, api_key=_api_key)
+                            st.session_state.interview_state = {
+                                'started': True, 'role': role_label, 'provider': _ai_provider,
+                                'api_key': _api_key, 'current_question': _fq,
+                                'history': [{'role': 'assistant', 'content': _fq}], 'scores': [],
+                            }
+                            st.rerun()
+                        except Exception as _re:
+                            st.error(f'Could not restart: {_re}')
+            with _cr2:
+                if st.button('Clear & Exit', use_container_width=True):
+                    st.session_state.interview_state = {
+                        'started': False, 'role': role_label, 'current_question': '',
+                        'history': [], 'scores': [], 'provider': _ai_provider, 'api_key': _api_key,
+                    }
+                    st.rerun()
 
+        # Start handler
         if start_clicked:
             if not _ai_ready:
-                st.error("❌ AI service is not configured. Contact the administrator.")
+                st.error('AI service is not configured.')
             else:
-                with st.spinner("🎬 Starting your interview..."):
+                with st.spinner('Starting your interview...'):
                     try:
                         first_q = start_interview(role=role_label, provider=_ai_provider, api_key=_api_key)
                         st.session_state.interview_state = {
-                            "started": True, "role": role_label,
-                            "provider": _ai_provider, "api_key": _api_key,
-                            "current_question": first_q,
-                            "history": [{"role": "assistant", "content": first_q}],
-                            "scores": [],
+                            'started': True, 'role': role_label,
+                            'provider': _ai_provider, 'api_key': _api_key,
+                            'current_question': first_q,
+                            'history': [{'role': 'assistant', 'content': first_q}],
+                            'scores': [],
                         }
                         st.rerun()
                     except Exception as e:
                         _em = str(e)
-                        if "quota" in _em.lower() or "429" in _em:
-                            st.error("⚠️ AI service is temporarily at capacity. Please try again in a moment.")
-                        elif "401" in _em or "403" in _em:
-                            st.error("❌ AI authentication failed. Please contact the administrator.")
+                        if 'quota' in _em.lower() or '429' in _em:
+                            st.error('AI is temporarily at capacity. Please retry.')
+                        elif '401' in _em or '403' in _em:
+                            st.error('AI authentication failed.')
                         else:
-                            st.error(f"❌ Could not start interview: {_em}")
+                            st.error(f'Could not start interview: {_em}')
 
-        # ── Tips box (before first start) ───────────────────────────
-        if not state.get("started"):
-            st.markdown("""
-            <div class="tip-box">
-            <strong>💡 Tips for a great interview:</strong>
-            <ul style="margin:6px 0 0 0; padding-left:18px;">
-                <li>Answer with real examples using the STAR method (Situation, Task, Action, Result).</li>
-                <li>Keep answers concise — 2-4 sentences per point.</li>
-                <li>It’s okay to say “I’m not sure, but I would approach it by...”</li>
-                <li>Complete the Skill Gaps tab first for more targeted questions.</li>
-            </ul>
-            </div>
-            """, unsafe_allow_html=True)
-            st.write("")
+        # Chat history
+        if state.get('started') and state.get('history'):
+            for msg in state['history']:
+                role_msg = msg.get('role', 'assistant')
+                content  = msg.get('content', '')
+                score    = msg.get('score', 0)
 
-        # ── Chat history ────────────────────────────────────────────
-        if state.get("started") and state.get("history"):
-            for msg in state["history"]:
-                role_msg = msg.get("role", "assistant")
-                content  = msg.get("content", "")
-                score    = msg.get("score", 0)
-
-                if role_msg == "user":
-                    st.chat_message("user").write(content)
-                elif content.startswith("**Feedback"):
-                    # Render feedback as a styled card
-                    with st.chat_message("assistant"):
-                        lines = content.replace("**Feedback:**\n", "").strip().split("\n")
-                        bullet_html = "".join(
-                            f"<li>{ln.lstrip('- ').strip()}</li>"
-                            for ln in lines if ln.strip()
-                        )
-                        score_html = ""
-                        if score and int(score) > 0:
-                            sc_class = "score-high" if score >= 7 else "score-mid" if score >= 5 else "score-low"
-                            score_html = f'<span class="score-chip {sc_class}">⭐ Score: {score}/10</span>'
-                        st.markdown(f"""
-                        <div class="feedback-card">
-                            <strong>💬 Feedback</strong> {score_html}
-                            <ul>{bullet_html}</ul>
-                        </div>
-                        """, unsafe_allow_html=True)
+                if role_msg == 'user':
+                    st.markdown(
+                        f'<div class="iv-chat-a"><div class="iv-bubble">'
+                        f'<div class="q-label">Your Answer</div>{content}</div>'
+                        f'<div class="iv-avatar">U</div></div>',
+                        unsafe_allow_html=True,
+                    )
+                elif content.startswith('**Feedback'):
+                    raw_fb   = content.replace('**Feedback:**\n', '').strip()
+                    fb_lines = [ln.strip() for ln in raw_fb.splitlines() if ln.strip()]
+                    n        = len(fb_lines)
+                    third    = max(1, n // 3)
+                    def _li(items):
+                        return ''.join(f'<li>{ln.lstrip("- ").strip()}</li>' for ln in items if ln)
+                    s_html  = _li(fb_lines[:third])
+                    i_html  = _li(fb_lines[third:third*2])
+                    t_html  = _li(fb_lines[third*2:])
+                    sc_cls  = 'iv-sc-high' if score >= 7 else ('iv-sc-mid' if score >= 5 else 'iv-sc-low')
+                    sc_chip = (f'<span class="iv-score-chip {sc_cls}">{score}/10</span>'
+                               if score and int(score) > 0 else '')
+                    tip_sec = (f'<div class="iv-fb-section iv-fb-tip">'
+                               f'<div class="iv-fb-label">Pro Tip</div>'
+                               f'<div class="iv-fb-text">'
+                               f'<ul style="margin:0;padding-left:16px">{t_html}</ul></div></div>'
+                               if t_html else '')
+                    fb_html = (
+                        f'<div class="iv-feedback-wrap"><div class="iv-feedback-card">'
+                        f'<div class="iv-feedback-header">'
+                        f'<span class="fb-title">Interviewer Feedback</span>{sc_chip}</div>'
+                        f'<div class="iv-feedback-body">'
+                        f'<div class="iv-fb-section iv-fb-strength">'
+                        f'<div class="iv-fb-label">Strengths</div>'
+                        f'<div class="iv-fb-text">'
+                        f'<ul style="margin:0;padding-left:16px">{s_html}</ul></div></div>'
+                        f'<div class="iv-fb-section iv-fb-improve">'
+                        f'<div class="iv-fb-label">Improvements</div>'
+                        f'<div class="iv-fb-text">'
+                        f'<ul style="margin:0;padding-left:16px">{i_html}</ul></div></div>'
+                        f'{tip_sec}</div></div></div>'
+                    )
+                    st.markdown(fb_html, unsafe_allow_html=True)
                 else:
-                    st.chat_message("assistant").write(content)
+                    st.markdown(
+                        f'<div class="iv-chat-q"><div class="iv-avatar">AI</div>'
+                        f'<div class="iv-bubble">'
+                        f'<div class="q-label">Interviewer Question</div>{content}</div></div>',
+                        unsafe_allow_html=True,
+                    )
+
+            # Session summary after 5+ answers
+            if a_count >= 5:
+                grade = 'Excellent' if avg_score >= 8 else ('Good' if avg_score >= 6 else 'Needs Practice')
+                gc    = '#10b981' if avg_score >= 8 else ('#f59e0b' if avg_score >= 6 else '#ef4444')
+                sm = (
+                    f'<div class="iv-summary-card"><h3>Session Snapshot</h3>'
+                    f'<p>Based on {a_count} answers so far</p>'
+                    f'<div class="iv-summary-metrics">'
+                    f'<div class="iv-sum-metric">'
+                    f'<div class="sm-val">{a_count}</div>'
+                    f'<div class="sm-lbl">Answers</div></div>'
+                    f'<div class="iv-sum-metric">'
+                    f'<div class="sm-val" style="color:{gc}">{avg_score}/10</div>'
+                    f'<div class="sm-lbl">Avg score</div></div>'
+                    f'<div class="iv-sum-metric">'
+                    f'<div class="sm-val" style="color:#6366f1">{best_score}/10</div>'
+                    f'<div class="sm-lbl">Best score</div></div>'
+                    f'<div class="iv-sum-metric">'
+                    f'<div class="sm-val" style="color:{gc}">{grade}</div>'
+                    f'<div class="sm-lbl">Overall grade</div></div>'
+                    f'</div></div>'
+                )
+                st.markdown(sm, unsafe_allow_html=True)
 
             # Answer input
-            user_answer = st.chat_input(f"Your answer for the {role_label} interview...")
+            user_answer = st.chat_input(f'Type your answer for the {role_label} interview...')
             if user_answer:
-                state["history"].append({"role": "user", "content": user_answer})
-                with st.spinner("🤔 Evaluating your answer..."):
+                state['history'].append({'role': 'user', 'content': user_answer})
+                with st.spinner('Analysing your answer...'):
                     try:
                         result = interview_turn(
-                            role=state.get("role", role_label),
-                            question=state.get("current_question", ""),
+                            role=state.get('role', role_label),
+                            question=state.get('current_question', ''),
                             answer=user_answer,
                             missing_skills=missing_skills if missing_skills else None,
-                            provider=state.get("provider", _ai_provider),
-                            api_key=state.get("api_key") or _api_key,
+                            provider=state.get('provider', _ai_provider),
+                            api_key=state.get('api_key') or _api_key,
                         )
-                        feedback  = result.get("feedback", "").strip()
-                        next_q    = result.get("next_question", "").strip()
-                        score_val = int(result.get("score", 0) or 0)
-
+                        feedback  = result.get('feedback', '').strip()
+                        next_q    = result.get('next_question', '').strip()
+                        score_val = int(result.get('score', 0) or 0)
                         if score_val > 0:
-                            state.setdefault("scores", []).append(score_val)
-
+                            state.setdefault('scores', []).append(score_val)
                         if feedback:
-                            state["history"].append({
-                                "role": "assistant",
-                                "content": f"**Feedback:**\n{feedback}",
-                                "score": score_val,
+                            state['history'].append({
+                                'role': 'assistant',
+                                'content': f'**Feedback:**\n{feedback}',
+                                'score': score_val,
                             })
                         if next_q:
-                            state["current_question"] = next_q
-                            state["history"].append({"role": "assistant", "content": next_q})
-
+                            state['current_question'] = next_q
+                            state['history'].append({'role': 'assistant', 'content': next_q})
                         st.session_state.interview_state = state
                         st.rerun()
                     except Exception as e:
                         _msg = str(e)
-                        if "quota" in _msg.lower() or "429" in _msg:
-                            st.error("⚠️ AI service is temporarily unavailable. Please try again in a moment.")
+                        if 'quota' in _msg.lower() or '429' in _msg:
+                            st.error('AI quota reached. Please retry.')
                         else:
-                            st.error(f"❌ Error processing answer: {_msg}")
+                            st.error(f'Error: {_msg}')
 
-        # ── Skill-Based Question Generator ────────────────────────────
-        st.divider()
-        st.markdown("### 🧩 Skill-Based Question Bank")
-        st.caption("AI-generated practice questions targeted at your identified skill gaps.")
+        # Skill-Based Question Bank
+        st.markdown('<div class="section-sep"></div>', unsafe_allow_html=True)
+        st.markdown('<div class="iv-qbank-header"><h3>Skill-Based Question Bank</h3></div>',
+                    unsafe_allow_html=True)
+        st.caption('AI-generated practice questions targeted at your skill gaps.')
 
         if not missing_skills:
-            st.caption("Complete Skill Gaps (Tab 3) first to unlock targeted practice questions.")
+            st.info('Complete the **Skill Gaps** tab first to unlock targeted practice questions.')
         else:
-            # Skill gap badges
-            badges = "".join(
-                f'<span class="skill-badge">{s}</span>'
-                for s in missing_skills[:12]
+            pills_html = ''.join(
+                f'<span class="iv-skill-pill">{s}</span>' for s in missing_skills[:14]
             )
-            st.markdown(f'<div style="margin-bottom:10px">{badges}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div style="margin-bottom:12px">{pills_html}</div>',
+                        unsafe_allow_html=True)
 
-            qps = st.select_slider(
-                "Questions per skill",
-                options=[1, 2, 3, 4, 5],
-                value=3,
-                help="Number of practice questions to generate per skill gap"
-            )
-            if st.button("⚡ Generate Question Bank", use_container_width=False):
+            qcol1, qcol2 = st.columns([2, 1])
+            with qcol1:
+                qps = st.select_slider('Questions per skill', options=[1, 2, 3, 4, 5], value=3)
+            with qcol2:
+                st.write('')
+                gen_clicked = st.button('Generate Question Bank', use_container_width=True, type='primary')
+
+            if gen_clicked:
                 if not _ai_ready:
-                    st.error("❌ AI service is not configured. Contact the administrator.")
+                    st.error('AI service not configured.')
                 else:
-                    with st.spinner(f"Generating {qps} questions per skill..."):
+                    with st.spinner(f'Generating {qps} questions per skill...'):
                         try:
                             questions_by_skill = generate_skill_questions(
-                                role=role_label,
-                                missing_skills=missing_skills,
+                                role=role_label, missing_skills=missing_skills,
                                 questions_per_skill=int(qps),
-                                provider=_ai_provider,
-                                api_key=_api_key,
+                                provider=_ai_provider, api_key=_api_key,
                             )
                             st.session_state.analysis_results['skill_questions'] = questions_by_skill
-                            st.caption(f"✅ Generated questions for {len(questions_by_skill)} skills.")
+                            st.rerun()
                         except Exception as e:
                             _em = str(e)
-                            if "quota" in _em.lower() or "429" in _em:
-                                st.error("⚠️ AI quota reached. Please try again later.")
+                            if 'quota' in _em.lower() or '429' in _em:
+                                st.error('Quota reached. Please try again later.')
                             else:
-                                st.error(f"❌ {_em}")
+                                st.error(f'Error: {_em}')
 
-            questions_by_skill = st.session_state.analysis_results.get('skill_questions')
+            questions_by_skill = st.session_state.get('analysis_results', {}).get('skill_questions')
             if questions_by_skill:
                 total_q = sum(len(v) for v in questions_by_skill.values())
-                st.caption(f"📚 **{total_q} questions** across **{len(questions_by_skill)} skills**")
+                st.markdown(
+                    f'<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">'
+                    f'<strong style="color:var(--text-primary)">{total_q} questions</strong> across '
+                    f'<strong style="color:var(--text-primary)">{len(questions_by_skill)} skills</strong></div>',
+                    unsafe_allow_html=True,
+                )
                 for skill, qs in questions_by_skill.items():
-                    with st.expander(f"🎯  {skill}  ({len(qs)} questions)", expanded=False):
-                        for idx, q in enumerate(qs, 1):
-                            st.markdown(
-                                f'<div class="skill-q-card"><strong>Q{idx}.</strong> {q}</div>',
-                                unsafe_allow_html=True
-                            )
+                    q_items = ''.join(
+                        f'<div class="iv-q-item"><div class="iv-q-num">Q{i}</div><div>{q}</div></div>'
+                        for i, q in enumerate(qs, 1)
+                    )
+                    st.markdown(
+                        f'<div class="iv-q-group">'
+                        f'<div class="iv-qbank-skill-header">{skill} '
+                        f'<span style="font-size:0.75rem;font-weight:400;color:var(--text-muted)">'
+                        f'({len(qs)} questions)</span></div>'
+                        f'{q_items}</div>',
+                        unsafe_allow_html=True,
+                    )
 
     # ── Tab 8: Tracking & History ──────────────────────────────────────────
     with tab8:

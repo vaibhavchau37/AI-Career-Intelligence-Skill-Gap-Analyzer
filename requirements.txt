@@ -26,6 +26,14 @@ sentence-transformers>=2.2.0
 # Web UI
 streamlit>=1.25.0
 
+# FastAPI Backend (Login / Signup API)
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.9   # required for OAuth2 form data
+pydantic[email]>=2.0.0    # Pydantic v2 with email validation
+PyJWT>=2.8.0              # JWT encode / decode
+bcrypt>=4.0.0             # Secure password hashing
+
 # API Integration
 requests>=2.31.0
 
